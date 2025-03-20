@@ -71,11 +71,11 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "MauiCleanTodos.WebUI:build:production"
+              "buildTarget": "MauiCleanTodos.WebUI:build:production"
             },
             "development": {
-              "browserTarget": "MauiCleanTodos.WebUI:build:development",
-              "proxyConfig": "proxy.conf.js"
+              "proxyConfig": "proxy.conf.js",
+              "buildTarget": "MauiCleanTodos.WebUI:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "MauiCleanTodos.WebUI:build"
+            "buildTarget": "MauiCleanTodos.WebUI:build"
           }
         },
         "test": {
@@ -116,7 +116,8 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": true
+              "vendorChunk": true,
+              "buildOptimizer": true
             },
             "production": {
               "optimization": true,
@@ -124,12 +125,12 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false
+              "vendorChunk": false,
+              "buildOptimizer": true
             }
           }
         }
       }
     }
-  },
-  "defaultProject": "MauiCleanTodos.WebUI"
+  }
 }
