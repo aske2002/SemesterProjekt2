@@ -9,7 +9,7 @@
     Title="Tremorur">
 
     <ShellContent
-        Title="Hej2"
+        Title="Test"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
