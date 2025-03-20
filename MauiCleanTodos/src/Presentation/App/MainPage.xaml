@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:system="clr-namespace:System;assembly=netstandard"
+             xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:MauiCleanTodos.App.Converters"
+             x:Name="TodoListsPage"
+             x:Class="MauiCleanTodos.App.MainPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <mct:InvertedBoolConverter x:Key="InverseBool"/>
+            <converters:ListColourToColorConverter x:Key="ListColourToColor"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="8*, 20*"
+          HorizontalOptions="Fill"
+          VerticalOptions="Fill">
+        <Ellipse Grid.Row="0"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 WidthRequest="530"
+                 HeightRequest="560"
+                 TranslationY="-200">
+            <Ellipse.Fill>
+                <LinearGradientBrush StartPoint="1,0.5"
+                                     EndPoint="0,0.5">
+                    <GradientStop Color="{StaticResource BallGradientStart}"
+                                  Offset="0"/>
+                    <GradientStop Color="{StaticResource BallGradientEnd}"
+                                  Offset="1"/>
+                </LinearGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+
+        <BoxView Grid.Row="0"
+                 VerticalOptions="Start"
+                 HeightRequest="54"
+                 BackgroundColor="Black"
+                 Opacity="0.15"/>
+
+        <Grid x:Name="LoginDisplay"
+              Padding="0,10,0,0"
+              IsVisible="{Binding LoggedIn}"
+              ColumnDefinitions="2*,6*,2*">
+            <Label Grid.Column="1"
+                   Text="{Binding UserName, StringFormat='Welcome, {0}!'}"
+                   TextColor="White"
+                   FontFamily="Viga"
+                   FontSize="20"
+                   HorizontalOptions="Center">
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Label.Shadow>
+            </Label>
+
+            <Label Grid.Column="2"
+                   TextColor="{StaticResource OffWhite}"
+                   FontSize="Title"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Text="&#xe0c4;"
+                   FontFamily="FluentIcons">
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Label.Shadow>
+            </Label>
+        </Grid>
+
+        <FlexLayout Grid.Row="0"
+                    VerticalOptions="End"
+                    JustifyContent="SpaceBetween">
+            <Image Source="todo_bot"
+                   HeightRequest="200"
+                   WidthRequest="200">
+                <Image.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Image.Shadow>
+            </Image>
+
+            <Label TextColor="{StaticResource OffWhite}"
+                   HorizontalOptions="End"
+                   HorizontalTextAlignment="End"
+                   Margin="20"
+                   VerticalOptions="Center"
+                   FontSize="48"
+                   FontFamily="Viga">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="MAUI"
+                              FontFamily="Viga"/>
+                        <Span Text="{x:Static system:Environment.NewLine}"/>
+                        <Span Text="Todo"
+                              FontFamily="Viga"/>
+                    </FormattedString>
+                </Label.FormattedText>
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Label.Shadow>
+            </Label>
+        </FlexLayout>
+
+        <VerticalStackLayout Grid.Row="1"
+                             x:Name="WelcomStack"
+                             IsVisible="{Binding LoggedIn, Converter={StaticResource InverseBool}}"
+                             Margin="0,50,0,0"
+                             Spacing="80">
+
+            <Label FontFamily="Viga"
+                   FontSize="48"
+                   TextColor="{StaticResource OffWhite}"
+                   HorizontalTextAlignment="Center"
+                   Text="Welcome!">
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Label.Shadow>
+            </Label>
+
+            <Label FontFamily="Viga"
+                   FontSize="24"
+                   TextColor="{StaticResource OffWhite}"
+                   HorizontalTextAlignment="Center"
+                   Text="Login to get started">
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Label.Shadow>
+            </Label>
+
+            <Button WidthRequest="130"
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    Text="Login"
+                    Command="{Binding LoginCommand}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource OffWhite}"
+                    BackgroundColor="{StaticResource Primary}"
+                    FontSize="16">
+                <Button.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Button.Shadow>
+            </Button>
+
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="40"
+                             IsVisible="{Binding LoggedIn}">
+
+            <Button WidthRequest="130"
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    Text="+ Add list"
+                    Command="{Binding AddListCommand}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    TextColor="{StaticResource OffWhite}"
+                    BackgroundColor="{StaticResource Primary}"
+                    FontSize="16">
+                <Button.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="10,10"
+                            Radius="10"
+                            Opacity="0.5" />
+                </Button.Shadow>
+            </Button>
+
+            <CollectionView ItemsSource="{Binding TodoLists}"
+                            HeightRequest="500"
+                            VerticalOptions="Center">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Reveal">
+                                    <SwipeItem IconImageSource="delete"
+                                               BackgroundColor="Transparent"
+                                               Command="{Binding Path=BindingContext.DeleteCommand, Source={x:Reference Name=TodoListsPage}}"
+                                               CommandParameter="{Binding Id}"/>
+                                </SwipeItems> 
+                            </SwipeView.RightItems>
+                            <Grid HeightRequest="100">
+                                <Button BackgroundColor="{Binding Colour, Converter={StaticResource ListColourToColor}}"
+                                        HeightRequest="70"
+                                        WidthRequest="300"
+                                        CornerRadius="35"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        Command="{Binding Path=BindingContext.ShowListCommand, Source={x:Reference Name=TodoListsPage}}"
+                                        CommandParameter="{Binding Id}"
+                                        TextColor="Black"
+                                        Text="{Binding Title}">
+                                    <Button.Shadow>
+                                        <Shadow Brush="Black"
+                                                Offset="10,10"
+                                                Radius="10"
+                                                Opacity="0.5" />
+                                    </Button.Shadow>
+                                </Button>
+                            </Grid>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+
+        <ActivityIndicator Color="{StaticResource Primary}"
+                           Grid.Row="1"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           WidthRequest="50"
+                           HeightRequest="50"
+                           IsRunning="True"
+                           IsVisible="{Binding IsBusy}"/>
+
+    </Grid>
+
+</ContentPage>

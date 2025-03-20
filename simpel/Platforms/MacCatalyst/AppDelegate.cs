@@ -37,12 +37,11 @@ public class AppDelegate : MauiUIApplicationDelegate
 		if (windowScene.Titlebar != null)
 		{
 			windowScene.Titlebar.TitleVisibility = UITitlebarTitleVisibility.Hidden;
+			
 		}
-
+		
 		window.BackgroundColor = UIColor.Clear;
 		window.Layer.CornerRadius = 200;
-		window.Layer.MasksToBounds = true;
-		window.BackgroundColor = UIColor.Clear;
 		window.MakeKeyAndVisible();
 		window.Opaque = true;
 
