@@ -36,7 +36,7 @@
               "RelativeDocumentMoniker": "simpel\\AppShell.xaml",
               "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
               "RelativeToolTip": "simpel\\AppShell.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-03-18T10:46:34.031Z",
               "EditorCaption": ""
@@ -51,8 +51,7 @@
               "RelativeToolTip": "simpel\\MainPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-03-18T10:45:40.116Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-18T10:45:40.116Z"
             },
             {
               "$type": "Document",
@@ -64,8 +63,7 @@
               "RelativeToolTip": "simpel\\MainPage.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-18T10:45:30.274Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-18T10:45:30.274Z"
             },
             {
               "$type": "Document",
@@ -77,8 +75,7 @@
               "RelativeToolTip": "simpel\\App.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-18T10:45:19.086Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-18T10:45:19.086Z"
             }
           ]
         }
