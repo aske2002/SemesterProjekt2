@@ -1,0 +1,50 @@
+﻿using Microsoft.Extensions.Logging;
+using tremorur.Messages;
+
+namespace tremorur
+{
+    public static partial class MauiProgram
+    {
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
+            builder.UseMauiApp<App>()
+                   .ConfigureFonts(fonts =>
+                   {
+                       fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                       fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
+                   });
+
+            builder.Services.AddSingleton<IDialogService, DialogService>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
+
+            builder.Services.AddSingleton<EventsViewModel>();
+            builder.Services.AddSingleton<EventsPage>();
+            builder.Services.AddSingleton<SearchViewModel>();
+            builder.Services.AddSingleton<SearchPage>();
+            builder.Services.AddSingleton<SettingsViewModel>();
+            builder.Services.AddSingleton<SettingsPage>();
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<NewEventViewModel>();
+            builder.Services.AddTransient<NewEventPage>();
+
+            // Manually create LoggerFactory and Logger
+            using var loggerFactory = LoggerFactory.Create(logging =>
+            {
+                logging.AddConsole(); // Add console logging or other providers
+#if DEBUG
+                logging.AddDebug();
+#endif
+            });
+            // Register the logger factory in services, so it's available later
+            builder.Services.AddSingleton<ILoggerFactory>(loggerFactory);
+            var messenger = new DefaultMessenger(loggerFactory.CreateLogger<DefaultMessenger>());
+            builder.Services.AddSingleton<Services.IMessenger>(messenger);
+
+            var mauiApp = builder.Build();
+            messenger.Send<AppBuilt>(new(mauiApp.Services));
+            return mauiApp;
+        }
+    }
+}

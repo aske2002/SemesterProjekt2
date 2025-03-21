@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using MauiCleanTodos.ApiClient;
 using MauiCleanTodos.App.Controls;
+using MauiCleanTodos.Infrastructure.Identity
 
 namespace MauiCleanTodos.App;
 
@@ -24,12 +25,14 @@ public static partial class MauiProgram
 
 		builder.Services.RegisterMauiClient(opt =>
 		{
-            opt.Authority	= "https://569a-163-53-144-8.ngrok-free.app";
-            opt.BaseUrl		= "https://569a-163-53-144-8.ngrok-free.app";
-            opt.ClientId	= "mctmobileapp";
-            opt.RedirectUri = "auth.com.goldie.mauicleantodos.app://callback";
-            opt.Scope		= "MauiCleanTodos.WebUIAPI openid profile offline_access";
-        });
+			opt.Authority = "https://localhost:44447";
+			opt.BaseUrl = "https://localhost:44447";
+			opt.ClientId = "mctmobileapp";
+			opt.RedirectUri = "auth.com.goldie.mauicleantodos.app://callback";
+			opt.Scope = "MauiCleanTodos.WebUIAPI openid profile offline_access";
+		});
+
+		builder.Services.AddInfrastructureServices(builder.Configuration);
 
 		builder.Services.AddSingleton<IBottomSheet, BottomSheetControl>();
 
