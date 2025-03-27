@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,7 @@ namespace tremorur.Views
     public partial class HomePage : ContentPage
     {
         private readonly ILogger _logger;
-        public HomePage(HomeViewModel viewModel, ILogger logger)
+        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger)
         {
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
@@ -33,7 +33,7 @@ namespace tremorur.Views
         }
         void OnNedClicked(object sender, EventArgs e)
         {
-            if(level>1)
+            if (level > 1)
             {
                 level--;
                 UpdateLevelLabel();
@@ -43,7 +43,7 @@ namespace tremorur.Views
         {
             LevelLabel.Text = $"Level:{level}";
             OpBtn.IsEnabled = level < 7;
-            NedBtn.IsEnabled = level >1;
+            NedBtn.IsEnabled = level > 1;
         }
         async void OnOkClicked(object sender, EventArgs e)
         {

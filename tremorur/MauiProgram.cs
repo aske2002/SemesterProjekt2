@@ -57,7 +57,7 @@ namespace tremorur
             builder.Services.AddTransient<NewEventPage>();
 
             // Manually create LoggerFactory and Logger
-            using var loggerFactory = LoggerFactory.Create(logging =>
+            var loggerFactory = LoggerFactory.Create(logging =>
             {
                 logging.AddConsole(); // Add console logging or other providers
 #if DEBUG

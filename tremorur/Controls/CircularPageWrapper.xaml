@@ -8,12 +8,20 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.Clip>
             <EllipseGeometry x:Name="EllipseClip"/>
         </Grid.Clip>
 
-        <ContentPresenter Grid.Column="0"
+        <ContentPresenter x:Name="ContentHolder"
+                          Grid.RowSpan="3"
                           Grid.ColumnSpan="3"
-                          x:Name="ContentHolder"/>
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"/>
+
     </Grid>
 </ContentView>
