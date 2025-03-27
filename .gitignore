@@ -4,3 +4,4 @@ obj
 .vs/slnx.sqlite
 .vs/SemesterProjekt2/FileContentIndex/86c830f6-4ae9-4985-b52f-e2755a28a838.vsidx
 *.vsidx
+*/**/.vs/
