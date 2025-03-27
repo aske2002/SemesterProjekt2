@@ -3,20 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:simpel\\AppShell.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\MauiProgram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tremorur\\MauiProgram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:simpel\\MainPage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tremorur\\tremorur.csproj.user||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:simpel\\MainPage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:tremorur\\tremorur.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:simpel\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,48 +39,84 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AppShell.xaml",
-              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
-              "RelativeDocumentMoniker": "simpel\\AppShell.xaml",
-              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
-              "RelativeToolTip": "simpel\\AppShell.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-03-18T10:46:34.031Z",
+              "Title": "MauiProgram.cs",
+              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\MauiProgram.cs",
+              "RelativeDocumentMoniker": "tremorur\\MauiProgram.cs",
+              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\MauiProgram.cs",
+              "RelativeToolTip": "tremorur\\MauiProgram.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABEAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-27T08:00:53.184Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "tremorur.csproj.user",
+              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj.user",
+              "RelativeDocumentMoniker": "tremorur\\tremorur.csproj.user",
+              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj.user",
+              "RelativeToolTip": "tremorur\\tremorur.csproj.user",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003464|",
+              "WhenOpened": "2025-03-27T07:29:37.046Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "tremorur.csproj",
+              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj",
+              "RelativeDocumentMoniker": "tremorur\\tremorur.csproj",
+              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\tremorur\\tremorur.csproj",
+              "RelativeToolTip": "tremorur\\tremorur.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-03-27T07:29:23.547Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AppShell.xaml",
+              "DocumentMoniker": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
+              "ToolTip": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\AppShell.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-18T10:46:34.031Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "MainPage.xaml",
-              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
-              "RelativeDocumentMoniker": "simpel\\MainPage.xaml",
-              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
-              "RelativeToolTip": "simpel\\MainPage.xaml",
+              "DocumentMoniker": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
+              "ToolTip": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-03-18T10:45:40.116Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "MainPage.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
-              "RelativeDocumentMoniker": "simpel\\MainPage.xaml.cs",
-              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
-              "RelativeToolTip": "simpel\\MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
+              "ToolTip": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\MainPage.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-18T10:45:30.274Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "App.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
-              "RelativeDocumentMoniker": "simpel\\App.xaml.cs",
-              "ToolTip": "C:\\Users\\csgos\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
-              "RelativeToolTip": "simpel\\App.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
+              "ToolTip": "C:\\Users\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\cecil\\OneDrive\\Dokumenter\\GitHub\\SemesterProjekt2\\simpel\\App.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-18T10:45:19.086Z"

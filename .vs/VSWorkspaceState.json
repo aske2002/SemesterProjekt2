@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ParkinsonsUrMaui"
+    "\\tremorur",
+    "\\tremorur\\ViewModels"
   ],
-  "SelectedNode": "\\ParkinsonsUrMaui\\MauiCleanTodos.sln",
+  "SelectedNode": "\\tremorur\\MauiProgram.cs",
   "PreviewInSolutionExplorer": false
 }
