@@ -20,8 +20,8 @@
                     <Label
                         x:Name="ClockLabel"
                         Text="00:00"
-                        FrontSize="60"
-                        FrontAttributes="Bold"
+                        FontSize="Title"
+                        FontAttributes="Bold"
                         TextColor="Blue"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"/>
@@ -29,8 +29,8 @@
                     <Label
                         x:Name="LevelLabel"
                         Text="Level: 1"
-                        FrontSize="30"
-                        FrontAttributes="Bold"
+                        FontSize="Caption"
+                        FontAttributes="Bold"
                         VerticalOptions="Center"
                         HorizontalOptions="End"/>
 
@@ -39,7 +39,6 @@
                     <Button
                         x:Name="OkBtn"
                         Text="OK"
-                        Clicked="OnOkClicked"
                         Grid.Row="0"
                         Grid.Column="0"
                         VerticalOptions="Start"
@@ -48,7 +47,6 @@
                     <Button
                         x:Name="OpBtn"
                         Text="Op"
-                        Clicked="OnOpClicked"
                         Grid.Row="0"
                         Grid.Column="1"
                         VerticalOptions="Start"
@@ -57,7 +55,6 @@
                     <Button
                         x:Name="AnnullerBtn"
                         Text="Annuller"
-                        Clicked="OnAnnullerClicked"
                         Grid.Row="1"
                         Grid.Column="0"
                         VerticalOptions="End"
@@ -66,7 +63,6 @@
                     <Button
                         x:Name="NedBtn"
                         Text="Ned"
-                        Clicked="OnNedClicked"
                         Grid.Row="1"
                         Grid.Column="1"
                         VerticalOptions="End"
