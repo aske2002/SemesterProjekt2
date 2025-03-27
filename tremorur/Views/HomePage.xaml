@@ -9,90 +9,74 @@
     xmlns:vm="clr-namespace:tremorur.ViewModels"
     x:DataType="vm:HomeViewModel"
     mc:Ignorable="d">
-<<<<<<< Updated upstream
     <controls:CircularPageWrapper>
         <controls:CircularPageWrapper.ContentInside>
-            <Grid RowDefinitions="*,40">
+            <Grid RowDefinitions="*,Auto"
+                  ColumnDefinitions="*,Auto">
+                <!--Deler skærmen i to rækker og to kolonner-->
                 <StackLayout
                     HorizontalOptions="Center"
                     VerticalOptions="Center">
-                    <Label Text="You don't have anything scheduled today."/>
+                    <Label
+                        x:Name="ClockLabel"
+                        Text="00:00"
+                        FrontSize="60"
+                        FrontAttributes="Bold"
+                        TextColor="Blue"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"/>
+
+                    <Label
+                        x:Name="LevelLabel"
+                        Text="Level: 1"
+                        FrontSize="30"
+                        FrontAttributes="Bold"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+
+
+                    <!--Knap i øverste venstre hjørne-->
                     <Button
-                        Command="{Binding AddEventCommand}"
-                        HorizontalOptions="Center"
-                        Style="{StaticResource PrimaryAction}"
-                        Text="Add Event"/>
+                        x:Name="OkBtn"
+                        Text="OK"
+                        Clicked="OnOkClicked"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        VerticalOptions="Start"
+                        HorizontalOptions="Start"/>
+                    <!--Knap i øverste højre hjørne-->
+                    <Button
+                        x:Name="OpBtn"
+                        Text="Op"
+                        Clicked="OnOpClicked"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        VerticalOptions="Start"
+                        HorizontalOptions="End"/>
+                    <!--Knap i nederste venstre hjørne-->
+                    <Button
+                        x:Name="AnnullerBtn"
+                        Text="Annuller"
+                        Clicked="OnAnnullerClicked"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        VerticalOptions="End"
+                        HorizontalOptions="Start"/>
+                    <!--Knap i nederste højre hjørne-->
+                    <Button
+                        x:Name="NedBtn"
+                        Text="Ned"
+                        Clicked="OnNedClicked"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalOptions="End"
+                        HorizontalOptions="End"/>
+
+
                 </StackLayout>
                 <Grid
                     Grid.Row="1"
-                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark}, 
-=======
-    <views:WatchPage.Content>
-        <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto"> <!--Deler skærmen i to rækker og to kolonner-->
-            <StackLayout
-                HorizontalOptions="Center"
-                VerticalOptions="Center">
-                <Label
-					x:Name="ClockLabel"
-					Text="00:00"
-					FrontSize="60"
-					FrontAttributes="Bold"
-					TextColor="Blue"
-                    VerticalOptions="Center"
-					HorizontalOptions="Center"/>
-
-                <Label
-                    x:Name="LevelLabel"
-                    Text="Level: 1"
-                    FrontSize="30"
-                    FrontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"/>
-
-
-                <!--Knap i øverste venstre hjørne-->
-                <Button
-                    x:Name="OkBtn"
-                   Text="OK"
-                    Clicked="OnOkClicked"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    VerticalOptions="Start"
-                    HorizontalOptions="Start"/>
-                <!--Knap i øverste højre hjørne-->
-                <Button
-                    x:Name="OpBtn"
-                    Text="Op"
-                    Clicked="OnOpClicked"
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    VerticalOptions="Start"
-                    HorizontalOptions="End"/>
-                <!--Knap i nederste venstre hjørne-->
-                <Button
-                    x:Name="AnnullerBtn"
-                    Text="Annuller"
-                    Clicked="OnAnnullerClicked"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    VerticalOptions="End"
-                    HorizontalOptions="Start"/>
-                <!--Knap i nederste højre hjørne-->
-                <Button
-                    x:Name="NedBtn"
-                    Text="Ned"
-                    Clicked="OnNedClicked"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    VerticalOptions="End"
-                    HorizontalOptions="End"/>
-
-
-            </StackLayout>
-            <Grid
-                Grid.Row="1"
-                BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark},
->>>>>>> Stashed changes
+                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark},
                                                   Light={StaticResource Primary}}">
 
                     <Label
