@@ -11,6 +11,8 @@ public partial class CircularPageWrapper : ContentView
     private void OnSizeChanged(object sender, EventArgs e)
     {
         double diameter = Math.Min(Width, Height);
+        MainGrid.WidthRequest = diameter;
+        MainGrid.HeightRequest = diameter;
         EllipseClip.Center = new Point(diameter / 2, diameter / 2);
         EllipseClip.RadiusX = diameter / 2;
         EllipseClip.RadiusY = diameter / 2;
