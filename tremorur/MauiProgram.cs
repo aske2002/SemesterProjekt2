@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
+using Microsoft.UI;
 
 namespace tremorur
 {
@@ -15,32 +16,6 @@ namespace tremorur
                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
-
-
-            builder.ConfigureLifecycleEvents(events =>
-            {
-#if WINDOWS
-    events.AddWindows(windows =>
-    {
-        windows.OnWindowCreated(window =>
-        {
-            var nativeWindow = window.Handler.PlatformView;
-            var windowId = Win32Interop.GetWindowIdFromWindow(nativeWindow);
-            var appWindow = AppWindow.GetFromWindowId(windowId);
-
-            // Set fixed size (rectangular)
-            int width = 800;
-            int height = 800;
-
-            appWindow.Resize(new SizeInt32(width, height));
-            appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
-
-            // Optional: prevent resizing
-            appWindow.Presenter.As<OverlappedPresenter>().IsResizable = false;
-        });
-    });
-#endif
-            });
 
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
