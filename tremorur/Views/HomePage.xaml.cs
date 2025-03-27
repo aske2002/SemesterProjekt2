@@ -4,7 +4,7 @@ namespace tremorur.Views
 {
     public partial class HomePage : ContentPage
     {
-        public HomePage(EventsViewModel viewModel)
+        public HomePage(HomeViewModel viewModel)
         {
             InitializeComponent();
             var version = typeof(MauiApp).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
@@ -12,7 +12,7 @@ namespace tremorur.Views
             BindingContext = viewModel;
             viewModel.Title = "Calendar";
             //this.SetBinding(Page.TitleProperty, static (EventsViewModel vm) => vm.Title);
-            SetBinding(Page.TitleProperty, new Binding(nameof(EventsViewModel.Title)));
+            SetBinding(Page.TitleProperty, new Binding(nameof(HomeViewModel.Title)));
         }
     }
 }

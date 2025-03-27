@@ -1,0 +1,24 @@
+
+namespace tremorur.Controls;
+public partial class CircularPageWrapper : ContentView
+{
+    public CircularPageWrapper()
+    {
+        InitializeComponent();
+        SizeChanged += OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        double diameter = Math.Min(Width, Height);
+        EllipseClip.Center = new Point(diameter / 2, diameter / 2);
+        EllipseClip.RadiusX = diameter / 2;
+        EllipseClip.RadiusY = diameter / 2;
+    }
+
+    public View ContentInside
+    {
+        get => ContentHolder.Content;
+        set => ContentHolder.Content = value;
+    }
+}

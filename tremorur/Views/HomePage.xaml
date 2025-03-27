@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<views:WatchPage
-    xmlns:views="clr-namespace:tremorur.Views"
+<ContentPage
     x:Class="tremorur.Views.HomePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:tremorur"
+    xmlns:controls="clr-namespace:tremorur.Controls"
     xmlns:vm="clr-namespace:tremorur.ViewModels"
-    x:DataType="vm:EventsViewModel"
+    x:DataType="vm:HomeViewModel"
     mc:Ignorable="d">
-    <views:WatchPage.Content>
-        <Grid RowDefinitions="*,40">
-            <StackLayout
-                HorizontalOptions="Center"
-                VerticalOptions="Center">
-                <Label Text="You don't have anything scheduled today."/>
-                <Button
-                    Command="{Binding AddEventCommand}"
+    <controls:CircularPageWrapper>
+        <controls:CircularPageWrapper.ContentInside>
+            <Grid RowDefinitions="*,40">
+                <StackLayout
                     HorizontalOptions="Center"
-                    Style="{StaticResource PrimaryAction}"
-                    Text="Add Event"/>
-            </StackLayout>
-            <Grid
-                Grid.Row="1"
-                BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark},
+                    VerticalOptions="Center">
+                    <Label Text="You don't have anything scheduled today."/>
+                    <Button
+                        Command="{Binding AddEventCommand}"
+                        HorizontalOptions="Center"
+                        Style="{StaticResource PrimaryAction}"
+                        Text="Add Event"/>
+                </StackLayout>
+                <Grid
+                    Grid.Row="1"
+                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark}, 
                                                   Light={StaticResource Primary}}">
 
-                <Label
-                    x:Name="VersionLabel"
-                    HorizontalOptions="Center"
-                    TextColor="{StaticResource White}"
-                    VerticalOptions="Center"/>
+                    <Label
+                        x:Name="VersionLabel"
+                        HorizontalOptions="Center"
+                        TextColor="{StaticResource White}"
+                        VerticalOptions="Center"/>
 
+                </Grid>
             </Grid>
-        </Grid>
-    </views:WatchPage.Content>
-</views:WatchPage>
+        </controls:CircularPageWrapper.ContentInside>
+    </controls:CircularPageWrapper>
+</ContentPage>
