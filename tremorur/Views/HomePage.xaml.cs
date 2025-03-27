@@ -2,9 +2,9 @@
 
 namespace tremorur.Views
 {
-    public partial class EventsPage : ContentPage
+    public partial class HomePage : ContentPage
     {
-        public EventsPage(EventsViewModel viewModel)
+        public HomePage(EventsViewModel viewModel)
         {
             InitializeComponent();
             var version = typeof(MauiApp).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;

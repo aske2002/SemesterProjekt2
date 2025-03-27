@@ -19,7 +19,7 @@ namespace tremorur
             builder.Services.AddSingleton<INavigationService, NavigationService>();
 
             builder.Services.AddSingleton<EventsViewModel>();
-            builder.Services.AddSingleton<EventsPage>();
+            builder.Services.AddSingleton<HomePage>();
             builder.Services.AddSingleton<SearchViewModel>();
             builder.Services.AddSingleton<SearchPage>();
             builder.Services.AddSingleton<SettingsViewModel>();

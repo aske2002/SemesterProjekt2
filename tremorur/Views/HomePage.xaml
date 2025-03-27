@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage
-    x:Class="tremorur.Views.EventsPage"
+<views:WatchPage
+    xmlns:views="clr-namespace:tremorur.Views"
+    x:Class="tremorur.Views.HomePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
@@ -9,17 +10,17 @@
     xmlns:vm="clr-namespace:tremorur.ViewModels"
     x:DataType="vm:EventsViewModel"
     mc:Ignorable="d">
-    <ContentPage.Content>
+    <views:WatchPage.Content>
         <Grid RowDefinitions="*,40">
             <StackLayout
                 HorizontalOptions="Center"
                 VerticalOptions="Center">
-                <Label Text="You don't have anything scheduled today." />
+                <Label Text="You don't have anything scheduled today."/>
                 <Button
                     Command="{Binding AddEventCommand}"
                     HorizontalOptions="Center"
                     Style="{StaticResource PrimaryAction}"
-                    Text="Add Event" />
+                    Text="Add Event"/>
             </StackLayout>
             <Grid
                 Grid.Row="1"
@@ -30,9 +31,9 @@
                     x:Name="VersionLabel"
                     HorizontalOptions="Center"
                     TextColor="{StaticResource White}"
-                    VerticalOptions="Center" />
+                    VerticalOptions="Center"/>
 
             </Grid>
         </Grid>
-    </ContentPage.Content>
-</ContentPage>
+    </views:WatchPage.Content>
+</views:WatchPage>
