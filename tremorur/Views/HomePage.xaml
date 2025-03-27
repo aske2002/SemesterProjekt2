@@ -11,77 +11,72 @@
     mc:Ignorable="d">
     <controls:CircularPageWrapper>
         <controls:CircularPageWrapper.ContentInside>
-            <Grid RowDefinitions="*,Auto"
-                  ColumnDefinitions="*,Auto">
+            <Grid BackgroundColor="Black"
+                  RowDefinitions="Auto,*,Auto"
+                  ColumnDefinitions="Auto,*,Auto">
                 <!--Deler skærmen i to rækker og to kolonner-->
-                <StackLayout
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center">
-                    <Label
+                <Label
                         x:Name="ClockLabel"
                         Text="00:00"
                         FontSize="Title"
                         FontAttributes="Bold"
-                        TextColor="Blue"
+                        TextColor="White"
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"/>
 
-                    <Label
+                <Label
                         x:Name="LevelLabel"
                         Text="Level: 1"
                         FontSize="Caption"
                         FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="End"/>
+                        TextColor="White"
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        VerticalOptions="Start"
+                        HorizontalOptions="Center"/>
 
-
-                    <!--Knap i øverste venstre hjørne-->
-                    <Button
+                <!--Knap i øverste venstre hjørne-->
+                <Button
                         x:Name="OkBtn"
                         Text="OK"
+                        TextColor="White"
+                        BackgroundColor="Black"
                         Grid.Row="0"
                         Grid.Column="0"
                         VerticalOptions="Start"
                         HorizontalOptions="Start"/>
-                    <!--Knap i øverste højre hjørne-->
-                    <Button
+                <!--Knap i øverste højre hjørne-->
+                <Button
                         x:Name="OpBtn"
                         Text="Op"
+                        TextColor="White"
+                        BackgroundColor="Black"
                         Grid.Row="0"
                         Grid.Column="1"
                         VerticalOptions="Start"
                         HorizontalOptions="End"/>
-                    <!--Knap i nederste venstre hjørne-->
-                    <Button
+                <!--Knap i nederste venstre hjørne-->
+                <Button
                         x:Name="AnnullerBtn"
                         Text="Annuller"
+                        TextColor="White"
+                        BackgroundColor="Black"
                         Grid.Row="1"
                         Grid.Column="0"
                         VerticalOptions="End"
                         HorizontalOptions="Start"/>
-                    <!--Knap i nederste højre hjørne-->
-                    <Button
+                <!--Knap i nederste højre hjørne-->
+                <Button
                         x:Name="NedBtn"
                         Text="Ned"
+                        TextColor="White"
+                        BackgroundColor="Black"
                         Grid.Row="1"
                         Grid.Column="1"
                         VerticalOptions="End"
                         HorizontalOptions="End"/>
-
-
-                </StackLayout>
-                <Grid
-                    Grid.Row="1"
-                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundDark},
-                                                  Light={StaticResource Primary}}">
-
-                    <Label
-                        x:Name="VersionLabel"
-                        HorizontalOptions="Center"
-                        TextColor="{StaticResource White}"
-                        VerticalOptions="Center"/>
-
-                </Grid>
             </Grid>
         </controls:CircularPageWrapper.ContentInside>
     </controls:CircularPageWrapper>

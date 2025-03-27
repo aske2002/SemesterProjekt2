@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
-using UIKit;
 
 namespace tremorur
 {
