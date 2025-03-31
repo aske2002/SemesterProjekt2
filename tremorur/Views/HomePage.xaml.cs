@@ -13,15 +13,24 @@ namespace tremorur.Views
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
             InitializeComponent();
+            StartClock();
         }
+
         async void StartClock()
         {
             while (true)
             {
-                ClockLabel.Text = DateTime.Now.ToString("HH:mm"); //Opdater label med klokken. Henter den aktuelle tid i 24 timers format
-                await Task.Delay(1000); //sørger for at opdateringen sker hvert sekund
+                DateTime now = DateTime.Now;
+                TimeSpan currentTime = now.TimeOfDay; // Henter tidspunktet som TimeSpan
+                string date = now.ToString("dd/MM/yyyy"); // Formatterer dato som dd/MM/yyyy
+
+                ClockLabel.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}"; // Viser tid
+                DateLabel.Text = date; // Opdaterer datoen i en separat label
+
+                await Task.Delay(1000); // Opdater hvert sekund
             }
         }
+
         private int level = 1; //vibrationsstart level 1
         void OnOpClicked(object sender, EventArgs e)
         {
