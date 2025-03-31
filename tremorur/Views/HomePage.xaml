@@ -18,7 +18,7 @@
                 <Label
                         x:Name="ClockLabel"
                         Text="00:00"
-                        FontSize="Title"
+                        FontSize="130"
                         FontAttributes="Bold"
                         TextColor="White"
                         Grid.Row="1"
@@ -63,7 +63,7 @@
                         Text="Annuller"
                         TextColor="White"
                         BackgroundColor="Black"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.Column="0"
                         VerticalOptions="End"
                         HorizontalOptions="Start"/>
@@ -73,7 +73,7 @@
                         Text="Ned"
                         TextColor="White"
                         BackgroundColor="Black"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.Column="1"
                         VerticalOptions="End"
                         HorizontalOptions="End"/>
