@@ -22,7 +22,7 @@ namespace tremorur.Views
             {
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay; // Henter tidspunktet som TimeSpan
-                string date = now.ToString("dd/MM/yyyy"); // Formatterer dato som dd/MM/yyyy
+                string date = now.ToString("ddd dd. MMM"); // Formatterer dato som ugedag/dato/måned
 
                 ClockLabel.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}"; // Viser tid
                 DateLabel.Text = date; // Opdaterer datoen i en separat label

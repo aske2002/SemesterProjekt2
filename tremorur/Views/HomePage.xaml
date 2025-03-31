@@ -39,13 +39,13 @@
                 
                 <Label
                     x:Name="DateLabel"
-                    Text="00/00/0000"
-                    FontSize="30"
+                    Text="tir. 12. jan."
+                    FontSize="25"
                     FontAttributes="Bold"
                     TextColor="White"
                     Grid.Row="2"
                     Grid.ColumnSpan="2"
-                    VerticalOptions="Start"
+                    VerticalOptions="StartAndExpand"
                     HorizontalOptions="Center"/>
 
                 <!--Knap i øverste venstre hjørne-->
