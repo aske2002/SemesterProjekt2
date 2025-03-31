@@ -16,22 +16,6 @@ namespace tremorur
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
 
-            builder.ConfigureLifecycleEvents(events =>
-{
-#if MACCATALYST
-    events.AddiOS(ios =>
-    {
-        ios.SceneWillConnect((scene, session, options) =>
-        {
-            if (scene is UIWindowScene windowScene)
-            {
-                Platforms.MacCatalyst.WindowManager.ConfigureWindow(windowScene);
-            }
-        });
-    });
-#endif
-});
-
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
 

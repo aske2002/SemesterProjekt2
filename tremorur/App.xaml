@@ -14,8 +14,6 @@
                 <ResourceDictionary Source="Resources/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- Additional Styles -->
-            <Thickness x:Key="ApplePadding">30,60,30,30</Thickness>
-            <Thickness x:Key="DefaultPadding">30</Thickness>
 
             <x:Double x:Key="ItemSpacing">10</x:Double>
 

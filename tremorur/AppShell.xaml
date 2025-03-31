@@ -9,6 +9,7 @@
     xmlns:vw="clr-namespace:tremorur.Views"
     Title="Test"
     BackgroundColor="Transparent"
+    Shell.NavBarIsVisible="False"
     mc:Ignorable="d">
     <!--
         The overall app visual hierarchy is defined here, along with navigation.
