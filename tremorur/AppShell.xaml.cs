@@ -7,6 +7,7 @@
             InitializeComponent();
             // Register the routes of the detail pages
             RegisterRoutes();
+            this.BackgroundColor = Colors.Transparent;
         }
 
         private void RegisterRoutes()

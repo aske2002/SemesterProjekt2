@@ -8,6 +8,7 @@
     xmlns:controls="clr-namespace:tremorur.Controls"
     xmlns:vm="clr-namespace:tremorur.ViewModels"
     x:DataType="vm:HomeViewModel"
+    BackgroundColor="Transparent"
     mc:Ignorable="d">
     <controls:CircularPageWrapper>
         <controls:CircularPageWrapper.ContentInside>

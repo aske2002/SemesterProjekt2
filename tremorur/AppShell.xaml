@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:tremorur"
     xmlns:vw="clr-namespace:tremorur.Views"
     Title="Test"
-    BackgroundColor="Transparent"
+    Shell.BackgroundColor="Transparent"
     Shell.NavBarIsVisible="False"
     mc:Ignorable="d">
     <!--
