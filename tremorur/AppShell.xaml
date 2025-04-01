@@ -66,8 +66,8 @@
     -->
     <TabBar>
         <ShellContent
-            ContentTemplate="{DataTemplate vw:LoginPage}"
-            Route="login"/>
+            ContentTemplate="{DataTemplate vw:SetAlarmPage}"
+            Route="SetAlarm"/>
     </TabBar>
     <!-- Optional Templates
     // These may be provided inline as below or as separate classes.

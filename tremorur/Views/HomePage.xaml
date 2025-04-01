@@ -52,6 +52,7 @@
                 <Button
                         x:Name="OkBtn"
                         Text="OK"
+                        Command="{Binding SetAlarmAsync}"
                         TextColor="White"
                         BackgroundColor="Black"
                         Grid.Row="0"

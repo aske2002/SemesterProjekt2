@@ -7,6 +7,7 @@
             InitializeComponent();
             // Register the routes of the detail pages
             RegisterRoutes();
+
         }
 
         private void RegisterRoutes()
@@ -16,7 +17,7 @@
 
         private async void OnMenuItemClicked(object sender, EventArgs e)
         {
-            await Current.GoToAsync("//login");
+            await Current.GoToAsync("//SetAlarm");
         }
     }
 }
