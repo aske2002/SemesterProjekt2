@@ -49,8 +49,8 @@
     <SolidColorBrush x:Key="DarkGrayBrush" Color="{StaticResource DarkGray}" />
 
     <!-- Dark and Light App Theme -->
-    <Color x:Key="BackgroundDark">#121212</Color>
-    <Color x:Key="BackgroundLight">White</Color>
+    <Color x:Key="BackgroundDark">Transparent</Color>
+    <Color x:Key="BackgroundLight">Transparent</Color>
     <Color x:Key="TextDark">White</Color>
     <Color x:Key="TextLight">Black</Color>
 

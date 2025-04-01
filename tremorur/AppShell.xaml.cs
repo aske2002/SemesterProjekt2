@@ -7,7 +7,7 @@
             InitializeComponent();
             // Register the routes of the detail pages
             RegisterRoutes();
-
+            this.BackgroundColor = Colors.Transparent;
         }
 
         private void RegisterRoutes()
@@ -17,7 +17,7 @@
 
         private async void OnMenuItemClicked(object sender, EventArgs e)
         {
-            await Current.GoToAsync("//SetAlarm");
+            await Current.GoToAsync("//login");
         }
     }
 }
