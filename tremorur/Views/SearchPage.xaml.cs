@@ -2,7 +2,7 @@
 {
     public partial class SearchPage : ContentPage
     {
-        public SearchPage(SearchViewModel viewModel)
+        public SearchPage(MedicationAlarmViewModel viewModel)
         {
             InitializeComponent();
             viewModel.Title = "Search";

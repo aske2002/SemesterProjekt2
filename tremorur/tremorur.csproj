@@ -84,4 +84,10 @@
         <DependentUpon>SetAlarmPage.xaml</DependentUpon>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="Views\MedicationAlarmPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
 </Project>
