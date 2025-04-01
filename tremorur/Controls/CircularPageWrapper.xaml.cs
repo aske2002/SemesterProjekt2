@@ -4,8 +4,8 @@ public partial class CircularPageWrapper : ContentView
 {
     public CircularPageWrapper()
     {
-        InitializeComponent();
         SizeChanged += OnSizeChanged;
+        InitializeComponent();
     }
 
     private void OnSizeChanged(object sender, EventArgs e)

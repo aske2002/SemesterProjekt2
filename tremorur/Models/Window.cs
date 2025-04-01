@@ -13,8 +13,10 @@ namespace tremorur.Models
         public WatchWindow(Page page) : base(page)
         {
             this.SizeChanged += OnSizeChanged;
-            this.Width = 800;
-            this.Height = 800;
+            this.MaximumWidth = 800;
+            this.MaximumHeight = 800;
+            this.MinimumHeight = 800;
+            this.MinimumWidth = 800;
         }
 
         protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)

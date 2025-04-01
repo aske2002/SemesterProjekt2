@@ -6,7 +6,6 @@
         {
             InitializeComponent();
 
-            UserAppTheme = PlatformAppTheme;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
