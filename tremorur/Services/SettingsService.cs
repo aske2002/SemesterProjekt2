@@ -7,6 +7,12 @@ namespace tremorur.Services;
 
 public static class SettingsService
 {
+    public static List<Alarm> Alarms
+    {
+        get => GetClassFromStorage<List<Alarm>>("Alarms");
+        set => SetClassInStorage<List<Alarm>>("Alarms", value);
+    }
+
 
     private static ImmutableDictionary<string, object?> _cache = ImmutableDictionary<string, object?>.Empty;
     private static IPreferences DefaultPreferences => Microsoft.Maui.Storage.Preferences.Default;
