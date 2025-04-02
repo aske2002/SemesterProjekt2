@@ -21,12 +21,12 @@ namespace tremorur
 
             builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<HomePage>();
-            builder.Services.AddSingleton<SearchViewModel>();
+            builder.Services.AddSingleton<MedicationAlarmViewModel>();
             builder.Services.AddSingleton<SearchPage>();
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<SettingsPage>();
-            builder.Services.AddTransient<LoginViewModel>();
-            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<SetAlarmViewModel>();
+            builder.Services.AddTransient<SetAlarmPage>();
             builder.Services.AddTransient<NewEventViewModel>();
             builder.Services.AddTransient<NewEventPage>();
 

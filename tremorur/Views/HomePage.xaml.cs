@@ -13,6 +13,7 @@ namespace tremorur.Views
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
             InitializeComponent();
+            BindingContext = viewModel;
             StartClock();
         }
 
@@ -53,10 +54,6 @@ namespace tremorur.Views
             LevelLabel.Text = $"Level:{level}";
             OpBtn.IsEnabled = level < 7;
             NedBtn.IsEnabled = level > 1;
-        }
-        async void OnOkClicked(object sender, EventArgs e)
-        {
-            await DisplayAlert("Levet Accepteres", $"Du har valgt Level {level}!", "OK");
         }
         async void OnAnnullerClicked(object sender, EventArgs e)
         {
