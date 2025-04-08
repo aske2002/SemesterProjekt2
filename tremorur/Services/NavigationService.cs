@@ -8,8 +8,20 @@ namespace tremorur.Services
         public NavigationService(IMessenger messenger)
         {
             _messenger = messenger;
-
         }
+
+        private void OnUpdateApplication(Type[]? types)
+        {
+            if (Shell.Current is null)
+            {
+                throw new NotSupportedException($"Navigation with the '{nameof(OnUpdateApplication)}' method is currently supported only with a Shell-enabled application.");
+            }
+
+            var navigateionState = new ShellNavigationState("..");
+            _messenger.Send(navigateionState);
+            Shell.Current.GoToAsync(navigateionState);
+        }
+
         public Task GoToAsync(string route)
         {
             if (Shell.Current is null)

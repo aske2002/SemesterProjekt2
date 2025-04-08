@@ -3,6 +3,10 @@
     "Windows Machine": {
       "commandName": "MsixPackage",
       "nativeDebugging": false
+    },
+    "dotnet": {
+      "hotReloadEnabled": true,
+      "commandName": "Project"
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"
