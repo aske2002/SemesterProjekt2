@@ -24,6 +24,11 @@
         Uncomment the below section to enable Shell Flyout item(s)
         And ensure appropriate page definitions are available for it work as expected
     -->
+    <FlyoutItem Title="AddAlarm">
+        <ShellContent
+            ContentTemplate="{DataTemplate vw:MedicationAlarmPage}"
+            Route="addAlarm"/>
+    </FlyoutItem>
     <FlyoutItem Title="Calendar">
         <ShellContent
             ContentTemplate="{DataTemplate vw:HomePage}"

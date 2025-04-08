@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="tremorur.Views.MedicationAlarmPage"
+<models:ContentPageWithButtons x:Class="tremorur.Views.MedicationAlarmPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:tremorur"
              xmlns:controls="clr-namespace:tremorur.Controls"
              xmlns:vm="clr-namespace:tremorur.ViewModels"
+             xmlns:models="clr-namespace:tremorur.Models"
              Shell.NavBarIsVisible="False"
              ControlTemplate="{StaticResource LayoutTemplate}"
              x:DataType="vm:MedicationAlarmViewModel"
@@ -39,4 +40,4 @@
             HorizontalOptions="Center"/>
 
     </Grid>
-</ContentPage>
+</models:ContentPageWithButtons>

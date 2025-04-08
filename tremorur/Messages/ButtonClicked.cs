@@ -25,10 +25,10 @@ public static class ButtonTypes
 
     public static readonly Dictionary<WatchButton, double> Positions = new()
     {
-        { WatchButton.Ok, 45 },
-        { WatchButton.Cancel, 135 },
-        { WatchButton.Down, 225 },
-        { WatchButton.Up, 315 }
+        { WatchButton.Ok, 315 },
+        { WatchButton.Cancel, 45 },
+        { WatchButton.Down, 135 },
+        { WatchButton.Up, 225 }
     };
 }
 

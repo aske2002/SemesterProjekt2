@@ -25,6 +25,7 @@ public class ButtonService : IButtonService
     public ButtonService(tremorur.Services.IMessenger messenger)
     {
         _messenger = messenger;
+        Initialize();
     }
 
     public void Initialize()

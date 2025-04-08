@@ -1,11 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Foundation;
-using GameController;
-using ObjCRuntime;
-using UIKit;
-
 namespace tremorur.Models
 {
 

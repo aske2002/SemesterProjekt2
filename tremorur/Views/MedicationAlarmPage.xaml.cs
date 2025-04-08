@@ -1,12 +1,33 @@
 namespace tremorur.Views;
 
-public partial class MedicationAlarmPage : ContentPage
+public partial class MedicationAlarmPage : ContentPageWithButtons
 {
-	public MedicationAlarmPage()
-	{
-		InitializeComponent();
+    public MedicationAlarmPage(IButtonService buttonService) : base(buttonService)
+    {
+        InitializeComponent();
         StartClock();
-	}
+    }
+
+    protected override void OnButtonClicked(object? sender, EventArgs e)
+    {
+        MedicationLabel.Text = "OK blev trykket";
+    }
+
+    protected override void OnCancelButtonClicked(object? sender, EventArgs e)
+    {
+        MedicationLabel.Text = "Annuller blev trykket";
+    }
+
+    protected override void OnDownButtonClicked(object? sender, EventArgs e)
+    {
+        MedicationLabel.Text = "Ned blev trykket";
+    }
+
+    protected override void OnUpButtonClicked(object? sender, EventArgs e)
+    {
+        MedicationLabel.Text = "Op blev trykket";
+    }
+
     async void StartClock()
     {
         while (true)

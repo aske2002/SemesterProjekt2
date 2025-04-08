@@ -6,6 +6,7 @@ namespace tremorur.Controls;
 public partial class BorderButton : Grid
 {
     private const string Root = "Root";
+    private readonly Services.IMessenger messenger;
     public static readonly BindableProperty ButtonBackgroundColorProperty =
             BindableProperty.Create(nameof(ButtonBackgroundColor), typeof(Color), typeof(BorderButton), Blue);
     public Color ButtonBackgroundColor
@@ -14,12 +15,10 @@ public partial class BorderButton : Grid
         set => SetValue(ButtonBackgroundColorProperty, value);
     }
 
-    // Optional: Expose Clicked event
-    public event EventHandler? Clicked;
 
     private void InnerButton_Clicked(object sender, EventArgs e)
     {
-        Clicked?.Invoke(this, e); // Bubble up the click event
+        messenger.Send(new ButtonClickedEvent(ButtonType));
     }
 
     public WatchButton ButtonType;
@@ -34,7 +33,10 @@ public partial class BorderButton : Grid
     }
     public BorderButton(Services.IMessenger messenger, WatchButton buttonType)
     {
-        ButtonType = buttonType;
         InitializeComponent();
+        ButtonType = buttonType;
+        this.messenger = messenger;
+        InnerButton.Text = ButtonTypes.Names[ButtonType];
+        InnerButton.Clicked += InnerButton_Clicked;
     }
 }
