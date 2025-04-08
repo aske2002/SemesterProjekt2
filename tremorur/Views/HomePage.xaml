@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="tremorur.Views.HomePage"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="clr-namespace:tremorur.Controls"
-    xmlns:vm="clr-namespace:tremorur.ViewModels"
-    x:DataType="vm:HomeViewModel"
-    BackgroundColor="Transparent"
-    mc:Ignorable="d">
-    <controls:CircularPageWrapper>
-        <controls:CircularPageWrapper.ContentInside>
-            <Grid BackgroundColor="Black"
-                  RowDefinitions="Auto,*,Auto"
-                  ColumnDefinitions="Auto,*,Auto">
+        x:Class="tremorur.Views.HomePage"
+        xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:tremorur.ViewModels"
+        xmlns:local="clr-namespace:tremorur.Views"
+        ControlTemplate="{StaticResource LayoutTemplate}"
+        BackgroundColor="Transparent"
+        x:DataType="vm:HomeViewModel"
+        mc:Ignorable="d">
+        <Grid BackgroundColor="DarkGray"
+              RowDefinitions="Auto,*,Auto"
+              ColumnDefinitions="Auto,*,Auto">
                 <!--Deler skærmen i to rækker og to kolonner-->
                 <Label
                         x:Name="ClockLabel"
@@ -37,17 +36,17 @@
                         Grid.ColumnSpan="2"
                         VerticalOptions="Start"
                         HorizontalOptions="Center"/>
-                
+
                 <Label
-                    x:Name="DateLabel"
-                    Text="tir. 12. jan."
-                    FontSize="25"
-                    FontAttributes="Bold"
-                    TextColor="White"
-                    Grid.Row="2"
-                    Grid.ColumnSpan="2"
-                    VerticalOptions="StartAndExpand"
-                    HorizontalOptions="Center"/>
+                        x:Name="DateLabel"
+                        Text="tir. 12. jan."
+                        FontSize="25"
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        VerticalOptions="StartAndExpand"
+                        HorizontalOptions="Center"/>
 
                 <!--Knap i øverste venstre hjørne-->
                 <Button
@@ -90,7 +89,5 @@
                         Grid.Column="1"
                         VerticalOptions="End"
                         HorizontalOptions="End"/>
-            </Grid>
-        </controls:CircularPageWrapper.ContentInside>
-    </controls:CircularPageWrapper>
+        </Grid>
 </ContentPage>

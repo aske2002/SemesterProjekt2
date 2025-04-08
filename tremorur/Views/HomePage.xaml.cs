@@ -1,14 +1,15 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using tremorur.Development.HotReload;
+using tremorur.Messages;
 
 namespace tremorur.Views
 {
     public partial class HomePage : ContentPage
     {
         private readonly ILogger _logger;
-        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger)
+        private readonly IButtonService _buttonService;
+        private readonly Services.IMessenger _messenger;
+        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger)
         {
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
@@ -49,6 +50,7 @@ namespace tremorur.Views
                 UpdateLevelLabel();
             }
         }
+
         private void UpdateLevelLabel()
         {
             LevelLabel.Text = $"Level:{level}";

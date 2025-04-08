@@ -7,8 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:tremorur"
     xmlns:vm="clr-namespace:tremorur.ViewModels"
-    Title="{Binding Title}"
-    x:DataType="vm:SearchViewModel"
     mc:Ignorable="d">
     <ContentPage.Content>
         <Label

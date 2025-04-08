@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage x:Class="tremorur.Views.MedicationAlarmPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
-xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-xmlns:local="clr-namespace:tremorur"
-xmlns:controls="clr-namespace:tremorur.Controls"
-xmlns:vm="clr-namespace:tremorur.ViewModels"
-Shell.NavBarIsVisible="False"
-x:DataType="vm:MedicationAlarmViewModel"
-mc:Ignorable="d">
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:tremorur"
+             xmlns:controls="clr-namespace:tremorur.Controls"
+             xmlns:vm="clr-namespace:tremorur.ViewModels"
+             Shell.NavBarIsVisible="False"
+             ControlTemplate="{StaticResource LayoutTemplate}"
+             x:DataType="vm:MedicationAlarmViewModel"
+             mc:Ignorable="d">
 
-    <controls:CircularPageWrapper>
-        <controls:CircularPageWrapper.ContentInside>
-            <Grid BackgroundColor="Black"
-            RowDefinitions="Auto,*,Auto"
-            ColumnDefinitions="Auto,*,Auto">
-                
-                <Label
-                x:Name="MedicationLabel"
-                Text="Tag din medicin"
-                FontSize="100"
-                FontAttributes="Bold"
-                TextColor="White" 
-                Grid.Row="1"
-                Grid.ColumnSpan="2"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"/>
+    <Grid BackgroundColor="Black"
+          RowDefinitions="Auto,*,Auto"
+          ColumnDefinitions="Auto,*,Auto">
 
-                <Label
-                x:Name="ClockLabel"
-                Text="00:00"
-                FontSize="Title"
-                FontAttributes="Bold"
-                TextColor="White"
-                Grid.Row="1"
-                Grid.ColumnSpan="2"
-                VerticalOptions="Start"
-                HorizontalOptions="Center"/>
+        <Label
+            x:Name="MedicationLabel"
+            Text="Tag din medicin"
+            FontSize="100"
+            FontAttributes="Bold"
+            TextColor="White"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"/>
 
-            </Grid>
-        </controls:CircularPageWrapper.ContentInside>
-    </controls:CircularPageWrapper>
+        <Label
+            x:Name="ClockLabel"
+            Text="00:00"
+            FontSize="Title"
+            FontAttributes="Bold"
+            TextColor="White"
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            VerticalOptions="Start"
+            HorizontalOptions="Center"/>
+
+    </Grid>
 </ContentPage>
