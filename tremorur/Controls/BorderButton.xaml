@@ -1,0 +1,30 @@
+<Grid  x:Class="tremorur.Controls.BorderButton"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+        <Border StrokeThickness="0">
+                <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="25,25,0,0"/>
+                </Border.StrokeShape>
+                <Button x:Name="InnerButton"
+                
+                        Clicked="InnerButton_Clicked">
+                        <Button.Style>
+                                <Style TargetType="Button">
+                                        <Setter Property="BorderColor"
+                                                Value="Black"/>
+                                        <Setter Property="BackgroundColor"
+                                                Value="#FF343434"/>
+                                        <Setter Property="CornerRadius"
+                                                Value="5"/>
+                                        <Setter Property="Padding"
+                                                Value="35,15"/>
+                                        <Setter Property="TextColor"
+                                                Value="Black"/>
+                                        <Setter Property="FontSize"
+                                                Value="16"/>
+                                </Style>
+
+                        </Button.Style>
+                </Button>
+        </Border>
+</Grid>

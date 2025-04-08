@@ -6,7 +6,35 @@
     xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:tremorur"
-    
+    xmlns:vw="clr-namespace:tremorur.Views"
     mc:Ignorable="d">
-    
+    <Application.Resources>
+        <ControlTemplate x:Key="LayoutTemplate">
+            <AbsoluteLayout
+                BackgroundColor="Transparent"
+                Loaded="AbsoluteLayoutLoaded">
+                <Grid
+                    AbsoluteLayout.LayoutBounds="0,0,1,1"
+                    AbsoluteLayout.LayoutFlags="All"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    Loaded="GridLoaded"
+                    RowDefinitions="*"
+                    ColumnDefinitions="*"
+                    BackgroundColor="Red">
+                    <Grid.Clip>
+                        <EllipseGeometry
+                            Center="200,200"
+                            RadiusX="200"
+                            RadiusY="200"/>
+                    </Grid.Clip>
+
+                    <ContentPresenter HorizontalOptions="Center"
+                                      VerticalOptions="Center"
+                                      Grid.Row="0"
+                                      Grid.Column="0"/>
+                </Grid>
+            </AbsoluteLayout>
+        </ControlTemplate>
+    </Application.Resources>
 </Application>

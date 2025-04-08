@@ -8,18 +8,14 @@
     xmlns:local="clr-namespace:tremorur"
     xmlns:vw="clr-namespace:tremorur.Views"
     Title="Test"
-    Shell.BackgroundColor="Transparent"
+    BackgroundColor="Transparent"
     Shell.NavBarIsVisible="False"
     mc:Ignorable="d">
     <!--
         The overall app visual hierarchy is defined here, along with navigation.
         Ensure atleast a Flyout item or a TabBar is defined for Shell to work
     -->
-    <Shell.Resources>
-        <!--
-        Define the resources to be used within this Shell visual hierarchy
-    -->
-    </Shell.Resources>
+
     <!--
         When the Flyout is visible this defines the content to display in the flyout.
         FlyoutDisplayOptions="AsMultipleItems" will create a separate flyout item for each child element
