@@ -8,8 +8,8 @@ namespace tremorur.Models
 {
     public class Alarm
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        public TimeSpan Time { get; set; }
+        public TimeSpan TimeSpan { get; set; }  
     }
 }

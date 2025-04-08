@@ -9,8 +9,8 @@ public static class SettingsService
 {
     public static List<Alarm> Alarms
     {
-        get => GetClassFromStorage<List<Alarm>>("Alarms");
-        set => SetClassInStorage<List<Alarm>>("Alarms", value);
+        get => GetClassFromStorage<List<Alarm>>("Alarms").ToList();
+        set => SetClassInStorage("Alarms", value);
     }
 
 
