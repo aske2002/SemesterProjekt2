@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using.Collection.Specialized;
+﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
 using System.Collections.Specialized;//tilføjet for notifycollectionChangedEventArgs
 
 namespace tremorur.Services
