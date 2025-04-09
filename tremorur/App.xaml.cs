@@ -34,6 +34,7 @@ namespace tremorur
                 _watchButtons = ButtonTypes.CreateButtons(_messenger);
                 _watchButtons.ForEach(absoluteLayout.Children.Add);
                 _absoluteLayout.SizeChanged += SizeChanged;
+                SizeChanged(sender, e);
             }
         }
 
@@ -43,6 +44,7 @@ namespace tremorur
             {
                 _grid = grid;
                 _grid.SizeChanged += SizeChanged;
+                SizeChanged(sender, e);
             }
         }
 
