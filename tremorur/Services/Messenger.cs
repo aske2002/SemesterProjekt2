@@ -6,14 +6,14 @@ using ICommunityToolkitMessenger = CommunityToolkit.Mvvm.Messaging.IMessenger;
 
 namespace tremorur.Services;
 
-public class DefaultMessenger : IMessenger
+public class Messenger : IMessenger
 {
     private readonly ILogger _logger;
     private readonly ICommunityToolkitMessenger _messenger = StrongReferenceMessenger.Default;
     private readonly List<IMiddlewareRegistration> _middleware = new();
     private IServiceProvider? serviceProvider;
 
-    public DefaultMessenger(ILogger logger)
+    public Messenger(ILogger logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -109,7 +109,7 @@ sealed file class Unsubscriber<T>(ICommunityToolkitMessenger messenger, object r
     }
 }
 
-sealed file class MiddlewareUnsubscriber<T>(DefaultMessenger messenger) : IDisposable
+sealed file class MiddlewareUnsubscriber<T>(Messenger messenger) : IDisposable
     where T : class
 {
     public void Dispose()

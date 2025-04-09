@@ -20,17 +20,6 @@ namespace tremorur
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
 
-            builder.Services.AddSingleton<HomeViewModel>();
-            builder.Services.AddSingleton<HomePage>();
-            builder.Services.AddSingleton<MedicationAlarmViewModel>();
-            builder.Services.AddSingleton<SearchPage>();
-            builder.Services.AddSingleton<SettingsViewModel>();
-            builder.Services.AddSingleton<SettingsPage>();
-            builder.Services.AddTransient<SetAlarmViewModel>();
-            builder.Services.AddTransient<SetAlarmPage>();
-            builder.Services.AddTransient<NewEventViewModel>();
-            builder.Services.AddTransient<NewEventPage>();
-
             // Manually create LoggerFactory and Logger
             var loggerFactory = LoggerFactory.Create(logging =>
             {
@@ -40,8 +29,9 @@ namespace tremorur
 #endif
             });
             // Register the logger factory in services, so it's available later
-            builder.Services.AddSingleton<ILoggerFactory>(loggerFactory);
-            var messenger = new DefaultMessenger(loggerFactory.CreateLogger<DefaultMessenger>());
+            builder.Services.AddSingleton(loggerFactory);
+
+            var messenger = new Messenger(loggerFactory.CreateLogger<Messenger>());
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
 
             var mauiApp = builder.Build();
