@@ -2,7 +2,7 @@ namespace tremorur.Services
 {
     public interface INavigationService
     {
-        Task GoToAsync(string route);
+        Task GåTilSideAsync(string route);
         Task GoBackAsync();
     }
 }

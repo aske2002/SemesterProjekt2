@@ -6,10 +6,13 @@
                         <RoundRectangle CornerRadius="25,25,0,0"/>
                 </Border.StrokeShape>
                 <Button x:Name="InnerButton"
-                
+                        Text="{Binding ButtonText}"
+                        TextColor="White"
                         Clicked="InnerButton_Clicked">
                         <Button.Style>
                                 <Style TargetType="Button">
+                                        <Setter Property="TextColor"
+                                                Value="White"/>
                                         <Setter Property="BorderColor"
                                                 Value="Black"/>
                                         <Setter Property="BackgroundColor"

@@ -11,22 +11,22 @@ public interface IMessenger
         [CallerLineNumber] int callerLineNumber = 0)
         where TMessage : class;
 
-    IDisposable On<TMessage>(
+    IDisposable LytEfterBegivenhed<TMessage>(
         Action<TMessage> handler,
         [CallerFilePath] string callerFilePath = "",
         [CallerMemberName] string callerMemberName = "",
         [CallerLineNumber] int callerLineNumber = 0)
         where TMessage : class;
 
-    IDisposable On<TMessage>(Action handler)
+    IDisposable LytEfterBegivenhed<TMessage>(Action handler)
         where TMessage : class
-        => On<TMessage>(_ => handler());
+        => LytEfterBegivenhed<TMessage>(_ => handler());
 
     IDisposable OnOnce<TMessage>(Action handler)
         where TMessage : class
-        => On<TMessage>(_ => handler());
+        => LytEfterBegivenhed<TMessage>(_ => handler());
 
-    void Send<TMessage>(
+    void SendBegivenhed<TMessage>(
         TMessage message,
         [CallerFilePath] string callerFilePath = "",
         [CallerMemberName] string callerMemberName = "",

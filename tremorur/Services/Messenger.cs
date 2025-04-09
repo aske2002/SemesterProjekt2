@@ -17,10 +17,10 @@ public class Messenger : IMessenger
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        On<AppBuilt>(m => serviceProvider = m.Services);
+        LytEfterBegivenhed<AppBuilt>(m => serviceProvider = m.Services);
     }
 
-    public IDisposable On<TMessage>(
+    public IDisposable LytEfterBegivenhed<TMessage>(
         Action<TMessage> handler,
         [CallerFilePath] string callerFilePath = "",
         [CallerMemberName] string callerMemberName = "",
@@ -41,14 +41,14 @@ public class Messenger : IMessenger
         return new Unsubscriber<TMessage>(_messenger, recipient);
     }
 
-    public IDisposable On<TMessage>(Action handler)
+    public IDisposable LytEfterBegivenhed<TMessage>(Action handler)
         where TMessage : class
-        => On<TMessage>(_ => handler());
+        => LytEfterBegivenhed<TMessage>(_ => handler());
 
     public IDisposable OnOnce<TMessage>(Action handler) where TMessage : class
     {
         IDisposable? unsub = null;
-        unsub = On<TMessage>(() =>
+        unsub = LytEfterBegivenhed<TMessage>(() =>
         {
             handler();
             unsub?.Dispose();
@@ -57,7 +57,7 @@ public class Messenger : IMessenger
         return unsub;
     }
 
-    public void Send<TMessage>(
+    public void SendBegivenhed<TMessage>(
         TMessage message,
         [CallerFilePath] string callerFilePath = "",
         [CallerMemberName] string callerMemberName = "",

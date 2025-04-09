@@ -30,6 +30,11 @@ namespace tremorur
         {
             if (sender is AbsoluteLayout absoluteLayout)
             {
+                #if DEBUG
+                // Enable HotReload for the AbsoluteLayout
+                // absoluteLayout.Children.Add(new Button)
+                #endif
+
                 _absoluteLayout = absoluteLayout;
                 _watchButtons = ButtonTypes.CreateButtons(_messenger);
                 _watchButtons.ForEach(absoluteLayout.Children.Add);

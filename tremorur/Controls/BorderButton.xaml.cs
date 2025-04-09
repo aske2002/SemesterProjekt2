@@ -18,7 +18,7 @@ public partial class BorderButton : Grid
 
     private void InnerButton_Clicked(object sender, EventArgs e)
     {
-        messenger.Send(new ButtonClickedEvent(ButtonType));
+        messenger.SendBegivenhed(new ButtonClickedEvent(ButtonType));
     }
 
     public WatchButton ButtonType;

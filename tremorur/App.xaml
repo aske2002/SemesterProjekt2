@@ -21,7 +21,7 @@
                     Loaded="GridLoaded"
                     RowDefinitions="*"
                     ColumnDefinitions="*"
-                    BackgroundColor="Red">
+                    BackgroundColor="#FF292929">
                     <Grid.Clip>
                         <EllipseGeometry
                             Center="200,200"
