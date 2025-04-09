@@ -10,12 +10,12 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 
     protected override void OnButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "OK blev trykket";
+        MedicationLabel.Text = "Medicinpåmindelse blev godkendt";
     }
 
     protected override void OnCancelButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Annuller blev trykket";
+        MedicationLabel.Text = "Medicinpåmindelse blev annulleret";
     }
 
     protected override void OnDownButtonClicked(object? sender, EventArgs e)

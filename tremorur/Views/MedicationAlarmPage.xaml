@@ -20,7 +20,7 @@
         <Label
             x:Name="MedicationLabel"
             Text="Tag din medicin"
-            FontSize="100"
+            FontSize="60"
             FontAttributes="Bold"
             TextColor="White"
             Grid.Row="1"
