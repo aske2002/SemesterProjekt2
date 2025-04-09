@@ -2,10 +2,12 @@ namespace tremorur.Views;
 
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
-    public MedicationAlarmPage(IButtonService buttonService) : base(buttonService)
+    private readonly INavigationService navigationService;
+    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService) : base(buttonService)
     {
         InitializeComponent();
         StartClock();
+        this.navigationService = navigationService;
     }
 
     protected override void OnButtonClicked(object? sender, EventArgs e)
@@ -15,7 +17,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 
     protected override void OnCancelButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Medicinpåmindelse blev annulleret";
+        navigationService.GåTilSideAsync("//home");
     }
 
     protected override void OnDownButtonClicked(object? sender, EventArgs e)

@@ -13,7 +13,7 @@
              x:DataType="vm:MedicationAlarmViewModel"
              mc:Ignorable="d">
 
-    <Grid BackgroundColor="Black"
+    <Grid 
           RowDefinitions="Auto,*,Auto"
           ColumnDefinitions="Auto,*,Auto">
 
