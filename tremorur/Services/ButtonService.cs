@@ -28,7 +28,7 @@ public class ButtonService : IButtonService //hvis bottonservice skal bruges et 
         Initialize();
     }
 
-    public void Initialize()
+    public void Initialize() //initialize metode 
     {
         _messenger.LytEfterBegivenhed<ButtonClickedEvent>((ButtonClickedEvent e) =>
         {
