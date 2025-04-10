@@ -9,14 +9,14 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         StartClock();
         this.navigationService = navigationService;
     }
-
-    protected override void OnButtonClicked(object? sender, EventArgs e)
+    protected override void OnOKButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Medicinpåmindelse blev godkendt";
+        MedicationLabel.Text = "Medicinpåmindelse godkendt";
     }
 
     protected override void OnCancelButtonClicked(object? sender, EventArgs e)
     {
+        MedicationLabel.Text = "Medicinpåmindelse annulleret";
         navigationService.GåTilSideAsync("//home");
     }
 

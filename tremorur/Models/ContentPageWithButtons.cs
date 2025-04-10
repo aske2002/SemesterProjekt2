@@ -15,7 +15,7 @@ namespace tremorur.Models
         protected void InitializeButtons()
         {
             _buttonService.CancelButtonClicked += OnCancelButtonClicked;
-            _buttonService.OkButtonClicked += OnButtonClicked;
+            _buttonService.OkButtonClicked += OnOKButtonClicked;
             _buttonService.UpButtonClicked += OnUpButtonClicked;
             _buttonService.DownButtonClicked += OnDownButtonClicked;
         }
@@ -25,7 +25,7 @@ namespace tremorur.Models
 
         }
 
-        protected virtual void OnButtonClicked(object? sender, EventArgs e)
+        protected virtual void OnOKButtonClicked(object? sender, EventArgs e)
         {
 
         }

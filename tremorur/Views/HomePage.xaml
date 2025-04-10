@@ -11,8 +11,7 @@
         BackgroundColor="Transparent"
         x:DataType="vm:HomeViewModel"
         mc:Ignorable="d">
-        <Grid BackgroundColor="DarkGray"
-              RowDefinitions="Auto,*,Auto"
+        <Grid RowDefinitions="Auto,*,Auto"
               ColumnDefinitions="Auto,*,Auto">
                 <!--Deler skærmen i to rækker og to kolonner-->
                 <Label
@@ -37,7 +36,7 @@
                         VerticalOptions="Start"
                         HorizontalOptions="Center"/>
 
-                <Label
+        <Label
                         x:Name="DateLabel"
                         Text="tir. 12. jan."
                         FontSize="25"
@@ -47,47 +46,5 @@
                         Grid.ColumnSpan="2"
                         VerticalOptions="StartAndExpand"
                         HorizontalOptions="Center"/>
-
-                <!--Knap i øverste venstre hjørne-->
-                <Button
-                        x:Name="OkBtn"
-                        Text="OK"
-                        Command="{Binding SetAlarmAsync}"
-                        TextColor="White"
-                        BackgroundColor="Black"
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        VerticalOptions="Start"
-                        HorizontalOptions="Start"/>
-                <!--Knap i øverste højre hjørne-->
-                <Button
-                        x:Name="OpBtn"
-                        Text="Op"
-                        TextColor="White"
-                        BackgroundColor="Black"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        VerticalOptions="Start"
-                        HorizontalOptions="End"/>
-                <!--Knap i nederste venstre hjørne-->
-                <Button
-                        x:Name="AnnullerBtn"
-                        Text="Annuller"
-                        TextColor="White"
-                        BackgroundColor="Black"
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        VerticalOptions="End"
-                        HorizontalOptions="Start"/>
-                <!--Knap i nederste højre hjørne-->
-                <Button
-                        x:Name="NedBtn"
-                        Text="Ned"
-                        TextColor="White"
-                        BackgroundColor="Black"
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        VerticalOptions="End"
-                        HorizontalOptions="End"/>
-        </Grid>
+    </Grid>
 </ContentPage>

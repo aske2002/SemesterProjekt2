@@ -33,37 +33,37 @@ namespace tremorur.Views
             }
         }
 
-        private int level = 1; //vibrationsstart level 1
-        void OnOpClicked(object sender, EventArgs e)
-        {
-            if (level < 7)
-            {
-                level++;
-                UpdateLevelLabel();
-            }
-        }
-        void OnNedClicked(object sender, EventArgs e)
-        {
-            if (level > 1)
-            {
-                level--;
-                UpdateLevelLabel();
-            }
-        }
+        //private int level = 1; //vibrationsstart level 1
+        //void OnOpClicked(object sender, EventArgs e)
+        //{
+        //    if (level < 7)
+        //    {
+        //        level++;
+        //        UpdateLevelLabel();
+        //    }
+        //}
+        //void OnNedClicked(object sender, EventArgs e)
+        //{
+        //    if (level > 1)
+        //    {
+        //        level--;
+        //        UpdateLevelLabel();
+        //    }
+        //}
 
-        private void UpdateLevelLabel()
-        {
-            LevelLabel.Text = $"Level:{level}";
-            OpBtn.IsEnabled = level < 7;
-            NedBtn.IsEnabled = level > 1;
-        }
-        async void OnAnnullerClicked(object sender, EventArgs e)
-        {
-            bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
-            if (confirm)
-            {
-                await Navigation.PopAsync();
-            }
-        }
+        //private void UpdateLevelLabel()
+        //{
+        //    LevelLabel.Text = $"Level:{level}";
+        //    OpBtn.IsEnabled = level < 7;
+        //    NedBtn.IsEnabled = level > 1;
+        //}
+        //async void OnAnnullerClicked(object sender, EventArgs e)
+        //{
+        //    bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
+        //    if (confirm)
+        //    {
+        //        await Navigation.PopAsync();
+        //    }
+        //}
     }
 }

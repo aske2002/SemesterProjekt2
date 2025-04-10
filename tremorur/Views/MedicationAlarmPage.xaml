@@ -20,11 +20,11 @@
         <Label
             x:Name="MedicationLabel"
             Text="Tag din medicin"
-            FontSize="60"
+            FontSize="50"
             FontAttributes="Bold"
             TextColor="White"
             Grid.Row="1"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="1"
             VerticalOptions="Center"
             HorizontalOptions="Center"/>
 
@@ -34,10 +34,9 @@
             FontSize="Title"
             FontAttributes="Bold"
             TextColor="White"
-            Grid.Row="1"
+            Grid.Row="0"
             Grid.ColumnSpan="2"
             VerticalOptions="Start"
             HorizontalOptions="Center"/>
-
     </Grid>
 </models:ContentPageWithButtons>
