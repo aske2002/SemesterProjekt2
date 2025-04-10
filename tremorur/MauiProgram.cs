@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
@@ -7,7 +7,7 @@ namespace tremorur
 {
     public static partial class MauiProgram
     {
-        public static MauiApp CreateMauiApp()
+        public static MauiApp CreateMauiApp() //sker inden programmet starter op
         {
             var builder = MauiApp.CreateBuilder();
             builder.UseMauiCommunityToolkit();
@@ -26,6 +26,9 @@ namespace tremorur
             builder.Services.AddSingleton<INavigationService, NavigationService>();
 
             builder.Services.AddSingleton<HomeViewModel>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>(); //bruges til at navigere rundt med. Har en goto, hvordan vi navigerer rundt mellem mapperne. 
+
+            builder.Services.AddSingleton<HomeViewModel>(); 
             builder.Services.AddSingleton<HomePage>();
             builder.Services.AddSingleton<MedicationAlarmViewModel>();
             builder.Services.AddTransient<SetAlarmViewModel>();
@@ -49,10 +52,14 @@ namespace tremorur
             builder.Services.AddSingleton(loggerFactory);
             var messenger = new Messenger(loggerFactory.CreateLogger<Messenger>());
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
+            var messenger = new DefaultMessenger(loggerFactory.CreateLogger<DefaultMessenger>());
+            builder.Services.AddSingleton<Services.IMessenger>(messenger); //singelton - statisk object - har ikke nogen instans metode. 
 
             var mauiApp = builder.Build();
             messenger.SendMessage<AppBuilt>(new(mauiApp.Services));
             return mauiApp;
+            messenger.Send<AppBuilt>(new(mauiApp.Services));
+            return mauiApp; //n�r dette er k�rt igennem, starter vinduet op 
         }
     }
 }
