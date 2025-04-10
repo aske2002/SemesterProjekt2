@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
 
@@ -16,6 +16,7 @@ namespace tremorur
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
 
+            builder.Services.AddTransient<AlarmService>();
             builder.Services.AddTransient<IButtonService, ButtonService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
