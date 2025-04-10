@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
 
@@ -30,6 +30,7 @@ namespace tremorur
             builder.Services.AddTransient<SetAlarmPage>();
             builder.Services.AddTransient<NewEventViewModel>();
             builder.Services.AddTransient<NewEventPage>();
+            builder.Services.AddSingleton<BluetoothService>();
 
             // Manually create LoggerFactory and Logger
             var loggerFactory = LoggerFactory.Create(logging =>

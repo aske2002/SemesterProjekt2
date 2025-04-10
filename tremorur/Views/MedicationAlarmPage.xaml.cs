@@ -3,11 +3,13 @@ namespace tremorur.Views;
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
-    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService) : base(buttonService)
+    private readonly BluetoothService bluetoothService;
+    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, BluetoothService bluetoothService) : base(buttonService)
     {
         InitializeComponent();
         StartClock();
         this.navigationService = navigationService;
+        this.bluetoothService = bluetoothService;
     }
     protected override void OnOKButtonClicked(object? sender, EventArgs e)
     {
@@ -22,7 +24,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 
     protected override void OnDownButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Ned blev trykket";
+        bluetoothService.Start();
     }
 
     protected override void OnUpButtonClicked(object? sender, EventArgs e)
