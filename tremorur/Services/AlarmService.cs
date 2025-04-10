@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
-using System.Collections.Specialized;//tilføjet for notifycollectionChangedEventArgs
+using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
+using AVKit;//tilføjet for notifycollectionChangedEventArgs
 
 namespace tremorur.Services
 {
@@ -44,6 +46,28 @@ namespace tremorur.Services
         public IEnumerable<Alarm> GetAlarms() 
         {
             return _alarms; //retunerer alle alarmer i ObservableCollection 
+        }
+
+        private List<Timer> activeTimers = new(); //gemmer alle aktive timere
+
+        public void ScheduleAlarms()
+        {
+            foreach (var alarm in SettingsService.Alarms)
+            {
+                TimeSpan delay = alarm.TimeSpan - DateTime.Now.TimeOfDay;
+                if (delay < TimeSpan.Zero)
+                    delay += TimeSpan.FromDays(1);
+                Timer timer = new Timer(TriggerAlarm, alarm, delay, Timeout.InfiniteTimeSpan);
+                activeTimers.Add(timer);
+            }
+
+        }
+        private void TriggerAlarm(object? state)
+        {
+            if (state is Alarm alarm)
+            {
+                Console.WriteLine($"Alarm({alarm.Id})triggered at {DateTime.Now}");
+            }
         }
     }
 }

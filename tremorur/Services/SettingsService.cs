@@ -23,6 +23,7 @@ public static class SettingsService
             && weaklyTypedCachedValue is T value)
             return value;
 
+
         var serializedValue = Preferences.Get(storageKey, "");
 
         if (serializedValue.Length == 0)

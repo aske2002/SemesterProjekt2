@@ -19,9 +19,9 @@ public interface IButtonService
     event EventHandler? CancelButtonClicked;
 }
 
-public class ButtonService : IButtonService
+public class ButtonService : IButtonService //hvis bottonservice skal bruges et sted, skriver man bottonservice : IbottonService 
 {
-    private readonly tremorur.Services.IMessenger _messenger;
+    private readonly tremorur.Services.IMessenger _messenger; //constructor der tager en Imessage som parameter 
     public ButtonService(tremorur.Services.IMessenger messenger)
     {
         _messenger = messenger;
