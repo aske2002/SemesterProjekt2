@@ -6,3 +6,5 @@ obj
 *.vsidx
 */**/.vs/
 tremorur/tremorur.csproj.user
+
+.DS_Store
