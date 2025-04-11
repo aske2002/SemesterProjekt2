@@ -1,7 +1,4 @@
 using Tmds.DBus;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using client.Services.Bluetooth;

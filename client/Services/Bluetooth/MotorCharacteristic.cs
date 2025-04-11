@@ -2,7 +2,7 @@ using Tmds.DBus;
 
 namespace client.Services.Bluetooth;
 
-class MotorCharacteristic : IGattCharacteristic1
+public class MotorCharacteristic : IGattCharacteristic1
 {
     public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/service0/char0");
     private byte[] _value = System.Text.Encoding.UTF8.GetBytes("Hello from Pi!");

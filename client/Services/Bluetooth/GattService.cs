@@ -2,7 +2,7 @@ using Tmds.DBus;
 
 namespace client.Services.Bluetooth;
 
-class GattService : IGattService1
+public class GattService : IGattService1
 {
     public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/service0");
 

@@ -2,7 +2,7 @@ using Tmds.DBus;
 
 namespace client.Services.Bluetooth;
 
-class Advertisement : ILEAdvertisement1
+public class Advertisement : ILEAdvertisement1
 {
     public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/advertisement0");
 
