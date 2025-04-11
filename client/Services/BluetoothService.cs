@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using client.Services.Bluetooth;
 
 namespace client.Services;
+
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
@@ -25,11 +26,12 @@ public class Worker : BackgroundService
         await conn.RegisterObjectAsync(charac);
 
         var gattManager = conn.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
+
         await gattManager.RegisterApplicationAsync(
-            new ObjectPath("/org/bluez/example"),
+            new ObjectPath("/org/bluez/example"),  // Application root, not the adapter path
             new Dictionary<string, object>());
 
-        Console.WriteLine("BLE GATT Service registered and running.");
+        _logger.LogInformation("BLE GATT Service registered and running.");
         await Task.Delay(-1, stoppingToken); // Keep alive
     }
 }
