@@ -4,7 +4,7 @@ namespace client.Services.Bluetooth;
 
 public class GattService : IGattService1
 {
-    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/service0");
+    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/tremorur/service0");
 
     public Task<IDictionary<string, object>> GetAllAsync() =>
         Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object>

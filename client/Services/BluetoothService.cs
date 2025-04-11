@@ -28,7 +28,7 @@ public class Worker : BackgroundService
         var gattManager = conn.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
 
         await gattManager.RegisterApplicationAsync(
-            new ObjectPath("/org/bluez/example"),  // Application root, not the adapter path
+            new ObjectPath("/org/bluez/tremorur"),  // Application root, not the adapter path
             new Dictionary<string, object>());
 
         _logger.LogInformation("BLE GATT Service registered and running.");

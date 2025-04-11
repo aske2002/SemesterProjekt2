@@ -4,7 +4,7 @@ namespace client.Services.Bluetooth;
 
 public class MotorCharacteristic : IGattCharacteristic1
 {
-    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/service0/char0");
+    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/tremorur/service0/char0");
     private byte[] _value = System.Text.Encoding.UTF8.GetBytes("Hello from Pi!");
 
     public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
@@ -24,7 +24,7 @@ public class MotorCharacteristic : IGattCharacteristic1
         Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object>
         {
             { "UUID", "12345678-1234-5678-1234-56789abcdef0" },
-            { "Service", new ObjectPath("/org/bluez/example/service0") },
+            { "Service", new ObjectPath("/org/bluez/tremorur/service0") },
             { "Flags", new string[] { "read", "write" } }
         });
 }

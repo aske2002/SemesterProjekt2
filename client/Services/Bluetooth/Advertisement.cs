@@ -4,7 +4,7 @@ namespace client.Services.Bluetooth;
 
 public class Advertisement : ILEAdvertisement1
 {
-    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/example/advertisement0");
+    public ObjectPath ObjectPath { get; } = new ObjectPath("/org/bluez/tremorur/advertisement0");
 
     public Task ReleaseAsync()
     {
