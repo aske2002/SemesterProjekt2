@@ -54,13 +54,10 @@ namespace client.Services.Bluetooth
 
             _objectManager = _connection.CreateProxy<IObjectManager>("org.bluez", "/");
 
-            Debug.WriteLine("Connected to D-Bus");
             var managedObjects = await _objectManager.GetManagedObjectsAsync();
 
-            Debug.WriteLine("Managed Objects:");
             foreach (var obj in managedObjects)
             {
-                Debug.WriteLine($"Object: {obj.Key}");
                 if (obj.Value.ContainsKey("org.bluez.Adapter1"))
                 {
                     _adapter = _connection.CreateProxy<IAdapter1>("org.bluez", obj.Key);
@@ -71,18 +68,16 @@ namespace client.Services.Bluetooth
             if (_adapter == null)
                 throw new Exception("No Bluetooth adapter found.");
 
-
-            Debug.WriteLine("Starting Bluetooth Discovery...");
+            Console.WriteLine("Starting Bluetooth Discovery...");
             await StartDiscoveryAsync();
 
             var isDiscovering = await IsDiscoveringAsync();
-            Debug.WriteLine($"Discovering: {isDiscovering}");
+            Console.WriteLine($"Discovering: {isDiscovering}");
 
             await WatchInterfacesAddedAsync(info =>
             {
                 Console.WriteLine($"New interface added: {info.Item1}");
             });
-
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
