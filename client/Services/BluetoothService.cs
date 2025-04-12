@@ -1,59 +1,70 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Tmds.DBus;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using client.Services.Bluetooth;
 
-namespace client.Services;
-
-public class Worker : BackgroundService
+namespace client.Services.Bluetooth
 {
-    private readonly ILogger<Worker> _logger;
-
-    public Worker(ILogger<Worker> logger)
+    public class BluetoothService : IAsyncDisposable
     {
-        _logger = logger;
-    }
+        private readonly Connection _connection;
+        private IObjectManager _objectManager;
+        private IAdapter1 _adapter;
+        private IDisposable _interfaceAddedWatcher;
+        private IDisposable _interfaceRemovedWatcher;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        string? systemBusAddress = Address.System;
-        if (systemBusAddress is null)
+        public BluetoothService()
         {
-            Console.Write("Can not determine system bus address");
-            return;
+            _connection = new Connection(Address.System);
         }
 
-        var conn = new Connection(Address.System);
-        await conn.ConnectAsync();
-
-        var objectManager = conn.CreateProxy<IObjectManager>("org.bluez", "/");
-        bool hci0Exists = false;
-
-        while (!hci0Exists)
+        public async Task InitializeAsync()
         {
-            var managedObjects = await objectManager.GetManagedObjectsAsync();
-            hci0Exists = managedObjects.ContainsKey(new ObjectPath("/org/bluez/hci0"));
+            await _connection.ConnectAsync();
 
-            if (!hci0Exists)
+            _objectManager = _connection.CreateProxy<IObjectManager>("org.bluez", "/");
+
+            var managedObjects = await _objectManager.GetManagedObjectsAsync();
+
+            foreach (var obj in managedObjects)
             {
-                _logger.LogInformation("Waiting for Bluetooth adapter (hci0)...");
-                await Task.Delay(1000);
+                if (obj.Value.ContainsKey("org.bluez.Adapter1"))
+                {
+                    _adapter = _connection.CreateProxy<IAdapter1>("org.bluez", obj.Key);
+                    break;
+                }
             }
+
+            if (_adapter == null)
+                throw new Exception("No Bluetooth adapter found.");
         }
 
-        var service = new GattService();
-        var charac = new MotorCharacteristic();
+        public async Task StartDiscoveryAsync() => await _adapter.StartDiscoveryAsync();
+        public async Task StopDiscoveryAsync() => await _adapter.StopDiscoveryAsync();
 
-        await conn.RegisterObjectAsync(service);
-        await conn.RegisterObjectAsync(charac);
+        public async Task<bool> IsDiscoveringAsync() => await _adapter.GetDiscoveringAsync();
+        public async Task<string> GetAdapterAddressAsync() => await _adapter.GetAddressAsync();
 
-        var gattManager = conn.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
+        public async Task<IDisposable> WatchInterfacesAddedAsync(Action<(ObjectPath, IDictionary<string, IDictionary<string, object>>)> handler)
+        {
+            _interfaceAddedWatcher = await _objectManager.WatchInterfacesAddedAsync(handler, ex => Debug.WriteLine($"Error: {ex.Message}"));
+            return _interfaceAddedWatcher;
+        }
 
-        await gattManager.RegisterApplicationAsync(
-            new ObjectPath("/org/bluez/tremorur"),  // Application root, not the adapter path
-            new Dictionary<string, object>());
+        public async Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath, string[])> handler)
+        {
+            _interfaceRemovedWatcher = await _objectManager.WatchInterfacesRemovedAsync(handler, ex => Debug.WriteLine($"Error: {ex.Message}"));
+            return _interfaceRemovedWatcher;
+        }
 
-        _logger.LogInformation("BLE GATT Service registered and running.");
-        await Task.Delay(-1, stoppingToken); // Keep alive
+        public async Task SetDiscoverableAsync(bool enable) => await _adapter.SetDiscoverableAsync(enable);
+        public async Task SetPoweredAsync(bool enable) => await _adapter.SetPoweredAsync(enable);
+
+        public async ValueTask DisposeAsync()
+        {
+            _interfaceAddedWatcher?.Dispose();
+            _interfaceRemovedWatcher?.Dispose();
+        }
     }
 }
