@@ -297,6 +297,108 @@ namespace client.Services.Bluetooth
         Task UnregisterApplicationAsync(ObjectPath Application);
     }
 
+    [DBusInterface("org.bluez.GattService1")]
+    interface IGattService1 : IDBusObject
+    {
+        Task<T> GetAsync<T>(string prop);
+        Task<GattService1Properties> GetAllAsync();
+        Task SetAsync(string prop, object val);
+        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
+    }
+
+    [Dictionary]
+    class GattService1Properties
+    {
+        private string _UUID = default(string);
+        public string UUID
+        {
+            get
+            {
+                return _UUID;
+            }
+
+            set
+            {
+                _UUID = (value);
+            }
+        }
+
+        private bool _Primary = default(bool);
+        public bool Primary
+        {
+            get
+            {
+                return _Primary;
+            }
+
+            set
+            {
+                _Primary = (value);
+            }
+        }
+    }
+
+
+    [DBusInterface("org.bluez.GattCharacteristic1")]
+    interface IGattCharacteristic1 : IDBusObject
+    {
+        Task<byte[]> ReadValueAsync(IDictionary<string, object> Options);
+        Task WriteValueAsync(byte[] Value, IDictionary<string, object> Options);
+        Task<(CloseSafeHandle fd, ushort mtu)> AcquireWriteAsync(IDictionary<string, object> Options);
+        Task<(CloseSafeHandle fd, ushort mtu)> AcquireNotifyAsync(IDictionary<string, object> Options);
+        Task StartNotifyAsync();
+        Task StopNotifyAsync();
+        Task<T> GetAsync<T>(string prop);
+        Task<GattCharacteristic1Properties> GetAllAsync();
+        Task SetAsync(string prop, object val);
+        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
+    }
+
+    [Dictionary]
+    class GattCharacteristic1Properties
+    {
+        private string _UUID = default(string);
+        public string UUID
+        {
+            get
+            {
+                return _UUID;
+            }
+
+            set
+            {
+                _UUID = (value);
+            }
+        }
+
+        private string[] _Flags = default(string[]);
+        public string[] Flags
+        {
+            get
+            {
+                return _Flags;
+            }
+
+            set
+            {
+                _Flags = (value);
+            }
+        }
+
+        private string _Service = default(string);
+        public string Service
+        {
+            get
+            {
+                return _Service;
+            }
+
+            set
+            {
+                _Service = (value);
+            }
+        }
+    }
     [DBusInterface("org.bluez.Media1")]
     interface IMedia1 : IDBusObject
     {
@@ -352,7 +454,6 @@ namespace client.Services.Bluetooth
         Task SetAsync(string prop, object val);
         Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
     }
-
     [Dictionary]
     class LEAdvertisingManager1Properties
     {
