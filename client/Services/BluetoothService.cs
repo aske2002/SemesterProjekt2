@@ -40,6 +40,13 @@ namespace client.Services.Bluetooth
 
         public async Task SetDiscoverableAsync(bool enable) => await _adapter.SetDiscoverableAsync(enable);
         public async Task SetPoweredAsync(bool enable) => await _adapter.SetPoweredAsync(enable);
+        public async Task SetPairableAsync(bool enable) => await _adapter.SetPairableAsync(enable);
+        public async Task<bool> IsDiscoverableAsync() => await _adapter.GetDiscoverableAsync();
+        public async Task<bool> IsPoweredAsync() => await _adapter.GetPoweredAsync();
+        public async Task<bool> IsPairableAsync() => await _adapter.GetPairableAsync();
+        public async Task<string> GetAdapterNameAsync() => await _adapter.GetNameAsync();
+        public async Task SetAliasAsync(string name) => await _adapter.SetAliasAsync(name);
+        public async Task<string> GetAliasAsync() => await _adapter.GetAliasAsync();
 
         public async ValueTask DisposeAsync()
         {
@@ -69,10 +76,27 @@ namespace client.Services.Bluetooth
                 throw new Exception("No Bluetooth adapter found.");
 
             Console.WriteLine("Starting Bluetooth Discovery...");
+            await SetDiscoverableAsync(true);
+            await SetPoweredAsync(true);
+            await SetPairableAsync(true);
+            await SetAliasAsync("Tremor-ur");
             await StartDiscoveryAsync();
 
+            var isDiscoverable = await _adapter.GetDiscoverableAsync();
+            var isPowered = await _adapter.GetPoweredAsync();
+            var isPairable = await _adapter.GetPairableAsync();
+            var adapterName = await GetAdapterNameAsync();
+            var adapterAddress = await GetAdapterAddressAsync();
             var isDiscovering = await IsDiscoveringAsync();
+            var adapterAlias = await GetAliasAsync();
+            Console.WriteLine($"Discoverable: {isDiscoverable}");
+            Console.WriteLine($"Powered: {isPowered}");
+            Console.WriteLine($"Pairable: {isPairable}");
+            Console.WriteLine($"Adapter Name: {adapterName}");
+            Console.WriteLine($"Adapter Address: {adapterAddress}");
             Console.WriteLine($"Discovering: {isDiscovering}");
+            Console.WriteLine($"Adapter Alias: {adapterAlias}");
+            Console.WriteLine("Bluetooth Discovery started.");
 
             await WatchInterfacesAddedAsync(info =>
             {
