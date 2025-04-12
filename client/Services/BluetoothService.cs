@@ -46,7 +46,7 @@ namespace client.Services.Bluetooth
             {
                 CharacteristicSource = new ExampleCharacteristicSource(),
                 UUID = "12345678-1234-5678-1234-56789abcdef1",
-                Flags = new[] { "read", "write" },
+                Flags = new[] { "read", "write", "writable-auxiliaries" },
             };
             var gattDescriptorDescription = new GattDescriptorDescription
             {
