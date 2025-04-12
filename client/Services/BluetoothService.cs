@@ -122,6 +122,7 @@ namespace client.Services.Bluetooth
 
         public async Task EnableIncomingConnectionsAsync()
         {
+            await _adapter.SetAliasAsync("My Bluetooth Device");
             await _adapter.SetPoweredAsync(true);
             await _adapter.SetPairableAsync(true);
             await _adapter.SetDiscoverableAsync(true);
