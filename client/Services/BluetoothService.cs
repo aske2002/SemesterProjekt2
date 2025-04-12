@@ -16,8 +16,30 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        string? systemBusAddress = Address.System;
+        if (systemBusAddress is null)
+        {
+            Console.Write("Can not determine system bus address");
+            return;
+        }
+
         var conn = new Connection(Address.System);
         await conn.ConnectAsync();
+
+        var objectManager = conn.CreateProxy<IObjectManager>("org.bluez", "/");
+        bool hci0Exists = false;
+
+        while (!hci0Exists)
+        {
+            var managedObjects = await objectManager.GetManagedObjectsAsync();
+            hci0Exists = managedObjects.ContainsKey(new ObjectPath("/org/bluez/hci0"));
+
+            if (!hci0Exists)
+            {
+                _logger.LogInformation("Waiting for Bluetooth adapter (hci0)...");
+                await Task.Delay(1000);
+            }
+        }
 
         var service = new GattService();
         var charac = new MotorCharacteristic();
