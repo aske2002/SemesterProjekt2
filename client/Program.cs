@@ -1,23 +1,10 @@
-﻿using System.Diagnostics;
+﻿using client.Services;
 using client.Services.Bluetooth;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-var bluetoothService = new BluetoothService();
-await bluetoothService.InitializeAsync();
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddHostedService<BluetoothService>();
 
-Debug.WriteLine("Starting Bluetooth Discovery...");
-await bluetoothService.StartDiscoveryAsync();
-
-var isDiscovering = await bluetoothService.IsDiscoveringAsync();
-Debug.WriteLine($"Discovering: {isDiscovering}");
-
-await bluetoothService.WatchInterfacesAddedAsync(info =>
-{
-    Debug.WriteLine($"New interface added: {info.Item2}");
-});
-
-await Task.Delay(10000); // Let it discover for 10s
-
-await bluetoothService.StopDiscoveryAsync();
-Debug.WriteLine("Stopped Discovery");
-
-await bluetoothService.DisposeAsync();
+var host = builder.Build();
+host.Run();
