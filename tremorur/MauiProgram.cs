@@ -46,7 +46,7 @@ namespace tremorur
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
 
             var mauiApp = builder.Build();
-            messenger.SendBegivenhed<AppBuilt>(new(mauiApp.Services));
+            messenger.SendMessage<AppBuilt>(new(mauiApp.Services));
             return mauiApp;
         }
     }

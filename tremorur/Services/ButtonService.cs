@@ -30,7 +30,7 @@ public class ButtonService : IButtonService
 
     public void Initialize()
     {
-        _messenger.LytEfterBegivenhed<ButtonClickedEvent>((ButtonClickedEvent e) =>
+        _messenger.On<ButtonClickedEvent>((ButtonClickedEvent e) =>
         {
             switch (e.Button)
             {

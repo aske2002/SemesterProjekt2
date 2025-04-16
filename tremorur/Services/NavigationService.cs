@@ -18,7 +18,7 @@ namespace tremorur.Services
             }
 
             var navigateionState = new ShellNavigationState("..");
-            _messenger.SendBegivenhed(navigateionState);
+            _messenger.SendMessage(navigateionState);
             Shell.Current.GoToAsync(navigateionState);
         }
 
@@ -30,7 +30,7 @@ namespace tremorur.Services
             }
 
             var navigateionState = new ShellNavigationState(route);
-            _messenger.SendBegivenhed(navigateionState);
+            _messenger.SendMessage(navigateionState);
             return Shell.Current.GoToAsync(navigateionState);
         }
 
@@ -44,7 +44,7 @@ namespace tremorur.Services
             }
 
             var navigateionState = new ShellNavigationState("..");
-            _messenger.SendBegivenhed(navigateionState);
+            _messenger.SendMessage(navigateionState);
             return Shell.Current.GoToAsync(navigateionState);
         }
     }
