@@ -70,33 +70,6 @@ public class Messenger : IMessenger
         _messenger.Send(message);
     }
 
-    public IDisposable RegisterMiddlewareFor<TMessage>(Func<TMessage, TMessage> middleware,
-                                                   [CallerFilePath] string callerFilePath = "",
-                                                   [CallerMemberName] string callerMemberName = "",
-                                                   [CallerLineNumber] int callerLineNumber = 0) where TMessage : class
-    {
-        _logger.Log(LogLevel.Information, "RegisterMiddlewareFor<{MessageType}>({Middleware}, {CallerFilePath}, {CallerMemberName}, {CallerLineNumber})",
-                            typeof(TMessage), middleware, callerFilePath, callerMemberName, callerLineNumber);
-
-        _middleware.Add(new MiddlewareRegistration<TMessage>(middleware));
-
-        return new MiddlewareUnsubscriber<TMessage>(this);
-    }
-
-    public void UnregisterMiddlewareFor<TMessage>()
-    {
-        _middleware.RemoveAll(m => m.MessageType == typeof(TMessage));
-    }
-
-    private object ExecuteMiddleware(object message)
-    {
-        foreach (var middleware in _middleware)
-        {
-            message = middleware.Execute(message);
-        }
-
-        return message;
-    }
 
 }
 
@@ -106,14 +79,5 @@ sealed file class Unsubscriber<T>(ICommunityToolkitMessenger messenger, object r
     public void Dispose()
     {
         messenger.Unregister<T>(recipient);
-    }
-}
-
-sealed file class MiddlewareUnsubscriber<T>(Messenger messenger) : IDisposable
-    where T : class
-{
-    public void Dispose()
-    {
-        messenger.UnregisterMiddlewareFor<T>();
     }
 }

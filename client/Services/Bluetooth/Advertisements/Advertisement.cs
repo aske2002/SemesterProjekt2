@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using client.Services.Bluetooth.Core;
+using Tmds.DBus;
 
 namespace client.Services.Bluetooth.Advertisements
 {

@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using client.Models;
 using client.Services.Bluetooth.Advertisements;
 using client.Services.Bluetooth.Core;
 using client.Services.Bluetooth.Gatt.BlueZModel;
 using client.Services.Bluetooth.Gatt.Description;
+using client.Services.Bluetooth.Models;
+using CommunityToolkit.Mvvm.Messaging;
 using Tmds.DBus;
 
 namespace client.Services.Bluetooth.Gatt
 {
-    public record CharacteristicCallback(string UUID, byte[] Value);
+    public record CharacteristicCallback(GattCharacteristic Characteristic, byte[] Value);
     public record AdvertisementConfig(string LocalName, string Type = "peripheral");
     public class GattApplicationManager
     {
@@ -22,57 +25,60 @@ namespace client.Services.Bluetooth.Gatt
         public GattApplicationBuilder Builder { get; } = new GattApplicationBuilder();
         public readonly string AppId = Guid.NewGuid().ToString().Substring(0, 8);
         public string ApplicationObjectPath => $"/{AppId}";
-        public Dictionary<string[], Action<CharacteristicCallback>> Handlers { get; } = new Dictionary<string[], Action<CharacteristicCallback>>();
+        private GattApplication gattApplication;
+        private IMessenger messenger = new WeakReferenceMessenger();
+        public Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>> Handlers { get; } = new Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>>();
         public GattApplicationManager(ServerContext serverContext, string localName, string type = "peripheral")
         {
             _serverContext = serverContext;
             advertisingManager = new AdvertisingManager(serverContext);
             advertisementConfig = new AdvertisementConfig(localName, type);
+            gattApplication = new GattApplication(ApplicationObjectPath, messenger);
+            messenger.Register<GattApplicationManager, CharChangeEvent>(this, CharacteristicDataHandler);
         }
 
-        public GattCharacteristic? FirstOrDefault(Expression<Func<GattCharacteristic, bool>> predicate)
+        public async Task<bool> WriteValueAsync(string uuid, byte[] value)
         {
-            var compiledPredicate = predicate.Compile();
-            foreach (var service in Services)
+            var characteristic = Services.SelectMany(x => x.Characteristics).FirstOrDefault(x => x.UUID == uuid);
+            if (characteristic != null)
             {
-                foreach (var characteristic in service.Characteristics)
+                await characteristic.WriteValueAsync(value, new Dictionary<string, object>());
+                return true;
+            }
+            return false;
+        }
+
+        public void AddHandler(Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>> handler, string[]? uuids = null)
+        {
+            uuids ??= [];
+            Handlers.Add(uuids, handler);
+        }
+
+        private async void CharacteristicDataHandler(GattApplicationManager _, CharChangeEvent data)
+        {
+            var handlers = Handlers.Where(x => x.Key.Contains(data.Value.CharacteristicId)).Select(x => x.Value).ToList();
+            foreach (var handler in handlers)
+            {
+                var result = await handler(data.AsProxy());
+
+                if (!data.HasReceivedResponse && result != null)
                 {
-                    if (compiledPredicate(characteristic))
-                    {
-                        return characteristic;
-                    }
+                    data.Reply(result);
                 }
             }
 
-            return null;
-        }
-
-        public void AddHandler(Action<CharacteristicCallback> handler, string[]? uuids = null)
-        {
-            List<GattCharacteristic> characteristics = Services.SelectMany(x => x.Characteristics).ToList();
-            if (uuids != null && uuids.Length > 0)
+            if (!data.HasReceivedResponse)
             {
-                characteristics = characteristics.Where(x => uuids.Contains(x.UUID)).ToList();
-            }
-            Handlers.Add(characteristics.Select(x => x.UUID).ToArray(), handler);
-        }
-
-        private void CharacteristicDataHandler(object? sender, byte[] value)
-        {
-            if (sender is GattCharacteristic characteristic)
-            {
-                var handlers = Handlers.Where(x => x.Key.Contains(characteristic.UUID)).ToList();
-                var args = new CharacteristicCallback(characteristic.UUID, value);
-                foreach (var handler in handlers)
-                {
-                    handler.Value(args);
-                }
+                data.Reply(MessageResponse.Success());
             }
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             await _serverContext.Connect();
+            var adapter = _serverContext.Connection.CreateProxy<IAdapter1>("org.bluez", "/org/bluez/hci0");
+            await adapter.SetAliasAsync(advertisementConfig.LocalName);
+
             var serviceDescriptions = Builder.BuildServiceDescriptions();
             await advertisingManager.CreateAdvertisement(new AdvertisementProperties()
             {
@@ -81,21 +87,17 @@ namespace client.Services.Bluetooth.Gatt
                 ServiceUUIDs = serviceDescriptions.Select(x => x.UUID).ToArray(),
             }, AppId);
 
-            await BuildApplicationTree(ApplicationObjectPath, serviceDescriptions);
+            await BuildApplicationTree(serviceDescriptions);
             await RegisterApplicationInBluez(ApplicationObjectPath);
-            Services.SelectMany(x => x.Characteristics).ToList().ForEach(x =>
-            {
-                x.OnValueChanged += CharacteristicDataHandler;
-            });
         }
 
-        private async Task BuildApplicationTree(string applicationObjectPath, IEnumerable<GattServiceDescription> gattServiceDescriptions)
+        private async Task BuildApplicationTree(IEnumerable<GattServiceDescription> gattServiceDescriptions)
         {
-            var application = await BuildGattApplication(applicationObjectPath);
+            await _serverContext.Connection.RegisterObjectAsync(gattApplication);
 
             foreach (var serviceDescription in gattServiceDescriptions)
             {
-                var service = await AddNewService(application, serviceDescription);
+                var service = await AddNewService(serviceDescription);
 
                 foreach (var characteristicDescription in serviceDescription.GattCharacteristicDescriptions)
                 {
@@ -115,18 +117,11 @@ namespace client.Services.Bluetooth.Gatt
             await gattManager.RegisterApplicationAsync(new ObjectPath(applicationObjectPath), new Dictionary<string, object>());
         }
 
-        private async Task<GattApplication> BuildGattApplication(string applicationObjectPath)
-        {
-            var application = new GattApplication(applicationObjectPath);
-            await _serverContext.Connection.RegisterObjectAsync(application);
-            return application;
-        }
-
-        private async Task<GattService> AddNewService(GattApplication application,
+        private async Task<GattService> AddNewService(
             GattServiceDescription serviceDescription)
         {
             var gattService1Properties = GattPropertiesFactory.CreateGattService(serviceDescription);
-            var gattService = application.AddService(gattService1Properties);
+            var gattService = gattApplication.AddService(gattService1Properties);
             await _serverContext.Connection.RegisterObjectAsync(gattService);
             Services = Services.Add(gattService);
             return gattService;

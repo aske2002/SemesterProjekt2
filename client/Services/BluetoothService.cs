@@ -1,10 +1,16 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
+using client.Models;
 using client.Services.Bluetooth.Advertisements;
 using client.Services.Bluetooth.Core;
 using client.Services.Bluetooth.Gatt;
 using client.Services.Bluetooth.Gatt.BlueZModel;
 using client.Services.Bluetooth.Gatt.Description;
+using client.Services.Bluetooth.Models;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using shared.Models.Vibrations;
 
 namespace client.Services.Bluetooth
 {
@@ -12,45 +18,39 @@ namespace client.Services.Bluetooth
     {
         // UUIDs for the Advertisement
         public const string AdvertisementType = "peripheral";
-        public const string AdvertisementName = "Tremor ur";
+        public const string AdvertisementName = "Tremorur";
 
         // UUIDs for the Vibration Service and its characteristics
         public const string VibrationServiceUUID = "12345678-0000-1000-8000-00805F9B34FB";
 
         // UUIDs for motor control characteristic
-        public const string MotorControlCharacteristicUUID = "12345678-0001-1000-8000-00805F9B34FB";
-        public const string MotorControlDescriptorUUID = "12345678-0002-1000-8000-00805F9B34FB";
-        public const CharacteristicFlags MotorControlFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse;
+        public const string VibrationPatternCharacteristicUUID = "12345678-0001-1000-8000-00805F9B34FB";
+        public const CharacteristicFlags VibrationPatternFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
 
         // UUIDs for motor status characteristic
-        public const string MotorStatusCharacteristicUUID = "12345678-0003-1000-8000-00805F9B34FB";
-        public const string MotorStatusDescriptorUUID = "12345678-0004-1000-8000-00805F9B34FB";
-        public const CharacteristicFlags MotorStatusFlags = CharacteristicFlags.Read | CharacteristicFlags.Notify;
+        public const string VibrationEnabledCharacteristicUUID = "12345678-0003-1000-8000-00805F9B34FB";
+        public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.Read | CharacteristicFlags.Notify | CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse;
 
-        // UUIDs for motor speed characteristic
-        public const string MotorSpeedCharacteristicUUID = "12345678-0005-1000-8000-00805F9B34FB";
-        public const string MotorSpeedDescriptorUUID = "12345678-0006-1000-8000-00805F9B34FB";
-        public const CharacteristicFlags MotorSpeedFlags = CharacteristicFlags.Read | CharacteristicFlags.Notify;
     }
 
-    public class BluetoothService : IHostedService, IAsyncDisposable
+    public class BluetoothService : IHostedService, IRecipient<VibrationsDidToggleEvent>, IRecipient<VibrationSettingsChangedEvent>
     {
-        private readonly List<Tuple<string, string, CharacteristicFlags>> _characteristics = new()
+        private readonly List<Tuple<string, CharacteristicFlags>> _characteristics = new()
         {
-            new Tuple<string, string, CharacteristicFlags>(BluetoothIdentifiers.MotorControlCharacteristicUUID, BluetoothIdentifiers.MotorControlDescriptorUUID, BluetoothIdentifiers.MotorControlFlags),
-            new Tuple<string, string, CharacteristicFlags>(BluetoothIdentifiers.MotorStatusCharacteristicUUID, BluetoothIdentifiers.MotorStatusDescriptorUUID, BluetoothIdentifiers.MotorStatusFlags),
-            new Tuple<string, string, CharacteristicFlags>(BluetoothIdentifiers.MotorSpeedCharacteristicUUID, BluetoothIdentifiers.MotorSpeedDescriptorUUID, BluetoothIdentifiers.MotorSpeedFlags)
+            new Tuple<string, CharacteristicFlags>(BluetoothIdentifiers.VibrationPatternCharacteristicUUID, BluetoothIdentifiers.VibrationPatternFlags),
+            new Tuple<string, CharacteristicFlags>(BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, BluetoothIdentifiers.VibrationEnabledFlags),
         };
-        private readonly ServerContext _serverContext;
+        private readonly ServerContext serverContext;
         private readonly GattApplicationManager app;
-        public BluetoothService()
+        private readonly ILogger<BluetoothService> logger;
+        private readonly IMessenger messenger;
+        public BluetoothService(ILogger<BluetoothService> logger, IMessenger messenger)
         {
-            _serverContext = new ServerContext();
-            app = new GattApplicationManager(_serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.AdvertisementType);
-        }
-        public ValueTask DisposeAsync()
-        {
-            throw new NotImplementedException();
+            this.logger = logger;
+            this.messenger = messenger;
+            messenger.RegisterAll(this);
+            serverContext = new ServerContext();
+            app = new GattApplicationManager(serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.AdvertisementType);
         }
 
         private void registerGattApplication()
@@ -67,48 +67,76 @@ namespace client.Services.Bluetooth
                 var gattCharacteristicDescription = new GattCharacteristicDescription
                 {
                     UUID = characteristic.Item1,
-                    Flags = characteristic.Item3,
+                    Flags = characteristic.Item2,
                 };
 
-                var gattDescriptorDescription = new GattDescriptorDescription
-                {
-                    UUID = characteristic.Item2,
-                    Value = [0x00],
-                    Flags = ["read"]
-                };
-
-                sb.WithCharacteristic(gattCharacteristicDescription, [gattDescriptorDescription]);
+                sb.WithCharacteristic(gattCharacteristicDescription, []);
             }
         }
 
-        public void HandleDataReceived(CharacteristicCallback args)
+        public async Task<MessageResponse?> VibrationSettingsSet(AsyncRequestProxy<CharChangeData, MessageResponse> args)
         {
-            switch (args.UUID)
+            try
             {
-                case BluetoothIdentifiers.MotorControlCharacteristicUUID:
-                    // Handle motor control characteristic data
-                    break;
-                case BluetoothIdentifiers.MotorStatusCharacteristicUUID:
-                    // Handle motor status characteristic data
-                    break;
-                case BluetoothIdentifiers.MotorSpeedCharacteristicUUID:
-                    // Handle motor speed characteristic data
-                    break;
-                default:
-                    Debug.WriteLine($"Unknown characteristic UUID: {args.UUID}");
-                    break;
+                logger.LogInformation("Vibration settings set");
+                logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
+                
+                var settings = await VibrationSettings.FromBytes(args.Value.Data);
+                await messenger.Send(new SetVibrationSettingsMessage(settings));
+                return MessageResponse.Success();
+            }
+            catch
+            {
+                logger.LogError("Failed to parse vibration settings");
+                return MessageResponse.Failure("Failed to parse vibration settings");
             }
         }
+
+        public async Task<MessageResponse?> VibrationToggled(AsyncRequestProxy<CharChangeData, MessageResponse> args)
+        {
+            try
+            {
+                logger.LogInformation("Vibration toggled");
+                logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
+
+                var state = args.Value.Data[0] == 1;
+                await messenger.Send(new ToggleVibrationsMessage(state));
+                return MessageResponse.Success();
+            }
+            catch
+            {
+                logger.LogError("Failed to parse vibration state");
+                return MessageResponse.Failure("Failed to toggle vibration state");
+            }
+        }
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             registerGattApplication();
-            app.AddHandler(HandleDataReceived);
-            await app.Run();
+
+            // Register the GATT characteristic handlers
+            app.AddHandler(VibrationSettingsSet, [BluetoothIdentifiers.VibrationPatternCharacteristicUUID]);
+            app.AddHandler(VibrationToggled, [BluetoothIdentifiers.VibrationEnabledCharacteristicUUID]);
+
+            // Run the GATT application
+            await app.RunAsync();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            serverContext.Dispose();
+            messenger.UnregisterAll(this);
+            return Task.CompletedTask;
+        }
+
+        public async void Receive(VibrationSettingsChangedEvent message)
+        {
+            await app.WriteValueAsync(BluetoothIdentifiers.VibrationPatternCharacteristicUUID, message.Value.ToBytes());
+        }
+
+        public async void Receive(VibrationsDidToggleEvent message)
+        {
+            await app.WriteValueAsync(BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, [Convert.ToByte(message.Value)]);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace client.Services.Bluetooth.Core
     interface IObjectManager : IDBusObject
     {
         Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync();
-        Task<IDisposable> WatchInterfacesAddedAsync(Action<ObjectPath, IDictionary<string, IDictionary<string, object>>> handler);
-        Task<IDisposable> WatchInterfacesRemovedAsync(Action<ObjectPath, string[]> handler);
+        Task<IDisposable> WatchInterfacesAddedAsync(Action<(ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces)> handler, Action<Exception>? onError = null);
+        Task<IDisposable> WatchInterfacesRemovedAsync(Action<(ObjectPath @object, string[] interfaces)> handler, Action<Exception>? onError = null);
     }
 
     [DBusInterface("org.freedesktop.DBus.ObjectManager")]
@@ -51,6 +51,7 @@ namespace client.Services.Bluetooth.Core
         Task SetDiscoveryFilterAsync(IDictionary<string, object> Properties);
         Task StopDiscoveryAsync();
         Task RemoveDeviceAsync(ObjectPath Device);
+        
         Task<string[]> GetDiscoveryFiltersAsync();
         Task<T> GetAsync<T>(string prop);
         Task<Adapter1Properties> GetAllAsync();

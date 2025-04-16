@@ -7,7 +7,6 @@ namespace client.Services.Bluetooth.Core
 {
     public class ServerContext : IDisposable
     {
-        public readonly PropertyListener Listener = new PropertyListener();
         public ServerContext()
         {
             Connection = new Connection(Address.System);
@@ -16,7 +15,6 @@ namespace client.Services.Bluetooth.Core
         public async Task Connect()
         {
             await Connection.ConnectAsync();
-            await Listener.InitializeAsync(Connection);
         }
 
         public Connection Connection { get; }

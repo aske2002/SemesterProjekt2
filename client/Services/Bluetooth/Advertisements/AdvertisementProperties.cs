@@ -5,8 +5,6 @@ using Tmds.DBus;
 namespace client.Services.Bluetooth.Advertisements
 {
     [Dictionary]
-    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class AdvertisementProperties
     {
         private string _Type;

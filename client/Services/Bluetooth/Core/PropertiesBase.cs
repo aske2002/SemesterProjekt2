@@ -33,6 +33,7 @@ namespace client.Services.Bluetooth.Core
 
         public Task SetAsync(string prop, object val)
         {
+            OnPropertiesChanged.Invoke(PropertyChanges.ForProperty(prop, val));
             return Properties.SetProperty(prop, val);
         }
 
@@ -40,7 +41,6 @@ namespace client.Services.Bluetooth.Core
         {
             return SignalWatcher.AddAsync(this, nameof(OnPropertiesChanged), handler);
         }
-
         public event Action<PropertyChanges> OnPropertiesChanged = delegate { };
     }
 }

@@ -82,9 +82,10 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
         Task WriteValueAsync(byte[] Value, IDictionary<string, object> Options);
         Task StartNotifyAsync();
         Task StopNotifyAsync();
-        Task<Object> GetAsync(string prop);
+        Task<object> GetAsync(string prop);
         Task<GattCharacteristic1Properties> GetAllAsync();
         Task SetAsync(string prop, object val);
+        Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
     }
 
     [Dictionary]
@@ -118,7 +119,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
             }
         }
 
-        private byte[] _Value = new byte[0];
+        private byte[] _Value = Array.Empty<byte>();
         public byte[] Value
         {
             get
@@ -341,16 +342,9 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
     [DBusInterface("org.freedesktop.DBus.Properties")]
     interface IProperties : IDBusObject
     {
-        Task<IDictionary<string, object>> GetAllAsync(string interfaceName);
-        Task<object> GetAsync(string interfaceName, string propertyName);
-        Task SetAsync(string interfaceName, string propertyName, object value);
-        Task<IDisposable> WatchPropertiesChangedAsync(Action<PropertyChanges> handler);
-    }
-
-    public class PropertyChanges
-    {
-        public string? Interface { get; set; }
-        public IDictionary<string, object> Changed { get; set; } = new Dictionary<string, object>();
-        public string[]? Invalidated { get; set; }
+        Task<IDictionary<string, object>> GetAllAsync();
+        Task<object> GetAsync(string propertyName);
+        Task SetAsync(string propertyName, object value);
+        Task<IDisposable> WatchPropertiesChangedAsync(Action<(string Interface, IDictionary<string, object> Changed, string[] Invalidated)> handler);
     }
 }

@@ -15,7 +15,6 @@ namespace client.Services.Bluetooth.Utilities
             return o.GetType().GetProperty(prop)?.GetValue(o) ?? throw new InvalidOperationException($"Property {prop} not found on {o.GetType()}");
         }
 
-
         public static Task SetProperty(this object o, string prop, object val)
         {
             o.GetType().GetProperty(prop)?.SetValue(o, val);
