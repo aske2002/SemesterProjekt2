@@ -34,8 +34,7 @@ public class Messenger : IMessenger
 
         _messenger.Register<TMessage>(recipient, (_, m) =>
         {
-            var message = (TMessage)ExecuteMiddleware(m);
-            handler(message);
+            handler(m);
         });
 
         return new Unsubscriber<TMessage>(_messenger, recipient);

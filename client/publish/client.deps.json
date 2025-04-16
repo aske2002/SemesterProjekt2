@@ -12,7 +12,8 @@
           "Microsoft.CodeAnalysis.CSharp.Scripting": "4.13.0",
           "System.Device.Gpio": "3.2.0",
           "Tmds.DBus": "0.21.2",
-          "Microsoft.Extensions.Hosting": "9.0.4"
+          "Microsoft.Extensions.Hosting": "9.0.4",
+          "shared": "1.0.0"
         },
         "runtime": {
           "client.dll": {}
@@ -652,6 +653,17 @@
             "fileVersion": "0.21.2.0"
           }
         }
+      },
+      "shared/1.0.0": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp.Scripting": "4.13.0"
+        },
+        "runtime": {
+          "shared.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -933,6 +945,11 @@
       "sha512": "sha512-KejVYde7VYeWsAj4aaELthlJyVzsbvG4rmHgaXuyPmv8QuN4SLYotKGYtYqWRG+zj9c24/VCYq+V67SRgasDYQ==",
       "path": "tmds.dbus/0.21.2",
       "hashPath": "tmds.dbus.0.21.2.nupkg.sha512"
+    },
+    "shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

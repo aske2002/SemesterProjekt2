@@ -24,13 +24,20 @@ public enum BluetoothCharacteristicProperties : ulong
 
 public partial class BluetoothPeripheralCharacteristic
 {
-    public partial List<object?> Descriptors { get; }
+    public partial List<object> Descriptors { get; }
     public partial bool IsNotifying { get; }
     public partial bool IsBroadcasted { get; }
+    public partial Task NotifyAsync(Action<byte[]> action);
+    public partial Task StopNotifyAsync(Action<byte[]> action);
+    public partial Task WriteValueAsync(byte[] data);
+    public partial Task<byte[]> ReadValueAsync();
+    public partial string UUID { get; }
     public partial BluetoothCharacteristicProperties Properties { get; }
+
 }
 public partial class BluetoothPeripheralService
 {
+    public partial string UUID { get; }
     public partial List<BluetoothPeripheralCharacteristic> Characteristics { get; }
     public partial bool IsPrimary { get; }
 }

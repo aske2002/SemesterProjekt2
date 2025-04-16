@@ -1,25 +1,137 @@
 using System.Diagnostics;
 using CoreBluetooth;
-using ObjCBindings;
+using Foundation;
 
 namespace tremorur.Models;
 
 public partial class BluetoothPeripheralCharacteristic
 {
     private readonly CBCharacteristic nativeCharacteristic;
+    private TaskCompletionSource? writeTaskCompletionSource;
+    private TaskCompletionSource<byte[]>? readTaskCompletionSource;
+    private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
+    private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
 
     public BluetoothPeripheralCharacteristic(CBCharacteristic cBCharacteristic)
     {
         nativeCharacteristic = cBCharacteristic;
-    }
 
-    public partial List<object> Descriptors
-    {
-        get
+        if (nativePeripheral != null)
         {
-            return this.nativeCharacteristic.Descriptors.Select(d => d.Value).Cast<object>().ToList();
+            nativePeripheral.UpdatedCharacterteristicValue += Characteristic_UpdatedValue;
+            nativePeripheral.WroteCharacteristicValue += Characteristic_WroteValue;
         }
     }
+
+    private void Characteristic_WroteValue(object? sender, CBCharacteristicEventArgs e)
+    {
+        if (e.Characteristic.UUID == nativeCharacteristic.UUID && writeTaskCompletionSource != null)
+        {
+            if (e.Error == null)
+            {
+                writeTaskCompletionSource.TrySetResult();
+            }
+            else
+            {
+                writeTaskCompletionSource.TrySetException(new Exception(e.Error.LocalizedDescription));
+            }
+            writeTaskCompletionSource = null;
+        }
+    }
+
+    private void Characteristic_UpdatedValue(object? sender, CBCharacteristicEventArgs e)
+    {
+        if (e.Characteristic.UUID != nativeCharacteristic.UUID)
+        {
+            return;
+        }
+
+        var data = e.Characteristic.Value?.ToArray() ?? Array.Empty<byte>();
+        foreach (var action in notifyActions)
+        {
+            action?.Invoke(data);
+        }
+
+        if (readTaskCompletionSource != null)
+        {
+            if (e.Error != null)
+            {
+                readTaskCompletionSource.TrySetException(new Exception(e.Error.LocalizedDescription));
+            }
+            else
+            {
+                readTaskCompletionSource.TrySetResult(data);
+            }
+        }
+    }
+
+    public partial Task NotifyAsync(Action<byte[]> action)
+    {
+        notifyActions.Add(action);
+        return Task.CompletedTask;
+    }
+
+    public partial Task StopNotifyAsync(Action<byte[]> action)
+    {
+        notifyActions.Remove(action);
+        return Task.CompletedTask;
+    }
+
+    public partial async Task WriteValueAsync(byte[] data)
+    {
+        if (nativePeripheral == null || nativeCharacteristic == null)
+        {
+            throw new InvalidOperationException("Peripheral or characteristic is null.");
+        }
+
+        var flags = nativeCharacteristic.Properties;
+        if (!flags.HasFlag(CBCharacteristicProperties.Write) && !flags.HasFlag(CBCharacteristicProperties.WriteWithoutResponse))
+        {
+            throw new InvalidOperationException("Characteristic does not support writing.");
+        }
+
+        if (writeTaskCompletionSource != null)
+        {
+            throw new InvalidOperationException("Write operation already in progress.");
+        }
+
+        writeTaskCompletionSource = new TaskCompletionSource();
+        nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
+
+        if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Write))
+        {
+            nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithResponse);
+            await writeTaskCompletionSource.Task;
+        }
+        else
+        {
+            nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
+        }
+    }
+
+    public partial async Task<byte[]> ReadValueAsync()
+    {
+        if (nativePeripheral == null || nativeCharacteristic == null)
+        {
+            throw new InvalidOperationException("Peripheral or characteristic is null.");
+        }
+
+        if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Read))
+        {
+            readTaskCompletionSource = new TaskCompletionSource<byte[]>();
+            nativePeripheral.ReadValue(nativeCharacteristic);
+            return await readTaskCompletionSource.Task;
+        }
+        else
+        {
+            throw new InvalidOperationException("Characteristic does not support reading.");
+        }
+    }
+
+    public partial bool IsNotifying => nativeCharacteristic.IsNotifying;
+    public partial bool IsBroadcasted => nativeCharacteristic.IsBroadcasted;
+    public partial List<object> Descriptors => this.nativeCharacteristic.Descriptors.Select(d => d.Value).Cast<object>().ToList();
+    public partial string UUID => this.nativeCharacteristic.UUID.ToString();
     public partial BluetoothCharacteristicProperties Properties
     {
         get
@@ -49,20 +161,6 @@ public partial class BluetoothPeripheralCharacteristic
             return properties;
         }
     }
-    public partial bool IsNotifying
-    {
-        get
-        {
-            return nativeCharacteristic.IsNotifying;
-        }
-    }
-    public partial bool IsBroadcasted
-    {
-        get
-        {
-            return nativeCharacteristic.IsBroadcasted;
-        }
-    }
 }
 public partial class BluetoothPeripheralService
 {
@@ -79,14 +177,8 @@ public partial class BluetoothPeripheralService
             return this.nativeService.Characteristics.Select(c => new BluetoothPeripheralCharacteristic(c)).ToList();
         }
     }
-
-    public partial bool IsPrimary
-    {
-        get
-        {
-            return this.nativeService.Primary;
-        }
-    }
+    public partial string UUID => this.nativeService.UUID.ToString();
+    public partial bool IsPrimary => this.nativeService.Primary;
 }
 public partial class BluetoothPeripheral
 {

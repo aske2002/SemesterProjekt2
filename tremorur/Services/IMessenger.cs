@@ -4,13 +4,6 @@ namespace tremorur.Services;
 
 public interface IMessenger
 {
-    IDisposable RegisterMiddlewareFor<TMessage>(
-        Func<TMessage, TMessage> middleware,
-        [CallerFilePath] string callerFilePath = "",
-        [CallerMemberName] string callerMemberName = "",
-        [CallerLineNumber] int callerLineNumber = 0)
-        where TMessage : class;
-
     IDisposable On<TMessage>(
         Action<TMessage> handler,
         [CallerFilePath] string callerFilePath = "",
