@@ -41,7 +41,7 @@ namespace tremorur
 #endif
             });
             // Register the logger factory in services, so it's available later
-            builder.Services.AddSingleton<ILoggerFactory>(loggerFactory);
+            builder.Services.AddSingleton(loggerFactory);
             var messenger = new Messenger(loggerFactory.CreateLogger<Messenger>());
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
 
