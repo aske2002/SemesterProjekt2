@@ -1,13 +1,17 @@
 using System.Diagnostics;
 using CoreBluetooth;
+using tremorur.Messages;
 
 namespace tremorur.Services;
 public partial class BluetoothService
 {
+    private readonly IMessenger _messenger;
     CBCentralManager centralManager;
 
-    public BluetoothService()
+    public BluetoothService(IMessenger messenger)
     {
+        _messenger = messenger;
+
         // Initialize the Bluetooth service
         centralManager = new CBCentralManager();
         centralManager.UpdatedState += (sender, e) =>
@@ -17,6 +21,7 @@ public partial class BluetoothService
 
             if (centralManager.State == CBManagerState.PoweredOn)
             {
+                _messenger.SendMessage(new BluetoothStateUpdated(BluetoothState.Available));
                 if (_shouldScan)
                 {
                     StartScan();
