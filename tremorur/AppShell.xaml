@@ -34,17 +34,6 @@
             ContentTemplate="{DataTemplate vw:HomePage}"
             Route="home"/>
     </FlyoutItem>
-    <FlyoutItem Title="Search">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:SearchPage}"
-            Route="search"/>
-    </FlyoutItem>
-    <FlyoutItem Title="Settings">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:SettingsPage}"
-            Route="settings"/>
-    </FlyoutItem>
-
     <FlyoutItem Title="Bluetooth List">
         <ShellContent
             ContentTemplate="{DataTemplate vw:BluetoothConnectPage}"

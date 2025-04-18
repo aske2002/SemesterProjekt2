@@ -49,7 +49,6 @@ namespace tremorur
 
         private void RegisterRoutes()
         {
-            Routing.RegisterRoute("newevent", typeof(NewEventPage));
         }
 
         private async void OnMenuItemClicked(object sender, EventArgs e)
