@@ -12,11 +12,71 @@ public record VibrationSettings
         Pattern = new VibrationPatternConstant(0)
     };
 
+    /// <summary>
+    /// Creates a VibrationSettings object with a sine pattern.
+    /// </summary>
+    /// <param name="frequency">
+    /// The frequency of the sine wave in Hz.
+    /// </param>
+    /// <returns>VibrationSettings object</returns>
+    public static async Task<VibrationSettings> CreateSinePatternSettings(float frequency)
+    {
+        var expression = $"Math.Sin(t * 2 * Math.PI * {frequency} / 1000) * 0.5 + 0.5";
+        var pattern = await VibrationPatternExpression.ParseAsync(expression, 1);
+        return new VibrationSettings
+        {
+            Id = Guid.NewGuid(),
+            Pattern = pattern
+        };
+    }
+
+    /// <summary>
+    /// Creates a VibrationSettings object with a constant pattern.
+    /// </summary>
+    /// <param name="intensity">
+    /// Vibration intensity from 0.0 to 1.0 (0% to 100%).
+    /// </param>
+    /// <returns>VibrationSettings object</returns>
+    public static Task<VibrationSettings> CreateConstantPatternSettings(double intensity)
+    {
+        var pattern = new VibrationPatternConstant(intensity, double.MaxValue);
+        return Task.FromResult(new VibrationSettings
+        {
+            Id = Guid.NewGuid(),
+            Pattern = pattern
+        });
+    }
+
+    /// <summary>
+    /// Creates a VibrationSettings object with a dynamic pattern.
+    /// </summary>
+    /// <param name="points">An array of points (durationMS, intensity)</param>
+    /// <example>
+    /// VibrationSettings.CreateDynamicPatternSettings((10, 0.5), (100, 0.25), (10000, 1.0));
+    /// Creates a dynamic pattern with three segments:
+    ///     50% intensity for 10ms,
+    ///     25% intensity for 100ms,
+    ///     100% intensity for 10000ms.
+    /// </example>
+    /// <returns>VibrationSettings object</returns>
+    public static Task<VibrationSettings> CreateDynamicPatternSettings(params (double durationMS, double intensity)[] points)
+    {
+        var segments = points
+            .Select(point => new VibrationPatternDynamic.VibrationPatternSegment((int)point.durationMS, point.intensity))
+            .ToList();
+        var pattern = new VibrationPatternDynamic(segments, 1);
+        return Task.FromResult(new VibrationSettings
+        {
+            Id = Guid.NewGuid(),
+            Pattern = pattern
+        });
+    }
     public byte[] ToBytes()
     {
         var idBytes = Id.ToByteArray();
         var resolutionBytes = BitConverter.GetBytes(Pattern.Resolution);
         var dataBytes = Pattern.ToBytes();
+
 
         byte[] bytes = new byte[1] { (byte)Pattern.Mode }
             .Concat(idBytes)

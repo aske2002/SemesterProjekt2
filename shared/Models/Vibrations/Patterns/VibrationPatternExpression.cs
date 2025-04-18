@@ -31,7 +31,13 @@ public record VibrationPatternExpression : VibrationPatternBase
     public static async Task<VibrationPatternExpression> ParseAsync(byte[] data, double resolution)
     {
         var expression = System.Text.Encoding.UTF8.GetString(data);
+        return await ParseAsync(expression, resolution);
+        Math.Sin();
+    }
 
+    //expression kunne e.g være "Math.Sin(t * 2 * Math.PI / 1000) * 0.5 + 0.5"
+    public static async Task<VibrationPatternExpression> ParseAsync(string expression, double resolution)
+    {
         // Compile it using Roslyn
         var options = ScriptOptions.Default
             .AddReferences(typeof(Math).Assembly)
