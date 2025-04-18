@@ -17,12 +17,11 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         MedicationLabel.Text = "Medicinpåmindelse godkendt";
     }
 
-    protected override void OnCancelButtonClicked(object? sender, EventArgs e)
+    protected override void OnCancelButtonClicked(object? sender, EventArgs e)  
     {
         MedicationLabel.Text = "Medicinpåmindelse annulleret";
         navigationService.GoToAsync("//home");
     }
-
     protected override void OnDownButtonClicked(object? sender, EventArgs e)
     {
 
@@ -39,9 +38,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         {
             DateTime now = DateTime.Now;
             TimeSpan currentTime = now.TimeOfDay; // Henter tidspunktet som TimeSpan
-
-            //ClockLabel.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}"; // Viser tid i timer og sekunder
-
+            ClockLabel.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}"; // Viser tid i timer og sekunder
             await Task.Delay(1000); // Opdater hvert sekund
         }
     }

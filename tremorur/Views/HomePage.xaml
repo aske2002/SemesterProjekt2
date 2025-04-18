@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage
+<models:ContentPageWithButtons
         x:Class="tremorur.Views.HomePage"
         xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:tremorur.ViewModels"
         xmlns:local="clr-namespace:tremorur.Views"
+        xmlns:models="clr-namespace:tremorur.Models"
         ControlTemplate="{StaticResource LayoutTemplate}"
         BackgroundColor="Transparent"
         x:DataType="vm:HomeViewModel"
@@ -27,7 +28,7 @@
 
                 <Label
                         x:Name="LevelLabel"
-                        Text="Level: 1"
+                        Text="Level: 0"
                         FontSize="Caption"
                         FontAttributes="Bold"
                         TextColor="White"
@@ -47,4 +48,4 @@
                         VerticalOptions="StartAndExpand"
                         HorizontalOptions="Center"/>
     </Grid>
-</ContentPage>
+</models:ContentPageWithButtons>

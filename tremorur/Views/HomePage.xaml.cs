@@ -4,20 +4,21 @@ using tremorur.Messages;
 
 namespace tremorur.Views
 {
-    public partial class HomePage : ContentPage
+    public partial class HomePage : ContentPageWithButtons
     {
         private readonly ILogger _logger;
         private readonly IButtonService _buttonService;
         private readonly Services.IMessenger _messenger;
-        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger)
+        private readonly INavigationService navigationService;
+        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger, INavigationService navigationService) : base(buttonService)
         {
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
             InitializeComponent();
             BindingContext = viewModel;
+            this.navigationService = navigationService;
             StartClock();
         }
-
         async void StartClock()
         {
             while (true)
@@ -33,37 +34,37 @@ namespace tremorur.Views
             }
         }
 
-        //private int level = 1; //vibrationsstart level 1
-        //void OnOpClicked(object sender, EventArgs e)
-        //{
-        //    if (level < 7)
-        //    {
-        //        level++;
-        //        UpdateLevelLabel();
-        //    }
-        //}
-        //void OnNedClicked(object sender, EventArgs e)
-        //{
-        //    if (level > 1)
-        //    {
-        //        level--;
-        //        UpdateLevelLabel();
-        //    }
-        //}
+        private int level = 0; //vibrationsstart level 0, hvor 0 er off
+        protected override void OnUpButtonClicked(object? sender, EventArgs e)
+        {
+            if (level < 7)
+            {
+                level++;
+                //UpdateLevelLabel();
+            }
+        }
+        protected override void OnDownButtonClicked(object? sender, EventArgs e)
+        {
+            if (level > 1)
+            {
+                level--;
+                //UpdateLevelLabel();
+            }
+        }
 
         //private void UpdateLevelLabel()
         //{
         //    LevelLabel.Text = $"Level:{level}";
-        //    OpBtn.IsEnabled = level < 7;
-        //    NedBtn.IsEnabled = level > 1;
+        //    OnUpButtonClicked.IsEnabled = level < 7;
+        //    OnDownButtonClicked.IsEnabled = level > 1;
         //}
-        //async void OnAnnullerClicked(object sender, EventArgs e)
-        //{
-        //    bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
-        //    if (confirm)
-        //    {
-        //        await Navigation.PopAsync();
-        //    }
-        //}
+        protected override async void OnCancelButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
+        {
+            bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
+            if (confirm)
+            {
+                await Navigation.PopAsync();
+            }
+        }
     }
 }
