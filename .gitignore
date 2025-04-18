@@ -9,3 +9,7 @@ obj
 tremorur/tremorur.csproj.user
 
 .DS_Store
+
+.vs/tremorur/DesignTimeBuild/
+
+.vs/tremorur/v17/
