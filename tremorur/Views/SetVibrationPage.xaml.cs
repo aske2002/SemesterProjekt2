@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Logging;
+
 namespace tremorur.Views;
 
-public partial class SetVibrationsPage : ContentPage
+public partial class SetVibrationsPage : ContentPageWithButtons
 {
-	public SetVibrationsPage()
-	{
-		InitializeComponent();
-	}
+    private readonly INavigationService navigationService;
+    public SetVibrationsPage(IButtonService buttonService, INavigationService navigationService) : base(buttonService)
+    {
+        InitializeComponent();
+        this.navigationService = navigationService;
+    }
 }

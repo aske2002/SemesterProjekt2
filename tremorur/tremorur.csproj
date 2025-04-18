@@ -99,4 +99,12 @@
     </PackageReference>
   </ItemGroup>
 
+    <ItemGroup>
+      <MauiXaml Update="Views\MedicationAlarmPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+      <MauiXaml Update="Views\SetVibrationPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
 </Project>

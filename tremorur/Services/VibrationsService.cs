@@ -8,5 +8,6 @@ namespace tremorur.Services
 {
     class VibrationsService
     {
+
     }
 }
