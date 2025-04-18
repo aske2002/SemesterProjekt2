@@ -9,6 +9,7 @@ public partial class BluetoothPeripheralCharacteristic
     private readonly CBCharacteristic nativeCharacteristic;
     private TaskCompletionSource? writeTaskCompletionSource;
     private TaskCompletionSource<byte[]>? readTaskCompletionSource;
+    private TaskCompletionSource? notifyTaskCompletionSource;
     private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
 
@@ -18,8 +19,25 @@ public partial class BluetoothPeripheralCharacteristic
 
         if (nativePeripheral != null)
         {
+            nativePeripheral.UpdatedNotificationState += Peripheral_UpdatedNotificationState;
             nativePeripheral.UpdatedCharacterteristicValue += Characteristic_UpdatedValue;
             nativePeripheral.WroteCharacteristicValue += Characteristic_WroteValue;
+        }
+    }
+
+    private void Peripheral_UpdatedNotificationState(object? sender, CBCharacteristicEventArgs e)
+    {
+        if (e.Characteristic.UUID == nativeCharacteristic.UUID)
+        {
+            if (e.Error == null)
+            {
+                notifyTaskCompletionSource?.TrySetResult();
+            }
+            else
+            {
+                notifyTaskCompletionSource?.TrySetException(new Exception(e.Error.LocalizedDescription));
+            }
+            notifyTaskCompletionSource = null;
         }
     }
 
@@ -65,16 +83,24 @@ public partial class BluetoothPeripheralCharacteristic
         }
     }
 
-    public partial Task NotifyAsync(Action<byte[]> action)
-    {
-        notifyActions.Add(action);
-        return Task.CompletedTask;
-    }
+    public partial string UUID => nativeCharacteristic.UUID.ToString();
 
-    public partial Task StopNotifyAsync(Action<byte[]> action)
+    public partial async Task SetNotifyingAsync(bool value)
     {
-        notifyActions.Remove(action);
-        return Task.CompletedTask;
+        if (nativePeripheral == null || nativeCharacteristic == null)
+        {
+            throw new InvalidOperationException("Peripheral or characteristic is null.");
+        }
+
+        var flags = nativeCharacteristic.Properties;
+        if (!flags.HasFlag(CBCharacteristicProperties.Notify) && !flags.HasFlag(CBCharacteristicProperties.Indicate))
+        {
+            throw new InvalidOperationException("Characteristic does not support notifications.");
+        }
+
+        notifyTaskCompletionSource = new TaskCompletionSource();
+        nativePeripheral.SetNotifyValue(value, nativeCharacteristic);
+        await notifyTaskCompletionSource.Task;
     }
 
     public partial async Task WriteValueAsync(byte[] data)
@@ -130,8 +156,8 @@ public partial class BluetoothPeripheralCharacteristic
 
     public partial bool IsNotifying => nativeCharacteristic.IsNotifying;
     public partial bool IsBroadcasted => nativeCharacteristic.IsBroadcasted;
-    public partial List<object> Descriptors => this.nativeCharacteristic.Descriptors.Select(d => d.Value).Cast<object>().ToList();
-    public partial string UUID => this.nativeCharacteristic.UUID.ToString();
+    public partial List<object> Descriptors => nativeCharacteristic.Descriptors.Select(d => d.Value).Cast<object>().ToList();
+    public partial byte[] LastValue => nativeCharacteristic.Value?.ToArray() ?? Array.Empty<byte>();
     public partial BluetoothCharacteristicProperties Properties
     {
         get

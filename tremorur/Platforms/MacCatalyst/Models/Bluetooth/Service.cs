@@ -7,18 +7,28 @@ namespace tremorur.Models.Bluetooth;
 public partial class BluetoothPeripheralService
 {
     private readonly CBService nativeService;
+    private CBPeripheral? nativePeripheral => nativeService?.Peripheral;
 
     public BluetoothPeripheralService(CBService cBService)
     {
         nativeService = cBService;
-    }
-    public partial List<BluetoothPeripheralCharacteristic> Characteristics
-    {
-        get
+
+        if (nativePeripheral != null)
         {
-            return this.nativeService.Characteristics.Select(c => new BluetoothPeripheralCharacteristic(c)).ToList();
+            nativePeripheral.DiscoveredCharacteristics += Service_DiscoveredCharacteristics;
+            nativePeripheral?.DiscoverCharacteristics(forService: cBService);
         }
     }
-    public partial string UUID => this.nativeService.UUID.ToString();
+
+    private void Service_DiscoveredCharacteristics(object? sender, CBServiceEventArgs e)
+    {
+        var allCharacteristics = nativeService?.Characteristics?.ToList() ?? new List<CBCharacteristic>();
+        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString())).ToList();
+        characteristics.AddRange(missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)));
+    }
+
+    private List<BluetoothPeripheralCharacteristic> characteristics = new List<BluetoothPeripheralCharacteristic>();
+    public partial List<BluetoothPeripheralCharacteristic> Characteristics => characteristics;
+    public partial string UUID => nativeService?.UUID.ToString() ?? string.Empty;
     public partial bool IsPrimary => this.nativeService.Primary;
 }

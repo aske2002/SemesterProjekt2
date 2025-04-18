@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using tremorur.Messages;
 
@@ -9,13 +10,14 @@ namespace tremorur
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+            builder.UseMauiCommunityToolkit();
             builder.UseMauiApp<App>()
                    .ConfigureFonts(fonts =>
                    {
                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
-
+            builder.Services.AddSingleton<BluetoothService>();
             builder.Services.AddTransient<AlarmService>();
             builder.Services.AddTransient<IButtonService, ButtonService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
@@ -30,7 +32,9 @@ namespace tremorur
             builder.Services.AddTransient<SetAlarmPage>();
             builder.Services.AddTransient<NewEventViewModel>();
             builder.Services.AddTransient<NewEventPage>();
-            builder.Services.AddSingleton<BluetoothService>();
+
+            builder.Services.AddTransient<BluetoothTestPage>();
+            builder.Services.AddTransient<BluetoothTestViewModel>();
 
             // Manually create LoggerFactory and Logger
             var loggerFactory = LoggerFactory.Create(logging =>

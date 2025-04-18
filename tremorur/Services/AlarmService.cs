@@ -11,7 +11,7 @@ namespace tremorur.Services
         {
             _alarms = new ObservableCollection<Alarm>(SettingsService.Alarms); //henter eksisterende alarmer og initialiserer observableCollection
 
-            _alarms.CollectionChanged +=OnAlarmsChanged; //reagerer på ændringer i observableCollection
+            _alarms.CollectionChanged += OnAlarmsChanged; //reagerer på ændringer i observableCollection
         }
         public Alarm CreateAlarm(TimeSpan givenTimeSpan)
         {

@@ -1,45 +1,51 @@
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
+using ObjCRuntime;
 
 namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheral
 {
 
-    private readonly CBPeripheral nativePeripheral;
+    public readonly CBPeripheral NativePeripheral;
     private TaskCompletionSource<float?>? _rssiTaskCompletionSource;
-    public BluetoothPeripheral(CBPeripheral cBPeripheral)
+    public BluetoothPeripheral(CBPeripheral cBPeripheral) : base()
     {
-        nativePeripheral = cBPeripheral;
+        NativePeripheral = cBPeripheral;
         Name = cBPeripheral.Name;
-        Initialize();
+        NativePeripheral.DiscoveredService += DiscoveredService;
+        NativePeripheral.RssiRead += RssiRead;
+
+        NativePeripheral.DiscoverServices();
+        NativePeripheral.ReadRSSI();
     }
-    private partial void Initialize()
+
+    void DiscoveredService(object? sender, NSErrorEventArgs e)
     {
-        nativePeripheral.RssiRead += (sender, e) =>
-        {
-            if (e.Error == null)
-            {
-                _rssiTaskCompletionSource?.TrySetResult(e.Rssi.FloatValue);
-                _rssiTaskCompletionSource = null;
-                RSSI = e.Rssi.FloatValue;
-            }
-            else
-            {
-                _rssiTaskCompletionSource?.TrySetException(new Exception(e.Error.LocalizedDescription));
-                _rssiTaskCompletionSource = null;
-                Debug.WriteLine($"Error reading RSSI: {e.Error}");
-            }
-        };
+        var allServices = NativePeripheral?.Services?.ToList() ?? new List<CBService>();
+        var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.UUID.ToString())).ToList();
+        services.AddRange(missingServices.Select(x => new BluetoothPeripheralService(x)));
     }
-    public partial List<BluetoothPeripheralService> Services
+
+    public void RssiRead(object? peripheral, CBRssiEventArgs e)
     {
-        get
+        if (e.Error == null)
         {
-            return this.nativePeripheral.Services.Select(s => new BluetoothPeripheralService(s)).ToList();
+            _rssiTaskCompletionSource?.TrySetResult(e.Rssi.FloatValue);
+            RSSI = e.Rssi.FloatValue;
+        }
+        else
+        {
+            _rssiTaskCompletionSource?.TrySetException(new Exception(e.Error?.LocalizedDescription));
+            Debug.WriteLine($"Error reading RSSI: {e.Error?.LocalizedDescription}");
         }
     }
+
+    private List<BluetoothPeripheralService> services = new List<BluetoothPeripheralService>();
+    public partial List<BluetoothPeripheralService> Services => services;
+
+    public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
     public partial async Task<float?> GetSsriAsync()
     {
         if (_rssiTaskCompletionSource != null)
@@ -47,13 +53,13 @@ public partial class BluetoothPeripheral
             Debug.WriteLine("Already reading RSSI");
             return null;
         }
-        if (nativePeripheral.State != CBPeripheralState.Connected)
+        if (NativePeripheral.State != CBPeripheralState.Connected)
         {
             Debug.WriteLine("Peripheral is not connected");
             return null;
         }
         _rssiTaskCompletionSource = new TaskCompletionSource<float?>();
-        nativePeripheral.ReadRSSI();
+        NativePeripheral.ReadRSSI();
         if (await Task.WhenAny(_rssiTaskCompletionSource.Task, Task.Delay(1000)) == _rssiTaskCompletionSource.Task)
         {
             return await _rssiTaskCompletionSource.Task;
@@ -64,11 +70,17 @@ public partial class BluetoothPeripheral
             return null;
         }
     }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
+
     partial BluetoothPeripheralState State
     {
         get
         {
-            switch (nativePeripheral.State)
+            switch (NativePeripheral.State)
             {
                 case CBPeripheralState.Connected:
                     return BluetoothPeripheralState.Connected;
@@ -83,5 +95,4 @@ public partial class BluetoothPeripheral
             }
         }
     }
-
 }

@@ -1,9 +1,13 @@
+using System.Diagnostics;
+using tremorur.Models.Bluetooth;
+
 namespace tremorur.Views;
 
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
     private readonly BluetoothService bluetoothService;
+    private BluetoothPeripheral? peripheral;
     public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, BluetoothService bluetoothService) : base(buttonService)
     {
         InitializeComponent();
@@ -24,7 +28,26 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 
     protected override void OnDownButtonClicked(object? sender, EventArgs e)
     {
-        bluetoothService.Start();
+        bluetoothService.DiscoveredPeripheral += Discovered_PeripheralEvent;
+        bluetoothService.StartDiscovery();
+    }
+
+    private async void Discovered_PeripheralEvent(object? sender, DiscoveredPeripheral discoveredPeripheral)
+    {
+        if (discoveredPeripheral.Name == "Askes fuckphone")
+        {
+            bluetoothService.StopDiscovery();
+            bluetoothService.DiscoveredPeripheral -= Discovered_PeripheralEvent;
+            try {
+                peripheral = await bluetoothService.ConnectPeripheralAsync(discoveredPeripheral);
+            } catch (Exception ex)
+            {
+                Debug.WriteLine($"Error connecting to peripheral: {ex.Message}");
+                return;
+            }
+        }
+
+        Debug.WriteLine($"Peripheral found: {discoveredPeripheral.RSSI}");
     }
 
     protected override void OnUpButtonClicked(object? sender, EventArgs e)

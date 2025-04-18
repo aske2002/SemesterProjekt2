@@ -1,15 +1,32 @@
+using System.Collections.ObjectModel;
+using tremorur.Messages;
+using tremorur.Models.Bluetooth;
+
 namespace tremorur.Services;
 
 public partial class BluetoothService
 {
-    private bool _shouldScan = false;
-    public void Start()
+    internal readonly IMessenger _messenger;
+    public BluetoothService(IMessenger messenger)
     {
-        StartScan();
+        _messenger = messenger;
     }
-    public bool IsScanning => _isScanning;
 
-    private partial bool _isScanning { get; } // Defined per platform
+    private bool shouldScan = false;
+    public ObservableCollection<DiscoveredPeripheral> DiscoveredPeripherals { get; } = new ObservableCollection<DiscoveredPeripheral>();
+    internal void AddDiscoveredPeripheral(DiscoveredPeripheral discoveredPeripheral)
+    {
+        if (DiscoveredPeripherals.All(p => p.UUID != discoveredPeripheral.UUID))
+        {
+            DiscoveredPeripherals.Add(discoveredPeripheral);
+            _messenger.SendMessage(new DiscoveredPeripheralMessage(discoveredPeripheral));
+            DiscoveredPeripheral.Invoke(this, discoveredPeripheral);
+        }
 
-    partial void StartScan(); // Defined per platform
+    }
+    public event EventHandler<DiscoveredPeripheral> DiscoveredPeripheral = delegate { };
+    public partial bool IsScanning { get; } // Defined per platform
+    public partial Task<BluetoothPeripheral> ConnectPeripheralAsync(DiscoveredPeripheral device);
+    public partial void StartDiscovery(); // Defined per platform
+    public partial void StopDiscovery(); // Defined per platform
 }
