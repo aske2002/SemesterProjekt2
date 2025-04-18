@@ -19,10 +19,10 @@ public record VibrationSettings
     /// The frequency of the sine wave in Hz.
     /// </param>
     /// <returns>VibrationSettings object</returns>
-    public static async Task<VibrationSettings> CreateSinePatternSettings(float frequency)
+    public static VibrationSettings CreateSinePatternSettings(float frequency)
     {
         var expression = $"Math.Sin(t * 2 * Math.PI * {frequency} / 1000) * 0.5 + 0.5";
-        var pattern = await VibrationPatternExpression.ParseAsync(expression, 1);
+        var pattern = VibrationPatternExpression.ParseAsync(expression, 1).Result;
         return new VibrationSettings
         {
             Id = Guid.NewGuid(),
@@ -37,14 +37,14 @@ public record VibrationSettings
     /// Vibration intensity from 0.0 to 1.0 (0% to 100%).
     /// </param>
     /// <returns>VibrationSettings object</returns>
-    public static Task<VibrationSettings> CreateConstantPatternSettings(double intensity)
+    public static VibrationSettings CreateConstantPatternSettings(double intensity)
     {
         var pattern = new VibrationPatternConstant(intensity, double.MaxValue);
-        return Task.FromResult(new VibrationSettings
+        return new VibrationSettings
         {
             Id = Guid.NewGuid(),
             Pattern = pattern
-        });
+        };
     }
 
     /// <summary>
@@ -59,17 +59,17 @@ public record VibrationSettings
     ///     100% intensity for 10000ms.
     /// </example>
     /// <returns>VibrationSettings object</returns>
-    public static Task<VibrationSettings> CreateDynamicPatternSettings(params (double durationMS, double intensity)[] points)
+    public static VibrationSettings CreateDynamicPatternSettings(params (double durationMS, double intensity)[] points)
     {
         var segments = points
             .Select(point => new VibrationPatternDynamic.VibrationPatternSegment((int)point.durationMS, point.intensity))
             .ToList();
         var pattern = new VibrationPatternDynamic(segments, 1);
-        return Task.FromResult(new VibrationSettings
+        return new VibrationSettings
         {
             Id = Guid.NewGuid(),
             Pattern = pattern
-        });
+        };
     }
     public byte[] ToBytes()
     {
