@@ -23,7 +23,7 @@ public partial class BluetoothService
         centralManager.DiscoveredPeripheral += CM_DiscoveredPeripheral;
     }
 
-    private partial bool IsScanning =>
+    public partial bool IsScanning =>
         centralManager.IsScanning;
 
     private void CM_UpdatedState(object? sender, EventArgs e)

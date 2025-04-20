@@ -1,0 +1,59 @@
+<ContentPage x:Class="tremorur.Views.BluetoothConnectPage"
+             x:Name="BluetoothTest"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:tremorur.ViewModels"
+             xmlns:btmodels="clr-namespace:tremorur.Models.Bluetooth"
+             x:DataType="vm:BluetoothConnectViewModel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             mc:Ignorable="d"
+             Shell.NavBarIsVisible="False">
+    <ListView ItemsSource="{Binding Peripherals}"
+              SelectionMode="None"
+              SeparatorVisibility="Default"
+              Grid.Row="1">
+
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="btmodels:DiscoveredPeripheral">
+                <ViewCell>
+                    <Grid Padding="10"
+                          ColumnSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Device Name -->
+                        <Label Grid.Column="0"
+                               Text="{Binding Name}"
+                               VerticalOptions="Center"/>
+
+                        <!-- RSSI -->
+                        <Label Grid.Column="1"
+                               Text="{Binding RSSI}"
+                               VerticalOptions="Center"/>
+
+                        <!-- UUID -->
+                        <Label Grid.Column="2"
+                               Text="{Binding UUID}"
+                               VerticalOptions="Center"/>
+
+                        <!-- Connect Button -->
+                        <Button Grid.Column="3"
+                                Text="Connect"
+                                Command="{Binding Source={x:Reference BluetoothTest}, Path=BindingContext.ConnectCommand}"
+                                CommandParameter="{Binding .}"/>
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>

@@ -5,36 +5,28 @@ using tremorur.Models.Bluetooth;
 
 namespace tremorur.ViewModels
 {
-    public partial class BluetoothTestViewModel : ObservableObject
+    [QueryProperty(nameof(ConnectedDevice), "ConnectedDevice")]
+    public partial class BluetoothDevViewModel : ObservableObject
     {
-        public ObservableCollection<DiscoveredPeripheral> Peripherals { get; } = new();
-
-        [ObservableProperty]
-        private BluetoothPeripheral? connectedDevice;
+        BluetoothPeripheral? connectedDevice;
+        public BluetoothPeripheral? ConnectedDevice
+        {
+            get => connectedDevice;
+            set
+            {
+                connectedDevice = value;
+                OnPropertyChanged();
+            }
+        }
 
         private readonly BluetoothService bluetoothService;
         private readonly IDialogService dialogService;
-        public BluetoothTestViewModel(BluetoothService bluetoothService, IDialogService dialogService) 
+        public BluetoothDevViewModel(BluetoothService bluetoothService, IDialogService dialogService)
         {
             this.bluetoothService = bluetoothService;
             this.dialogService = dialogService;
-            bluetoothService.DiscoveredPeripheral += OnDiscoveredPeripheral;
-            bluetoothService.StartDiscovery();
         }
 
-        private void OnDiscoveredPeripheral(object? sender, DiscoveredPeripheral e)
-        {
-            if (e.Name == null)
-                return;
-
-            Peripherals.Add(e);
-        }
-
-        [RelayCommand]
-        public void Inspect()
-        {
-            Debug.WriteLine("Inspecting peripherals...");
-        }
 
         [RelayCommand]
         public async Task Connect(DiscoveredPeripheral peripheral)

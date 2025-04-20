@@ -5,10 +5,10 @@ using System.Diagnostics;
 
 namespace tremorur.Views
 {
-    public partial class BluetoothTestPage : ContentPage
+    public partial class BluetoothDevPage : ContentPage
     {
-        private BluetoothTestViewModel _viewModel;
-        public BluetoothTestPage(BluetoothTestViewModel viewModel)
+        private BluetoothDevViewModel _viewModel;
+        public BluetoothDevPage(BluetoothDevViewModel viewModel)
         {
             InitializeComponent();
             _viewModel = viewModel;

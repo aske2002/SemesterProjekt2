@@ -33,8 +33,11 @@ namespace tremorur
             builder.Services.AddTransient<NewEventViewModel>();
             builder.Services.AddTransient<NewEventPage>();
 
-            builder.Services.AddTransient<BluetoothTestPage>();
-            builder.Services.AddTransient<BluetoothTestViewModel>();
+            builder.Services.AddTransient<BluetoothConnectPage>();
+            builder.Services.AddTransient<BluetoothConnectViewModel>();
+
+            builder.Services.AddTransient<BluetoothDevPage>();
+            builder.Services.AddTransient<BluetoothDevViewModel>();
 
             // Manually create LoggerFactory and Logger
             var loggerFactory = LoggerFactory.Create(logging =>

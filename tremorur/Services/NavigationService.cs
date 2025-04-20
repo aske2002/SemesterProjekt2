@@ -22,16 +22,16 @@ namespace tremorur.Services
             Shell.Current.GoToAsync(navigateionState);
         }
 
-        public Task GåTilSideAsync(string route)
+        public Task GoToAsync(string route, IDictionary<string, object>? parameters = null)
         {
             if (Shell.Current is null)
             {
-                throw new NotSupportedException($"Navigation with the '{nameof(GåTilSideAsync)}' method is currently supported only with a Shell-enabled application.");
+                throw new NotSupportedException($"Navigation with the '{nameof(GoToAsync)}' method is currently supported only with a Shell-enabled application.");
             }
 
             var navigateionState = new ShellNavigationState(route);
             _messenger.SendMessage(navigateionState);
-            return Shell.Current.GoToAsync(navigateionState);
+            return Shell.Current.GoToAsync(navigateionState, parameters);
         }
 
         public Task GoBackAsync()
