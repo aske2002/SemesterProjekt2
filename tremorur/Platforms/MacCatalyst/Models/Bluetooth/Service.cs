@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
@@ -24,11 +25,15 @@ public partial class BluetoothPeripheralService : IBluetoothPeripheralService
     {
         var allCharacteristics = nativeService?.Characteristics?.ToList() ?? new List<CBCharacteristic>();
         var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString())).ToList();
-        characteristics.AddRange(missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)));
+
+        foreach (var characteristic in missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)))
+        {
+            characteristics.Add(characteristic);
+        }
     }
 
-    private List<IBluetoothPeripheralCharacteristic> characteristics = new List<IBluetoothPeripheralCharacteristic>();
-    public partial List<IBluetoothPeripheralCharacteristic> Characteristics => characteristics;
+    private ObservableCollection<BluetoothPeripheralCharacteristic> characteristics = new ObservableCollection<BluetoothPeripheralCharacteristic>();
+    public partial ObservableCollection<BluetoothPeripheralCharacteristic> Characteristics => characteristics;
     public partial string UUID => nativeService?.UUID.ToString() ?? string.Empty;
     public partial bool IsPrimary => this.nativeService.Primary;
 }

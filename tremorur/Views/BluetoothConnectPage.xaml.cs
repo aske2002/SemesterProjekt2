@@ -14,5 +14,6 @@ namespace tremorur.Views
             _viewModel = viewModel;
             BindingContext = viewModel;
         }
+
     }
 }

@@ -1,10 +1,12 @@
 using System.Globalization;
 using Microsoft.Maui.HotReload;
 using tremorur.Messages;
+using tremorur.Utils;
 
 namespace tremorur.Controls;
 public partial class BorderButton : Grid
 {
+
     private const string Root = "Root";
     private readonly Services.IMessenger messenger;
     public static readonly BindableProperty ButtonBackgroundColorProperty =
@@ -15,10 +17,9 @@ public partial class BorderButton : Grid
         set => SetValue(ButtonBackgroundColorProperty, value);
     }
 
-
-    private void InnerButton_Clicked(object sender, EventArgs e)
+    private void InnerButton_Clicked(object? sender, EventArgs e)
     {
-        messenger.SendMessage(new ButtonClickedEvent(ButtonType));
+        messenger.SendMessage(new ButtonClickedMessage(ButtonType));
     }
 
     public WatchButton ButtonType;
@@ -31,12 +32,13 @@ public partial class BorderButton : Grid
     {
         get => ButtonTypes.Positions[ButtonType];
     }
+
+
     public BorderButton(Services.IMessenger messenger, WatchButton buttonType)
     {
         InitializeComponent();
         ButtonType = buttonType;
         this.messenger = messenger;
         InnerButton.Text = ButtonTypes.Names[ButtonType];
-        InnerButton.Clicked += InnerButton_Clicked;
     }
 }

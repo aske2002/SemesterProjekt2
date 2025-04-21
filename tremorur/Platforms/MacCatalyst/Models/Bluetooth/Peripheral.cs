@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
@@ -25,7 +26,10 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
     {
         var allServices = NativePeripheral?.Services?.ToList() ?? new List<CBService>();
         var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.UUID.ToString())).ToList();
-        services.AddRange(missingServices.Select(x => new BluetoothPeripheralService(x)));
+        foreach (var service in missingServices.Select(x => new BluetoothPeripheralService(x)))
+        {
+            services.Add(service);
+        }
     }
 
     public void RssiRead(object? peripheral, CBRssiEventArgs e)
@@ -42,8 +46,8 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
         }
     }
 
-    private List<BluetoothPeripheralService> services = new List<BluetoothPeripheralService>();
-    public partial List<IBluetoothPeripheralService> Services => services;
+    private ObservableCollection<BluetoothPeripheralService> services = new ObservableCollection<BluetoothPeripheralService>();
+    public partial ObservableCollection<BluetoothPeripheralService> Services => services;
 
     public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
     public partial async Task<float?> GetSsriAsync()

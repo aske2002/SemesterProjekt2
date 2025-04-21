@@ -31,7 +31,16 @@ namespace tremorur.Services
 
             var navigateionState = new ShellNavigationState(route);
             _messenger.SendMessage(navigateionState);
-            return Shell.Current.GoToAsync(navigateionState, parameters);
+
+            if (parameters == null)
+            {
+                return Shell.Current.GoToAsync(navigateionState);
+            }
+            else
+            {
+                return Shell.Current.GoToAsync(navigateionState, parameters);
+
+            }
         }
 
         public Task GoBackAsync()

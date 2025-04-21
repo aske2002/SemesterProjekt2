@@ -1,25 +1,42 @@
 
 
+using tremorur.Messages;
+
 namespace tremorur.Models
 {
     public abstract class ContentPageWithButtons : ContentPage
     {
-        private readonly IButtonService _buttonService;
-        public ContentPageWithButtons(IButtonService buttonService)
+        public readonly IButtonService _buttonService;
+        public ContentPageWithButtons(IButtonService messenger)
         {
-            _buttonService = buttonService;
+            _buttonService = messenger ?? throw new ArgumentNullException(nameof(messenger));
             BindingContext = BindingContext;
-            InitializeButtons();
+            _buttonService.OnButtonClicked += OnButtonClicked;
         }
 
-        protected void InitializeButtons()
+        private void OnButtonClicked(object? sender, ButtonClickedEventArgs message)
         {
-            _buttonService.CancelButtonClicked += OnCancelButtonClicked;
-            _buttonService.OkButtonClicked += OnOKButtonClicked;
-            _buttonService.UpButtonClicked += OnUpButtonClicked;
-            _buttonService.DownButtonClicked += OnDownButtonClicked;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                switch (message.Button)
+                {
+                    case WatchButton.Cancel:
+                        OnCancelButtonClicked(this, EventArgs.Empty);
+                        break;
+                    case WatchButton.Ok:
+                        OnOKButtonClicked(this, EventArgs.Empty);
+                        break;
+                    case WatchButton.Up:
+                        OnUpButtonClicked(this, EventArgs.Empty);
+                        break;
+                    case WatchButton.Down:
+                        OnDownButtonClicked(this, EventArgs.Empty);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
         }
-
         protected virtual void OnCancelButtonClicked(object? sender, EventArgs e)
         {
 

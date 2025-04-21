@@ -18,10 +18,12 @@ namespace tremorur
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
             builder.Services.AddSingleton<BluetoothService>();
+            builder.Services.AddSingleton<IButtonService, ButtonService>();
+            
             builder.Services.AddTransient<AlarmService>();
-            builder.Services.AddTransient<IButtonService, ButtonService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
+
             builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<HomePage>();
             builder.Services.AddSingleton<MedicationAlarmViewModel>();

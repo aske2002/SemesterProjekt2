@@ -33,7 +33,7 @@ namespace tremorur.ViewModels
         public async Task Connect(DiscoveredPeripheral peripheral)
         {
             var device = await bluetoothService.ConnectPeripheralAsync(peripheral);
-            await navigationService.GoToAsync("BluetoothDevPage", new Dictionary<string, object>
+            await navigationService.GoToAsync("///bluetoothDev", new Dictionary<string, object>
             {
                 { "ConnectedDevice", device }
             });

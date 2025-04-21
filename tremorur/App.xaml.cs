@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using tremorur.Messages;
@@ -8,18 +9,32 @@ namespace tremorur
     {
         private List<BorderButton>? _watchButtons = null;
         private Services.IMessenger _messenger;
-
+        private IButtonService _buttonService;
+        private INavigationService _navigationService;
         private Grid? _grid = null;
         private AbsoluteLayout? _absoluteLayout = null;
 
-        public App(Services.IMessenger messenger)
+        public App(Services.IMessenger messenger, IButtonService buttonService, INavigationService navigationService)
         {
-            _messenger = messenger;
+            _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
+            _buttonService = buttonService ?? throw new ArgumentNullException(nameof(buttonService));
+            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _buttonService.OnButtomMultipleClicked += NavigateToBluetoothConnectPage;
             InitializeComponent();
         }
 
-    
+        private void NavigateToBluetoothConnectPage(object? sender, ButtonMultipleClickedEventArgs e)
+        {
+            if (e.Button == WatchButton.Ok && e.ClickCount == 4)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    _navigationService.GoToAsync("///bluetoothConnect");
+                });
 
+            }
+        }
 
         protected override void OnResume()
         {
@@ -30,10 +45,10 @@ namespace tremorur
         {
             if (sender is AbsoluteLayout absoluteLayout)
             {
-                #if DEBUG
+#if DEBUG
                 // Enable HotReload for the AbsoluteLayout
                 // absoluteLayout.Children.Add(new Button)
-                #endif
+#endif
 
                 _absoluteLayout = absoluteLayout;
                 _watchButtons = ButtonTypes.CreateButtons(_messenger);

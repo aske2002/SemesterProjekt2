@@ -54,7 +54,6 @@ namespace tremorur
 
         private async void OnMenuItemClicked(object sender, EventArgs e)
         {
-            await Current.GoToAsync("//bluetooth");
         }
     }
 }

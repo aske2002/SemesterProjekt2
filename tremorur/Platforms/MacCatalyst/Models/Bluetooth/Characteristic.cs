@@ -29,6 +29,8 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
     {
         if (e.Characteristic.UUID == nativeCharacteristic.UUID)
         {
+
+            NotifyingUpdated?.Invoke(this, e.Characteristic.IsNotifying);
             if (e.Error == null)
             {
                 notifyTaskCompletionSource?.TrySetResult();
@@ -69,6 +71,7 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
         {
             action?.Invoke(data);
         }
+        ValueUpdated?.Invoke(this, data);
 
         if (readTaskCompletionSource != null)
         {
@@ -122,7 +125,6 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
         }
 
         writeTaskCompletionSource = new TaskCompletionSource();
-        nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
 
         if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Write))
         {

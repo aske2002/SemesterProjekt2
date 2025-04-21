@@ -24,11 +24,6 @@
         Uncomment the below section to enable Shell Flyout item(s)
         And ensure appropriate page definitions are available for it work as expected
     -->
-    <FlyoutItem Title="Bluetooth">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:BluetoothTestPage}"
-            Route="bluetooth"/>
-    </FlyoutItem>
     <FlyoutItem Title="AddAlarm">
         <ShellContent
             ContentTemplate="{DataTemplate vw:MedicationAlarmPage}"
@@ -48,6 +43,17 @@
         <ShellContent
             ContentTemplate="{DataTemplate vw:SettingsPage}"
             Route="settings"/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Bluetooth List">
+        <ShellContent
+            ContentTemplate="{DataTemplate vw:BluetoothConnectPage}"
+            Route="bluetoothConnect"/>
+    </FlyoutItem>
+    <FlyoutItem Title="Bluetooth Device">
+        <ShellContent
+            ContentTemplate="{DataTemplate vw:BluetoothDevPage}"
+            Route="bluetoothDev"/>
     </FlyoutItem>
     <!--
         When the Flyout is visible this will be a menu item you can tie a click behavior to

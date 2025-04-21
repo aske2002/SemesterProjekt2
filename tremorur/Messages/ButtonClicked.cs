@@ -32,4 +32,4 @@ public static class ButtonTypes
     };
 }
 
-public record ButtonClickedEvent(WatchButton Button);
+public record ButtonClickedMessage(WatchButton Button, DateTime Timestamp = default);

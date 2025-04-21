@@ -10,9 +10,9 @@ namespace tremorur.Views
         private BluetoothDevViewModel _viewModel;
         public BluetoothDevPage(BluetoothDevViewModel viewModel)
         {
-            InitializeComponent();
             _viewModel = viewModel;
             BindingContext = viewModel;
+            InitializeComponent();
         }
 
         public async void NotifyCharacteristic(object? sender, ToggledEventArgs e)
