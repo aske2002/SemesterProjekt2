@@ -12,13 +12,13 @@ public partial class BluetoothPeripheral
     public BluetoothPeripheral(ObservableBluetoothLEDevice leDevice) : base()
     {
         NativePeripheral = leDevice;
-        Initialize();
+        Services_Changed(NativePeripheral.BluetoothLEDevice, null);
+        NativePeripheral.BluetoothLEDevice.GattServicesChanged += Services_Changed ;
     }
 
-    private async void Initialize()
+    private void Services_Changed(BluetoothLEDevice sender, object args)
     {
-        var serviceRes = await NativePeripheral.BluetoothLEDevice.GetGattServicesAsync();
-        var allServices = serviceRes.Services.ToList();
+        var allServices = NativePeripheral.BluetoothLEDevice.GattServices.ToList();
         var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.Uuid.ToString())).ToList();
         foreach (var service in missingServices.Select(x => new BluetoothPeripheralService(x)))
         {
