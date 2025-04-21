@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 
@@ -5,7 +6,7 @@ namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheral : IBluetoothPeripheral
 {
-    public partial List<IBluetoothPeripheralService> Services { get; }
+    public partial ObservableCollection<IBluetoothPeripheralService> Services { get; }
     public partial Guid UUID { get; }
     public float? RSSI { get; private set; }
     partial BluetoothPeripheralState State { get; }

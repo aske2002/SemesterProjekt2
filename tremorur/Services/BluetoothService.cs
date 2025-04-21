@@ -27,7 +27,7 @@ public partial class BluetoothService : IBluetoothService
     }
     
 
-    public event EventHandler<DiscoveredPeripheral> DiscoveredPeripheral = delegate { };
+    public event EventHandler<IDiscoveredPeripheral> DiscoveredPeripheral = delegate { };
     public partial bool IsScanning { get; } // Defined per platform
     public partial Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral);
     public partial void StartDiscovery(); // Defined per platform

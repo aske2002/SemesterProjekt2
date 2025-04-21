@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.WinUI.Connectivity;
 using Windows.Devices.Bluetooth;
@@ -19,14 +20,17 @@ public partial class BluetoothPeripheral
         var serviceRes = await NativePeripheral.BluetoothLEDevice.GetGattServicesAsync();
         var allServices = serviceRes.Services.ToList();
         var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.Uuid.ToString())).ToList();
-        services.AddRange(missingServices.Select(x => new BluetoothPeripheralService(x)));
+        foreach (var service in missingServices.Select(x => new BluetoothPeripheralService(x)))
+        {
+            services.Add(service);
+        }
     }
 
     public partial string? Name => NativePeripheral.Name;
-    public partial string? LocalName => NativePeripheral.DeviceInformation.Name;
+    public partial string? LocalName => NativePeripheral.DeviceInfo.Name;
 
-    private List<IBluetoothPeripheralService> services = new List<IBluetoothPeripheralService>();
-    public partial List<IBluetoothPeripheralService> Services => services;
+    private ObservableCollection<IBluetoothPeripheralService> services = new ObservableCollection<IBluetoothPeripheralService>();
+    public partial ObservableCollection<IBluetoothPeripheralService> Services => services;
 
     public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
     public partial Task<float?> GetSsriAsync()

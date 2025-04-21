@@ -7,7 +7,7 @@ namespace tremorur.ViewModels
 {
     public partial class BluetoothConnectViewModel : ObservableObject
     {
-        public ObservableCollection<DiscoveredPeripheral> Peripherals { get; } = new();
+        public ObservableCollection<IDiscoveredPeripheral> Peripherals { get; } = new();
 
         private readonly BluetoothService bluetoothService;
         private readonly IDialogService dialogService;
@@ -21,7 +21,7 @@ namespace tremorur.ViewModels
             bluetoothService.StartDiscovery();
         }
 
-        private void OnDiscoveredPeripheral(object? sender, DiscoveredPeripheral e)
+        private void OnDiscoveredPeripheral(object? sender, IDiscoveredPeripheral e)
         {
             if (e.Name == null)
                 return;

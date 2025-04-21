@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace tremorur.Models.Bluetooth;
@@ -5,6 +6,6 @@ namespace tremorur.Models.Bluetooth;
 public interface IBluetoothPeripheralService
 {
     string UUID { get; }
-    List<IBluetoothPeripheralCharacteristic> Characteristics { get; }
+    ObservableCollection<IBluetoothPeripheralCharacteristic> Characteristics { get; }
     bool IsPrimary { get; }
 }

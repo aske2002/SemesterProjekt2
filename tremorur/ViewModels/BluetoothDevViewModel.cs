@@ -8,8 +8,8 @@ namespace tremorur.ViewModels
     [QueryProperty(nameof(ConnectedDevice), "ConnectedDevice")]
     public partial class BluetoothDevViewModel : ObservableObject
     {
-        BluetoothPeripheral? connectedDevice;
-        public BluetoothPeripheral? ConnectedDevice
+        IBluetoothPeripheral? connectedDevice;
+        public IBluetoothPeripheral? ConnectedDevice
         {
             get => connectedDevice;
             set

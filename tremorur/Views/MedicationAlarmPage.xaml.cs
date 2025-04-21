@@ -7,7 +7,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
     private readonly BluetoothService bluetoothService;
-    private BluetoothPeripheral? peripheral;
+    private IBluetoothPeripheral? peripheral;
     public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, BluetoothService bluetoothService) : base(buttonService)
     {
         InitializeComponent();
@@ -32,7 +32,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         bluetoothService.StartDiscovery();
     }
 
-    private async void Discovered_PeripheralEvent(object? sender, DiscoveredPeripheral discoveredPeripheral)
+    private async void Discovered_PeripheralEvent(object? sender, IDiscoveredPeripheral discoveredPeripheral)
     {
         if (discoveredPeripheral.Name == "Askes fuckphone")
         {

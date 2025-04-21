@@ -12,13 +12,13 @@ public partial class DiscoveredPeripheral
     {
         NativePeripheral = device;
     }
-    public partial bool IsConnectable => NativePeripheral.DeviceInformation.Pairing.CanPair;
+    public partial bool IsConnectable => NativePeripheral.DeviceInfo.Pairing.CanPair;
 
-    public partial List<string> Services => NativePeripheral.GattServices
-        .Select(service => service.Uuid.ToString())
+    public partial List<string> Services => NativePeripheral.Services
+        .Select(service => service.UUID)
         .ToList();
 
-    public partial string? LocalName => NativePeripheral.DeviceInformation.Name;
+    public partial string? LocalName => NativePeripheral.DeviceInfo.Name;
     public partial string? Name => NativePeripheral.Name;
     public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
     public partial async Task<BluetoothPeripheral> ConnectAsync()

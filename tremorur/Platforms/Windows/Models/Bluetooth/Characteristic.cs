@@ -11,6 +11,9 @@ public partial class BluetoothPeripheralCharacteristic
     private readonly GattCharacteristic nativeCharacteristic;
     private TaskCompletionSource? notifyTaskCompletionSource;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
+    private bool isNotifying = false;
+    private bool isBroadcasted = false;
+    private byte[] lastValue = Array.Empty<byte>();
 
     public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic)
     {
@@ -18,13 +21,37 @@ public partial class BluetoothPeripheralCharacteristic
         nativeCharacteristic.ValueChanged += Characteristic_UpdatedValue;
     }
 
+    private async Task readDescriptors()
+    {
+        var result = await nativeCharacteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
+        if (result.ClientCharacteristicConfigurationDescriptor.HasFlag(GattClientCharacteristicConfigurationDescriptorValue.Notify))
+        {
+            isNotifying = true;
+        }
+        else
+        {
+            isNotifying = false;
+        }
+
+        if (result.ClientCharacteristicConfigurationDescriptor.HasFlag(GattClientCharacteristicConfigurationDescriptorValue.Indicate))
+        {
+            isBroadcasted = true;
+        }
+        else
+        {
+            isBroadcasted = false;
+        }
+    }
+
     private void Characteristic_UpdatedValue(object? sender, GattValueChangedEventArgs e)
     {
         var data = e.CharacteristicValue.ToArray();
+        lastValue = data;
         foreach (var action in notifyActions)
         {
             action?.Invoke(data);
         }
+        ValueUpdated.Invoke(this, data);
     }
 
     public partial string UUID => nativeCharacteristic.Uuid.ToString();
@@ -38,10 +65,13 @@ public partial class BluetoothPeripheralCharacteristic
         }
         var result = await nativeCharacteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(value ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None);
 
+
         if (result?.Status != null && result.Status != GattCommunicationStatus.Success)
         {
             throw new Exception($"Failed to set notification: {result.Status} {result.ProtocolError}");
         }
+
+        await readDescriptors();
     }
 
     public partial async Task WriteValueAsync(byte[] data)
@@ -86,36 +116,33 @@ public partial class BluetoothPeripheralCharacteristic
         return response.Value.ToArray();
     }
 
-    public partial bool IsNotifying => nativeCharacteristic.IsNotifying;
-    public partial bool IsBroadcasted => nativeCharacteristic.IsBroadcasted;
-    public partial List<object> Descriptors => nativeCharacteristic.Descriptors.Select(d => d.Value).Cast<object>().ToList();
-    public partial byte[] LastValue => nativeCharacteristic.Value?.ToArray() ?? Array.Empty<byte>();
+    public partial bool IsNotifying => isNotifying;
+    public partial bool IsBroadcasted => isBroadcasted;
+    public partial List<object> Descriptors => nativeCharacteristic.GetAllDescriptors().Cast<object>().ToList();
+
+    public partial byte[] LastValue => lastValue;
     public partial BluetoothCharacteristicProperties Properties
     {
         get
         {
 
             BluetoothCharacteristicProperties properties = 0;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Broadcast))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Broadcast))
                 properties |= BluetoothCharacteristicProperties.Broadcast;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Read))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
                 properties |= BluetoothCharacteristicProperties.Read;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.WriteWithoutResponse))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
                 properties |= BluetoothCharacteristicProperties.WriteWithoutResponse;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Write))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
                 properties |= BluetoothCharacteristicProperties.Write;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Notify))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify))
                 properties |= BluetoothCharacteristicProperties.Notify;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Indicate))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate))
                 properties |= BluetoothCharacteristicProperties.Indicate;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.AuthenticatedSignedWrites))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.AuthenticatedSignedWrites))
                 properties |= BluetoothCharacteristicProperties.AuthenticatedSignedWrites;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.ExtendedProperties))
+            if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.ExtendedProperties))
                 properties |= BluetoothCharacteristicProperties.ExtendedProperties;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.NotifyEncryptionRequired))
-                properties |= BluetoothCharacteristicProperties.NotifyEncryptionRequired;
-            if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.IndicateEncryptionRequired))
-                properties |= BluetoothCharacteristicProperties.IndicateEncryptionRequired;
             return properties;
         }
     }
