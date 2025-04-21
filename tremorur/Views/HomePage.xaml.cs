@@ -10,7 +10,8 @@ namespace tremorur.Views
         private readonly IButtonService _buttonService;
         private readonly Services.IMessenger _messenger;
         private readonly INavigationService navigationService;
-        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger, INavigationService navigationService) : base(buttonService)
+        private readonly VibrationsService vibrationsService;
+        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger, INavigationService navigationService, VibrationsService vibrationsService) : base(buttonService)
         {
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
@@ -18,6 +19,7 @@ namespace tremorur.Views
             BindingContext = viewModel;
             this.navigationService = navigationService;
             StartClock();
+            this.vibrationsService = vibrationsService;
         }
         async void StartClock()
         {
@@ -34,37 +36,52 @@ namespace tremorur.Views
             }
         }
 
-        private int level = 1; //vibrationsstart level 1
-        protected override void OnUpButtonClicked(object? sender, EventArgs e)
+        private CancellationTokenSource? okHoldCts;//hold ok nede
+        private CancellationTokenSource? upHoldCts;//hold up nede
+
+        protected override void OnOKButtonClicked(object? sender, EventArgs e)
         {
-            if (level < 7)
-            {
-                level++;
-                //UpdateLevelLabel();
+            if (okHoldCts != null)
+            { 
+                okHoldCts.Cancel();//hvis knappen trykkes igen afbrydes der
+                okHoldCts = null;
+                return;
             }
+            okHoldCts = new CancellationTokenSource();
+            StartOkHoldTimer(okHoldCts.Token);
         }
-        protected override void OnDownButtonClicked(object? sender, EventArgs e)
+        private async void StartOkHoldTimer(CancellationToken token)
         {
-            if (level > 1)
+            try
             {
-                level--;
-                //UpdateLevelLabel();
+                await Task.Delay(3000, token); //hold nede i 3 sekunder
+                await vibrationsService.StartStopVibration(); //starter vibrationer
+                await navigationService.GåTilSideAsync("//setVibration"); //går til SetVibrationsPage
             }
+            catch(TaskCanceledException){ }//der slippes inden 3 sekunder - afbryd   
+            finally { okHoldCts= null; }
         }
 
-        //private void UpdateLevelLabel()
-        //{
-        //    LevelLabel.Text = $"Level:{level}";
-        //    OnUpButtonClicked.IsEnabled = level < 7;
-        //    OnDownButtonClicked.IsEnabled = level > 1;
-        //}
-        protected override async void OnCancelButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
+        protected override void OnUpButtonClicked(object? sender, EventArgs e)
         {
-            bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
-            if (confirm)
+            if (upHoldCts != null)
             {
-                await Navigation.PopAsync();
+                upHoldCts.Cancel();//hvis knappen trykkes igen afbrydes der
+                upHoldCts = null;
+                return;
             }
+            okHoldCts = new CancellationTokenSource();
+            StartUpHoldTimer(upHoldCts.Token);
+        }
+        private async void StartUpHoldTimer(CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(3000, token); //hold nede i 3 sekunder
+                await navigationService.GåTilSideAsync("//setAlarm"); //går til SetAlarmPage
+            }
+            catch (TaskCanceledException) { }//der slippes inden 3 sekunder - afbryd   
+            finally { upHoldCts = null; }
         }
     }
 }

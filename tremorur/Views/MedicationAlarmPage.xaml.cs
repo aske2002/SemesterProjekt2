@@ -31,7 +31,14 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     {
         MedicationLabel.Text = "Op blev trykket";
     }
-
+    //protected override async void OnCancelButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
+    //{
+    //    bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
+    //    if (confirm)
+    //    {
+    //        await Navigation.PopAsync();
+    //    }
+    //}
     async void StartClock()
     {
         while (true)

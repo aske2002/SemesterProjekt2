@@ -10,7 +10,7 @@ using tremorur.Models.Bluetooth;
 
 namespace tremorur.Services
 {
-    class VibrationsService
+    public class VibrationsService
     {
         private readonly IBluetoothService _bluetoothService;
         private IBluetoothPeripheral? _connectedDevice = null; //null indtil der forbindes til bluetoothEnheden 
@@ -18,8 +18,7 @@ namespace tremorur.Services
         private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.Find(e => e.UUID == BluetoothID.VibrationPatternCharacteristicUUID);
         private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.Find(e => e.UUID == BluetoothID.VibrationEnabledCharacteristicUUID);
 
-
-        public VibrationsService(IBluetoothService bluetoothService)//inistaliserer bluetoothService
+        public VibrationsService(IBluetoothService bluetoothService)//initialiserer bluetoothService
         {
             _bluetoothService = bluetoothService;
             ConnectBluetooth();
@@ -57,7 +56,7 @@ namespace tremorur.Services
                 await _onOffChar.WriteValueAsync([0]);//slukker hvis vibration er tændt [1]
             }
         }
-        private static readonly List<VibrationSettings> VibrationsLevels = new List<VibrationSettings>()
+        private static readonly List<VibrationSettings> vibrationsLevels = new List<VibrationSettings>()
         {
             VibrationSettings.CreateSinePatternSettings(50), //level 1
             VibrationSettings.CreateSinePatternSettings(80), // level 2
@@ -76,7 +75,7 @@ namespace tremorur.Services
             var currentLevel = 0;
             if (currentPattern != null)
             {
-                currentLevel = VibrationsLevels.IndexOf(VibrationsLevels.Find(e => e.Id == currentPattern.Id));
+                currentLevel = vibrationsLevels.IndexOf(vibrationsLevels.Find(e => e.Id == currentPattern.Id));
             }
             return currentLevel;
         }
@@ -87,8 +86,8 @@ namespace tremorur.Services
                 return;
             }
             var currentVibrationIndex = await GetCurrentVibration(_patternChar);
-            var nextLevelIndex = (currentVibrationIndex + 1) % VibrationsLevels.Count; //finder næste index i vibrations liste
-            var nextLevel = VibrationsLevels[nextLevelIndex];//finder næste objekt i vibrations liste
+            var nextLevelIndex = (currentVibrationIndex + 1) % vibrationsLevels.Count; //finder næste index i vibrations liste
+            var nextLevel = vibrationsLevels[nextLevelIndex];//finder næste objekt i vibrations liste
             await _patternChar.WriteValueAsync(nextLevel.ToBytes());//skriver level om til bytes og sender det til RPi
         }
         public async Task NavigateLevelDown()
@@ -98,8 +97,8 @@ namespace tremorur.Services
                 return;
             }
             var currentVibrationIndex = await GetCurrentVibration(_patternChar);
-            var preLevelIndex = (currentVibrationIndex - 1) % VibrationsLevels.Count; //finder forrige index i vibrations liste
-            var preLevel = VibrationsLevels[preLevelIndex];//finder forrige objekt i vibrations liste
+            var preLevelIndex = (currentVibrationIndex - 1) % vibrationsLevels.Count; //finder forrige index i vibrations liste
+            var preLevel = vibrationsLevels[preLevelIndex];//finder forrige objekt i vibrations liste
             await _patternChar.WriteValueAsync(preLevel.ToBytes());//skriver level om til bytes og sender det til RPi
         }
 

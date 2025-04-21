@@ -34,6 +34,19 @@
             ContentTemplate="{DataTemplate vw:HomePage}"
             Route="home"/>
     </FlyoutItem>
+    
+    <FlyoutItem Title="SetAlarmPage">
+        <ShellContent
+        ContentTemplate="{DataTemplate vm:SetAlarmPage}"
+        Route="setAlarm"/>
+    </FlyoutItem>
+    
+    <FlyoutItem Title="SetVibrationPage">
+        <ShellContent
+        ContentTemplate="{DataTemplate vw:SetVibrationsPage}"
+        Route="setVibration"/>
+    </FlyoutItem>
+
     <FlyoutItem Title="Bluetooth List">
         <ShellContent
             ContentTemplate="{DataTemplate vw:BluetoothConnectPage}"
@@ -65,11 +78,6 @@
         Uncomment the below section to enable TabBar item(s)
         And ensure appropriate page definitions are available for it work as expected
     -->
-    <TabBar>
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:SetAlarmPage}"
-            Route="SetAlarm"/>
-    </TabBar>
     <!-- Optional Templates
     // These may be provided inline as below or as separate classes.
 
