@@ -81,6 +81,15 @@
     <Folder Include="Messages/" />
   </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\shared\shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\SetAlarmPage.xaml.cs">
+        <DependentUpon>SetAlarmPage.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\SetAlarmPage.xaml.cs">
       <DependentUpon>SetAlarmPage.xaml</DependentUpon>

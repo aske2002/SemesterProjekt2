@@ -23,14 +23,13 @@ namespace client.Services.Bluetooth
         // UUIDs for the Vibration Service and its characteristics
         public const string VibrationServiceUUID = "12345678-0000-1000-8000-00805F9B34FB";
 
-        // UUIDs for motor control characteristic
+        // UUIDs for motor control characteristic Pattern
         public const string VibrationPatternCharacteristicUUID = "12345678-0001-1000-8000-00805F9B34FB";
         public const CharacteristicFlags VibrationPatternFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
 
-        // UUIDs for motor status characteristic
+        // UUIDs for motor status characteristic on/off
         public const string VibrationEnabledCharacteristicUUID = "12345678-0003-1000-8000-00805F9B34FB";
-        public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.Read | CharacteristicFlags.Notify | CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse;
-
+        public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
     }
 
     public class BluetoothService : IHostedService, IRecipient<VibrationsDidToggleEvent>, IRecipient<VibrationSettingsChangedEvent>

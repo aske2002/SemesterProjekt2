@@ -32,7 +32,6 @@ public record VibrationPatternExpression : VibrationPatternBase
     {
         var expression = System.Text.Encoding.UTF8.GetString(data);
         return await ParseAsync(expression, resolution);
-        Math.Sin();
     }
 
     //expression kunne e.g være "Math.Sin(t * 2 * Math.PI / 1000) * 0.5 + 0.5"

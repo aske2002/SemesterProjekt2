@@ -34,7 +34,7 @@ namespace tremorur.Views
             }
         }
 
-        private int level = 0; //vibrationsstart level 0, hvor 0 er off
+        private int level = 1; //vibrationsstart level 1
         protected override void OnUpButtonClicked(object? sender, EventArgs e)
         {
             if (level < 7)
