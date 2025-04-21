@@ -1,6 +1,5 @@
 using System.Diagnostics;
-using CoreBluetooth;
-using Foundation;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Storage.Streams;
@@ -10,79 +9,21 @@ namespace tremorur.Models.Bluetooth;
 public partial class BluetoothPeripheralCharacteristic
 {
     private readonly GattCharacteristic nativeCharacteristic;
-    private TaskCompletionSource? writeTaskCompletionSource;
-    private TaskCompletionSource<byte[]>? readTaskCompletionSource;
     private TaskCompletionSource? notifyTaskCompletionSource;
-    private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
 
     public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic)
     {
         nativeCharacteristic = gattCharacteristic;
-
-        if (nativePeripheral != null)
-        {
-            nativePeripheral.UpdatedNotificationState += Peripheral_UpdatedNotificationState;
-            nativePeripheral.UpdatedCharacterteristicValue += Characteristic_UpdatedValue;
-            nativePeripheral.WroteCharacteristicValue += Characteristic_WroteValue;
-        }
+        nativeCharacteristic.ValueChanged += Characteristic_UpdatedValue;
     }
 
-    private void Peripheral_UpdatedNotificationState(object? sender, CBCharacteristicEventArgs e)
+    private void Characteristic_UpdatedValue(object? sender, GattValueChangedEventArgs e)
     {
-        if (e.Characteristic.UUID == nativeCharacteristic.UUID)
-        {
-            if (e.Error == null)
-            {
-                notifyTaskCompletionSource?.TrySetResult();
-            }
-            else
-            {
-                notifyTaskCompletionSource?.TrySetException(new Exception(e.Error.LocalizedDescription));
-            }
-            notifyTaskCompletionSource = null;
-        }
-    }
-
-    private void Characteristic_WroteValue(object? sender, CBCharacteristicEventArgs e)
-    {
-        if (e.Characteristic.UUID == nativeCharacteristic.UUID && writeTaskCompletionSource != null)
-        {
-            if (e.Error == null)
-            {
-                writeTaskCompletionSource.TrySetResult();
-            }
-            else
-            {
-                writeTaskCompletionSource.TrySetException(new Exception(e.Error.LocalizedDescription));
-            }
-            writeTaskCompletionSource = null;
-        }
-    }
-
-    private void Characteristic_UpdatedValue(object? sender, CBCharacteristicEventArgs e)
-    {
-        if (e.Characteristic.UUID != nativeCharacteristic.UUID)
-        {
-            return;
-        }
-
-        var data = e.Characteristic.Value?.ToArray() ?? Array.Empty<byte>();
+        var data = e.CharacteristicValue.ToArray();
         foreach (var action in notifyActions)
         {
             action?.Invoke(data);
-        }
-
-        if (readTaskCompletionSource != null)
-        {
-            if (e.Error != null)
-            {
-                readTaskCompletionSource.TrySetException(new Exception(e.Error.LocalizedDescription));
-            }
-            else
-            {
-                readTaskCompletionSource.TrySetResult(data);
-            }
         }
     }
 
@@ -112,11 +53,6 @@ public partial class BluetoothPeripheralCharacteristic
             throw new InvalidOperationException("Characteristic does not support writing.");
         }
 
-        if (writeTaskCompletionSource != null)
-        {
-            throw new InvalidOperationException("Write operation already in progress.");
-        }
-
         var stream = new InMemoryRandomAccessStream();
         var writer = new DataWriter(stream);
         writer.WriteBytes(data);
@@ -134,21 +70,20 @@ public partial class BluetoothPeripheralCharacteristic
 
     public partial async Task<byte[]> ReadValueAsync()
     {
-        if (nativePeripheral == null || nativeCharacteristic == null)
-        {
-            throw new InvalidOperationException("Peripheral or characteristic is null.");
-        }
 
-        if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Read))
-        {
-            readTaskCompletionSource = new TaskCompletionSource<byte[]>();
-            nativePeripheral.ReadValue(nativeCharacteristic);
-            return await readTaskCompletionSource.Task;
-        }
-        else
+        if (!nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
         {
             throw new InvalidOperationException("Characteristic does not support reading.");
+
         }
+
+        var response = await nativeCharacteristic.ReadValueAsync();
+
+        if (response.Status != GattCommunicationStatus.Success)
+        {
+            throw new Exception($"Failed to read characteristic: {response.Status}");
+        }
+        return response.Value.ToArray();
     }
 
     public partial bool IsNotifying => nativeCharacteristic.IsNotifying;

@@ -25,8 +25,8 @@ public partial class BluetoothPeripheral
     public partial string? Name => NativePeripheral.Name;
     public partial string? LocalName => NativePeripheral.DeviceInformation.Name;
 
-    private List<BluetoothPeripheralService> services = new List<BluetoothPeripheralService>();
-    public partial List<BluetoothPeripheralService> Services => services;
+    private List<IBluetoothPeripheralService> services = new List<IBluetoothPeripheralService>();
+    public partial List<IBluetoothPeripheralService> Services => services;
 
     public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
     public partial Task<float?> GetSsriAsync()

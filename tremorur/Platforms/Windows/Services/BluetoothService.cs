@@ -39,7 +39,8 @@ public partial class BluetoothService
             {
                 if (item is ObservableBluetoothLEDevice discoveredPeripheral)
                 {
-                    var peripheral = DiscoveredPeripherals.FirstOrDefault(p => p.NativePeripheral == discoveredPeripheral);
+                    var peripheral = DiscoveredPeripherals.OfType<DiscoveredPeripheral>()
+                        .FirstOrDefault(p => p.UUID.ToString() == discoveredPeripheral.DeviceInfo.Id);
                     if (peripheral != null)
                     {
                         RemoveDiscoveredPeripheral(peripheral);
@@ -49,9 +50,16 @@ public partial class BluetoothService
         }
     }
 
-    public partial async Task<BluetoothPeripheral> ConnectPeripheralAsync(DiscoveredPeripheral device)
+    public partial async Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral device)
     {
-        return await device.ConnectAsync();
+        if (device is not DiscoveredPeripheral discoveredPeripheral)
+        {
+            throw new ArgumentException("Invalid device type", nameof(device));
+        }
+
+        var nativeDevice = discoveredPeripheral.NativePeripheral;
+        await nativeDevice.ConnectAsync();
+        return new BluetoothPeripheral(nativeDevice);
     }
 
     public partial void StartDiscovery()
