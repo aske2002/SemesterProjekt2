@@ -1,21 +1,24 @@
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Foundation;
+using Windows.Storage.Streams;
 
 namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheralCharacteristic
 {
-    private readonly CBCharacteristic nativeCharacteristic;
+    private readonly GattCharacteristic nativeCharacteristic;
     private TaskCompletionSource? writeTaskCompletionSource;
     private TaskCompletionSource<byte[]>? readTaskCompletionSource;
     private TaskCompletionSource? notifyTaskCompletionSource;
     private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
 
-    public BluetoothPeripheralCharacteristic(CBCharacteristic cBCharacteristic)
+    public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic)
     {
-        nativeCharacteristic = cBCharacteristic;
+        nativeCharacteristic = gattCharacteristic;
 
         if (nativePeripheral != null)
         {
@@ -83,35 +86,28 @@ public partial class BluetoothPeripheralCharacteristic
         }
     }
 
-    public partial string UUID => nativeCharacteristic.UUID.ToString();
+    public partial string UUID => nativeCharacteristic.Uuid.ToString();
 
     public partial async Task SetNotifyingAsync(bool value)
     {
-        if (nativePeripheral == null || nativeCharacteristic == null)
-        {
-            throw new InvalidOperationException("Peripheral or characteristic is null.");
-        }
-
-        var flags = nativeCharacteristic.Properties;
-        if (!flags.HasFlag(CBCharacteristicProperties.Notify) && !flags.HasFlag(CBCharacteristicProperties.Indicate))
+        var flags = nativeCharacteristic.CharacteristicProperties;
+        if (!flags.HasFlag(GattCharacteristicProperties.Notify) && !flags.HasFlag(GattCharacteristicProperties.Indicate))
         {
             throw new InvalidOperationException("Characteristic does not support notifications.");
         }
+        var result = await nativeCharacteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(value ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None);
 
-        notifyTaskCompletionSource = new TaskCompletionSource();
-        nativePeripheral.SetNotifyValue(value, nativeCharacteristic);
-        await notifyTaskCompletionSource.Task;
+        if (result?.Status != null && result.Status != GattCommunicationStatus.Success)
+        {
+            throw new Exception($"Failed to set notification: {result.Status} {result.ProtocolError}");
+        }
     }
 
     public partial async Task WriteValueAsync(byte[] data)
     {
-        if (nativePeripheral == null || nativeCharacteristic == null)
-        {
-            throw new InvalidOperationException("Peripheral or characteristic is null.");
-        }
 
-        var flags = nativeCharacteristic.Properties;
-        if (!flags.HasFlag(CBCharacteristicProperties.Write) && !flags.HasFlag(CBCharacteristicProperties.WriteWithoutResponse))
+        var flags = nativeCharacteristic.CharacteristicProperties;
+        if (!flags.HasFlag(GattCharacteristicProperties.Write) && !flags.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
         {
             throw new InvalidOperationException("Characteristic does not support writing.");
         }
@@ -121,17 +117,18 @@ public partial class BluetoothPeripheralCharacteristic
             throw new InvalidOperationException("Write operation already in progress.");
         }
 
-        writeTaskCompletionSource = new TaskCompletionSource();
-        nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
+        var stream = new InMemoryRandomAccessStream();
+        var writer = new DataWriter(stream);
+        writer.WriteBytes(data);
+        var buffer = writer.DetachBuffer();
 
-        if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Write))
+        if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
         {
-            nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithResponse);
-            await writeTaskCompletionSource.Task;
+            await nativeCharacteristic.WriteValueWithResultAsync(buffer, GattWriteOption.WriteWithoutResponse);
         }
         else
         {
-            nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
+            await nativeCharacteristic.WriteValueWithResultAsync(buffer, GattWriteOption.WriteWithResponse);
         }
     }
 

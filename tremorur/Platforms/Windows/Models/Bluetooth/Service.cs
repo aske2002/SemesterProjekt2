@@ -1,34 +1,27 @@
 using System.Diagnostics;
-using CoreBluetooth;
-using Foundation;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheralService
 {
-    private readonly CBService nativeService;
-    private CBPeripheral? nativePeripheral => nativeService?.Peripheral;
-
-    public BluetoothPeripheralService(CBService cBService)
+    private readonly GattDeviceService nativeService;
+    public BluetoothPeripheralService(GattDeviceService  gattService)
     {
-        nativeService = cBService;
-
-        if (nativePeripheral != null)
-        {
-            nativePeripheral.DiscoveredCharacteristics += Service_DiscoveredCharacteristics;
-            nativePeripheral?.DiscoverCharacteristics(forService: cBService);
-        }
+        nativeService = gattService;
+        Initialize_Characteristics();
     }
 
-    private void Service_DiscoveredCharacteristics(object? sender, CBServiceEventArgs e)
+    private async void Initialize_Characteristics()
     {
-        var allCharacteristics = nativeService?.Characteristics?.ToList() ?? new List<CBCharacteristic>();
-        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString())).ToList();
+        var characteristicsResult = await nativeService.GetCharacteristicsAsync();
+        var allCharacteristics = characteristicsResult.Characteristics.ToList();
+        var missingCharacteristics = allCharacteristics.Where(x => !characteristics.Any(y => y.UUID == x.Uuid.ToString())).ToList();
         characteristics.AddRange(missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)));
     }
 
     private List<BluetoothPeripheralCharacteristic> characteristics = new List<BluetoothPeripheralCharacteristic>();
     public partial List<BluetoothPeripheralCharacteristic> Characteristics => characteristics;
-    public partial string UUID => nativeService?.UUID.ToString() ?? string.Empty;
-    public partial bool IsPrimary => this.nativeService.Primary;
+    public partial string UUID => nativeService.Uuid.ToString();
+    public partial bool IsPrimary => false;
 }

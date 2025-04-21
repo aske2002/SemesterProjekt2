@@ -60,7 +60,7 @@ public partial class BluetoothService : IBluetoothService
     }
     private void CM_DiscoveredPeripheral(object? sender, CBDiscoveredPeripheralEventArgs e)
     {
-        var discoveredPeripheral = new DiscoveredPeripheral(e);
+        var discoveredPeripheral = new DiscoveredPeripheral(e, this);
         AddDiscoveredPeripheral(discoveredPeripheral);
     }
 

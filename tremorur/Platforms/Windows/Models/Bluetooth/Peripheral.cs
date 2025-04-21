@@ -1,74 +1,37 @@
 using System.Diagnostics;
-using CoreBluetooth;
-using Foundation;
-using ObjCRuntime;
+using CommunityToolkit.WinUI.Connectivity;
+using Windows.Devices.Bluetooth;
 
 namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheral
 {
 
-    public readonly CBPeripheral NativePeripheral;
-    private TaskCompletionSource<float?>? _rssiTaskCompletionSource;
-    public BluetoothPeripheral(CBPeripheral cBPeripheral) : base()
+    public ObservableBluetoothLEDevice NativePeripheral { get; private set; }
+    public BluetoothPeripheral(ObservableBluetoothLEDevice leDevice) : base()
     {
-        NativePeripheral = cBPeripheral;
-        Name = cBPeripheral.Name;
-        NativePeripheral.DiscoveredService += DiscoveredService;
-        NativePeripheral.RssiRead += RssiRead;
-
-        NativePeripheral.DiscoverServices();
-        NativePeripheral.ReadRSSI();
+        NativePeripheral = leDevice;
+        Initialize();
     }
 
-    void DiscoveredService(object? sender, NSErrorEventArgs e)
+    private async void Initialize()
     {
-        var allServices = NativePeripheral?.Services?.ToList() ?? new List<CBService>();
-        var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.UUID.ToString())).ToList();
+        var serviceRes = await NativePeripheral.BluetoothLEDevice.GetGattServicesAsync();
+        var allServices = serviceRes.Services.ToList();
+        var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.Uuid.ToString())).ToList();
         services.AddRange(missingServices.Select(x => new BluetoothPeripheralService(x)));
     }
 
-    public void RssiRead(object? peripheral, CBRssiEventArgs e)
-    {
-        if (e.Error == null)
-        {
-            _rssiTaskCompletionSource?.TrySetResult(e.Rssi.FloatValue);
-            RSSI = e.Rssi.FloatValue;
-        }
-        else
-        {
-            _rssiTaskCompletionSource?.TrySetException(new Exception(e.Error?.LocalizedDescription));
-            Debug.WriteLine($"Error reading RSSI: {e.Error?.LocalizedDescription}");
-        }
-    }
+    public partial string? Name => NativePeripheral.Name;
+    public partial string? LocalName => NativePeripheral.DeviceInformation.Name;
 
     private List<BluetoothPeripheralService> services = new List<BluetoothPeripheralService>();
     public partial List<BluetoothPeripheralService> Services => services;
 
-    public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
-    public partial async Task<float?> GetSsriAsync()
+    public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
+    public partial Task<float?> GetSsriAsync()
     {
-        if (_rssiTaskCompletionSource != null)
-        {
-            Debug.WriteLine("Already reading RSSI");
-            return null;
-        }
-        if (NativePeripheral.State != CBPeripheralState.Connected)
-        {
-            Debug.WriteLine("Peripheral is not connected");
-            return null;
-        }
-        _rssiTaskCompletionSource = new TaskCompletionSource<float?>();
-        NativePeripheral.ReadRSSI();
-        if (await Task.WhenAny(_rssiTaskCompletionSource.Task, Task.Delay(1000)) == _rssiTaskCompletionSource.Task)
-        {
-            return await _rssiTaskCompletionSource.Task;
-        }
-        else
-        {
-            Debug.WriteLine("Timeout while reading RSSI");
-            return null;
-        }
+        return Task.FromResult((float?)NativePeripheral.RSSI);
     }
 
     public void Dispose()
@@ -80,16 +43,12 @@ public partial class BluetoothPeripheral
     {
         get
         {
-            switch (NativePeripheral.State)
+            switch (NativePeripheral.BluetoothLEDevice.ConnectionStatus)
             {
-                case CBPeripheralState.Connected:
+                case BluetoothConnectionStatus.Connected:
                     return BluetoothPeripheralState.Connected;
-                case CBPeripheralState.Disconnected:
+                case BluetoothConnectionStatus.Disconnected:
                     return BluetoothPeripheralState.Disconnected;
-                case CBPeripheralState.Connecting:
-                    return BluetoothPeripheralState.Connecting;
-                case CBPeripheralState.Disconnecting:
-                    return BluetoothPeripheralState.Disconnecting;
                 default:
                     return BluetoothPeripheralState.Disconnected;
             }

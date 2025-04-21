@@ -9,6 +9,7 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
     public partial Guid UUID { get; }
     public float? RSSI { get; private set; }
     partial BluetoothPeripheralState State { get; }
-    public string? Name { get; private set; }
+    public partial string? Name { get; }
+    public partial string? LocalName { get; }
     public partial Task<float?> GetSsriAsync();
 }

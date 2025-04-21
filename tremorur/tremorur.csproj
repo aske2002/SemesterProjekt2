@@ -94,4 +94,10 @@
     </MauiXaml>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.19041.0'">
+    <PackageReference Include="CommunityToolkit.WinUI.Connectivity">
+      <Version>7.1.2</Version>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

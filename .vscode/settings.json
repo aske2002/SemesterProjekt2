@@ -1,1 +1,12 @@
-{}
+{
+  "dotnetAcquisitionExtension.existingDotnetPath": [
+    {
+      "path": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "extensionId": "ms-dotnettools.csharp",
+    },
+    {
+      "path": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "extensionId": "ms-dotnettools.csdevkit",
+    }
+  ]
+}

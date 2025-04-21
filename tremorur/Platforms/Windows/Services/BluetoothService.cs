@@ -9,68 +9,49 @@ namespace tremorur.Services;
 public partial class BluetoothService
 {
     private readonly ILogger<BluetoothService> _logger;
-    private Dictionary<Guid, TaskCompletionSource<BluetoothPeripheral>?> connectTasks = new();
-    BluetoothLEHelper centralManager;
+    BluetoothLEHelper bluetoothLEHelper = BluetoothLEHelper.Context;
     public BluetoothService(IMessenger messenger, ILogger<BluetoothService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-
-        // Initialize the Bluetooth service
-        centralManager = new CBCentralManager();
-        centralManager.ConnectedPeripheral += CM_ConnectedPeripheral;
-        centralManager.UpdatedState += CM_UpdatedState;
-        centralManager.DiscoveredPeripheral += CM_DiscoveredPeripheral;
+        //Observable collection
+        bluetoothLEHelper.BluetoothLeDevices.CollectionChanged += DiscoveredDevicesChanged;
     }
 
-    private partial bool IsScanning =>
-        centralManager.IsScanning;
+    public partial bool IsScanning =>
+        bluetoothLEHelper.IsEnumerating;
 
-    private void CM_UpdatedState(object? sender, EventArgs e)
+    private void DiscoveredDevicesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        if (centralManager.State == CBManagerState.PoweredOn)
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
-            _logger.Log(LogLevel.Information, "Bluetooth is powered on.");
-            _messenger.SendMessage(new BluetoothStateUpdated(BluetoothState.Available));
-            if (shouldScan)
+            foreach (var item in e.NewItems)
             {
-                StartDiscovery();
+                if (item is ObservableBluetoothLEDevice discoveredPeripheral)
+                {
+                    AddDiscoveredPeripheral(new DiscoveredPeripheral(discoveredPeripheral));
+                }
             }
         }
-        else
+        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems != null)
         {
-            _logger.Log(LogLevel.Warning, "Bluetooth is not available.");
-            _messenger.SendMessage(new BluetoothStateUpdated(BluetoothState.NotAvailable));
+            foreach (var item in e.OldItems)
+            {
+                if (item is ObservableBluetoothLEDevice discoveredPeripheral)
+                {
+                    var peripheral = DiscoveredPeripherals.FirstOrDefault(p => p.NativePeripheral == discoveredPeripheral);
+                    if (peripheral != null)
+                    {
+                        RemoveDiscoveredPeripheral(peripheral);
+                    }
+                }
+            }
         }
-    }
-    private void CM_ConnectedPeripheral(object? sender, CBPeripheralEventArgs e)
-    {
-        Guid identifier = new Guid(e.Peripheral.Identifier.ToString());
-        var taskSource = connectTasks.GetValueOrDefault(identifier);
-        if (taskSource != null)
-        {
-            var peripheral = new BluetoothPeripheral(e.Peripheral);
-            taskSource.TrySetResult(peripheral);
-            connectTasks.Remove(identifier);
-        }
-        else
-        {
-            _logger.Log(LogLevel.Information, "Connected to peripheral: " + e.Peripheral.Name);
-        }
-    }
-    private void CM_DiscoveredPeripheral(object? sender, CBDiscoveredPeripheralEventArgs e)
-    {
-        var discoveredPeripheral = new DiscoveredPeripheral(e);
-        AddDiscoveredPeripheral(discoveredPeripheral);
     }
 
     public partial async Task<BluetoothPeripheral> ConnectPeripheralAsync(DiscoveredPeripheral device)
     {
-
-        var taskSource = new TaskCompletionSource<BluetoothPeripheral>();
-        connectTasks.Add(device.UUID, taskSource);
-        centralManager.ConnectPeripheral(device.NativePeripheral);
-        return await taskSource.Task;
+        return await device.ConnectAsync();
     }
 
     public partial void StartDiscovery()
@@ -81,7 +62,7 @@ public partial class BluetoothService
             return;
         }
         shouldScan = true;
-        centralManager.ScanForPeripherals(peripheralUuids: []);
+        bluetoothLEHelper.StartEnumeration();
     }
 
     public partial void StopDiscovery()
@@ -92,7 +73,7 @@ public partial class BluetoothService
             return;
         }
         shouldScan = false;
-        centralManager.StopScan();
+        bluetoothLEHelper.StopEnumeration();
     }
 
 }

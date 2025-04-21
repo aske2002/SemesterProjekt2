@@ -1,54 +1,36 @@
 using System.Diagnostics;
-using CoreBluetooth;
-using Foundation;
+using CommunityToolkit.WinUI.Connectivity;
+using Windows.Devices.Bluetooth;
 
 namespace tremorur.Models.Bluetooth;
 public partial class DiscoveredPeripheral
 {
-    public CBPeripheral NativePeripheral { get; private set; }
-    private NSDictionary advertisementData;
-    private float rssi = 0;
-    public partial float RSSI => rssi;
+    public ObservableBluetoothLEDevice NativePeripheral { get; private set; }
+    public partial float RSSI => NativePeripheral.RSSI;
 
-    public DiscoveredPeripheral(CBDiscoveredPeripheralEventArgs e)
+    public DiscoveredPeripheral(ObservableBluetoothLEDevice device)
     {
-        NativePeripheral = e.Peripheral;
-        advertisementData = e.AdvertisementData;
-        rssi = e.RSSI.FloatValue;
-        if (advertisementData.ContainsKey(CBAdvertisement.DataTxPowerLevelKey))
-        {
-            var rssi = advertisementData[CBAdvertisement.DataTxPowerLevelKey] as NSNumber;
-            if (rssi != null)
-            {
-
-            }
-        }
+        NativePeripheral = device;
     }
-    public partial bool IsConnectable => advertisementData.TryGetValue(CBAdvertisement.IsConnectable, out var isConnectable) && isConnectable.ToString() == "1";
+    public partial bool IsConnectable => NativePeripheral.DeviceInformation.Pairing.CanPair;
 
-    public partial List<string> Services
-    {
-        get
-        {
-            var services = new List<string>();
-            if (advertisementData.ContainsKey(CBAdvertisement.DataServiceUUIDsKey))
-            {
-                var uuids = advertisementData[CBAdvertisement.DataServiceUUIDsKey];
-                if (uuids is NSArray uuidArray)
-                {
-                    foreach (var uuid in uuidArray)
-                    {
-                        if (uuid is CBUUID cbUUID)
-                        {
-                            services.Add(cbUUID.ToString());
-                        }
-                    }
-                }
-            }
-            return services;
-        }
-    }
-    public partial string? LocalName => advertisementData.TryGetValue(CBAdvertisement.DataLocalNameKey, out var localName) ? localName.ToString() : null;
+    public partial List<string> Services => NativePeripheral.GattServices
+        .Select(service => service.Uuid.ToString())
+        .ToList();
+
+    public partial string? LocalName => NativePeripheral.DeviceInformation.Name;
     public partial string? Name => NativePeripheral.Name;
-    public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
+    public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
+    public partial async Task<BluetoothPeripheral> ConnectAsync()
+    {
+        await NativePeripheral.ConnectAsync();
+        if (NativePeripheral.IsConnected)
+        {
+            return new BluetoothPeripheral(NativePeripheral);
+        }
+        else
+        {
+            throw new Exception("Failed to connect to peripheral");
+        }
+    }
 }

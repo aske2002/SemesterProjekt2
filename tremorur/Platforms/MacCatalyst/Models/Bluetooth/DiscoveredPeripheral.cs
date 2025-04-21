@@ -6,12 +6,13 @@ namespace tremorur.Models.Bluetooth;
 public partial class DiscoveredPeripheral : IDiscoveredPeripheral
 {
     public CBPeripheral NativePeripheral { get; private set; }
+    private BluetoothService bluetoothService;
     private NSDictionary advertisementData;
     private float rssi = 0;
     public partial float RSSI => rssi;
-
-    public DiscoveredPeripheral(CBDiscoveredPeripheralEventArgs e)
+    public DiscoveredPeripheral(CBDiscoveredPeripheralEventArgs e, BluetoothService service)
     {
+        bluetoothService = service;
         NativePeripheral = e.Peripheral;
         advertisementData = e.AdvertisementData;
         rssi = e.RSSI.FloatValue;
@@ -24,6 +25,12 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
             }
         }
     }
+    public partial async Task<BluetoothPeripheral> ConnectAsync()
+    {
+        return await bluetoothService.ConnectPeripheralAsync(this);
+    }
+
+
     public partial bool IsConnectable => advertisementData.TryGetValue(CBAdvertisement.IsConnectable, out var isConnectable) && isConnectable.ToString() == "1";
 
     public partial List<string> Services
