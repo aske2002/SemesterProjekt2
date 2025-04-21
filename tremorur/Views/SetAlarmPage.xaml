@@ -19,22 +19,22 @@
         
         <Label
             x:Name="AlarmLabel"
-            Text="00:00"
-            FontSize="100"
-            FontAttributes="Bold"
-            TextColor="White"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
-
-        <Label
-            x:Name="SetAlarm"
-            Text="Set Alarm"
-            FontSize="Title"
+            Text="Indstil timer"
+            FontSize="30"
             FontAttributes="Bold"
             TextColor="White"
             Grid.Row="1"
             Grid.ColumnSpan="2"
-            VerticalOptions="Start"
-            HorizontalOptions="Center"/>
+            HorizontalTextAlignment="Center"/>
+
+        <Label
+            x:Name="SetAlarm" 
+            Text="00:00"
+            FontSize="90"
+            FontAttributes="Bold"
+            TextColor="White"
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            HorizontalTextAlignment="Center"/>
     </Grid>
 </models:ContentPageWithButtons>

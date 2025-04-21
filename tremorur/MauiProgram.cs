@@ -19,6 +19,7 @@ namespace tremorur
                    });
             builder.Services.AddSingleton<IBluetoothService,BluetoothService>();
             builder.Services.AddSingleton<IButtonService, ButtonService>();
+            builder.Services.AddSingleton<VibrationsService>();
             
             builder.Services.AddTransient<AlarmService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();

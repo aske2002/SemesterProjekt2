@@ -6,11 +6,13 @@ namespace tremorur.Views
     public partial class SetAlarmPage : ContentPageWithButtons
     {
         private readonly INavigationService navigationService;
-        public SetAlarmPage(IButtonService buttonService, INavigationService navigationService) : base(buttonService)
+        private readonly AlarmService alarmService;
+        public SetAlarmPage(IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
         {
             InitializeComponent();
             this.navigationService = navigationService;
             UpdateAlarmLabel();
+            this.alarmService = alarmService;
         }
 
         private int hours = 0;
@@ -19,7 +21,6 @@ namespace tremorur.Views
         private int cancelPressCount = 0; //Tæller antal gange cancel bliver trykket
         protected override void OnUpButtonClicked(object? sender, EventArgs e)
         {
-            AlarmLabel.Text = "Indstil Alarm";
             cancelPressCount = 0; //nulstiller når cancel bliver trykket
             if (step == 0) // Justerer timer
             {
@@ -27,7 +28,7 @@ namespace tremorur.Views
             }
             else if (step == 1) // Justerer minutter
             {
-                minutes = (minutes + 1) % 60;
+                minutes = (minutes + 5) % 60;
             }
             UpdateAlarmLabel();
         }
@@ -40,34 +41,37 @@ namespace tremorur.Views
             }
             else if (step == 1) // Justerer minutter
             {
-                minutes = (minutes - 1 + 60) % 60;
+                minutes = (minutes - 5 + 60) % 60;
             }
             UpdateAlarmLabel();
+        }
+        private async Task SetStep(int _step)//returnerer en Tas
+        {
+            step = _step;
+
+            if (step == 0) // Timer indstilles
+            {
+                AlarmLabel.Text = "Indstil Timer";
+            }
+            else if (step == 1)
+            {
+                AlarmLabel.Text = "Indstil Minutter";
+            }
+            else if (step == 2)
+            {
+                AlarmLabel.Text = "Tryk OK for at gemme";
+            }
+            else if (step >= 2) //gemmer alarmen i alarmService og navigerer til HomePage
+            {
+                var time = TimeSpan.FromHours(hours).Add(TimeSpan.FromMinutes(minutes)); //laver om til timeSpan
+                alarmService.CreateAlarm(time);
+                await navigationService.GoToAsync("//home");
+            }
         }
         protected override async void OnOKButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
         {
             cancelPressCount = 0; //nulstiller når cancel bliver trykket
-            if (step == 0) // Timer indstilles
-            {
-                AlarmLabel.Text = "Indstil timer";
-                step = 1;
-            }
-            else if (step == 1) //Minutter indstilles
-            {
-                AlarmLabel.Text = "Indstil minutter";
-                step = 2;
-            }
-            else if (step == 2) // Alarmen gemmes
-            {
-                await DisplayAlert("Alarm sat", $"Alarm sat til {hours:D2}:{minutes:D2}", "OK");
-                step = 0; // Nulstil valgprocessen
-                hours = 0;
-                minutes = 0;
-                await navigationService.GoToAsync("//home"); //navigerer til HomePage
-                return; //stopper koden i metoden, så man kan navigere væk
-            }
-                UpdateAlarmLabel();
-            
+            await SetStep(step + 1);
         }
         protected override async void OnCancelButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
         {
@@ -75,22 +79,19 @@ namespace tremorur.Views
 
             if (cancelPressCount>=2) //hvis cancel bliver trykket mere end 2 gange navigeres tilbage til HomePage
             {
-                cancelPressCount = 0;
-                step = 0;
+                await navigationService.GoToAsync("//home");
+            }
+            else
+            {
+                SetStep(0); // Nulstil valg i alarmen
                 hours = 0;
                 minutes = 0;
-                await navigationService.GoToAsync("//home");
-                return;
+                UpdateAlarmLabel();
             }
-
-            step = 0; // Nulstil valg i alarmen
-            hours = 0;
-            minutes = 0;
-            UpdateAlarmLabel();
         }
         private void UpdateAlarmLabel()
         {
-            SetAlarm.Text = $"Alarm: {hours:D2}:{minutes:D2}";
+            SetAlarm.Text = $"{hours:D2}:{minutes:D2}";
         }
     }
 

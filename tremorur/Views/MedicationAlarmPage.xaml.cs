@@ -20,7 +20,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     protected override void OnCancelButtonClicked(object? sender, EventArgs e)  
     {
         MedicationLabel.Text = "Medicinpåmindelse annulleret";
-        navigationService.GoToAsync("//home");
+        navigationService.GoToAsync("///home");
     }
     protected override void OnDownButtonClicked(object? sender, EventArgs e)
     {
