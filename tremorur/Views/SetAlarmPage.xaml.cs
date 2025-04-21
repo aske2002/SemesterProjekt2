@@ -63,7 +63,7 @@ namespace tremorur.Views
                 step = 0; // Nulstil valgprocessen
                 hours = 0;
                 minutes = 0;
-                await navigationService.GåTilSideAsync("//home"); //navigerer til HomePage
+                await navigationService.GoToAsync("//home"); //navigerer til HomePage
                 return; //stopper koden i metoden, så man kan navigere væk
             }
                 UpdateAlarmLabel();
@@ -79,7 +79,7 @@ namespace tremorur.Views
                 step = 0;
                 hours = 0;
                 minutes = 0;
-                await navigationService.GåTilSideAsync("//home");
+                await navigationService.GoToAsync("//home");
                 return;
             }
 

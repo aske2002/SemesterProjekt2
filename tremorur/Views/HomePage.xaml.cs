@@ -56,7 +56,7 @@ namespace tremorur.Views
             {
                 await Task.Delay(3000, token); //hold nede i 3 sekunder
                 await vibrationsService.StartStopVibration(); //starter vibrationer
-                await navigationService.GåTilSideAsync("//setVibration"); //går til SetVibrationsPage
+                await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
             }
             catch(TaskCanceledException){ }//der slippes inden 3 sekunder - afbryd   
             finally { okHoldCts= null; }
@@ -78,7 +78,7 @@ namespace tremorur.Views
             try
             {
                 await Task.Delay(3000, token); //hold nede i 3 sekunder
-                await navigationService.GåTilSideAsync("//setAlarm"); //går til SetAlarmPage
+                await navigationService.GoToAsync("//setAlarm"); //går til SetAlarmPage
             }
             catch (TaskCanceledException) { }//der slippes inden 3 sekunder - afbryd   
             finally { upHoldCts = null; }
