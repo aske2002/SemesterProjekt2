@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace tremorur.Models.Bluetooth;
 
-public partial class BluetoothPeripheralCharacteristic
+public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCharacteristic
 {
     public partial List<object> Descriptors { get; }
     public partial bool IsNotifying { get; }

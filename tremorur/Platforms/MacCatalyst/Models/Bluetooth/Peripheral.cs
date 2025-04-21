@@ -5,7 +5,7 @@ using ObjCRuntime;
 
 namespace tremorur.Models.Bluetooth;
 
-public partial class BluetoothPeripheral
+public partial class BluetoothPeripheral : IBluetoothPeripheral
 {
 
     public readonly CBPeripheral NativePeripheral;
@@ -43,7 +43,7 @@ public partial class BluetoothPeripheral
     }
 
     private List<BluetoothPeripheralService> services = new List<BluetoothPeripheralService>();
-    public partial List<BluetoothPeripheralService> Services => services;
+    public partial List<IBluetoothPeripheralService> Services => services;
 
     public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
     public partial async Task<float?> GetSsriAsync()

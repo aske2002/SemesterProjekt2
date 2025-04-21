@@ -4,7 +4,7 @@ using Foundation;
 
 namespace tremorur.Models.Bluetooth;
 
-public partial class BluetoothPeripheralService
+public partial class BluetoothPeripheralService : IBluetoothPeripheralService
 {
     private readonly CBService nativeService;
     private CBPeripheral? nativePeripheral => nativeService?.Peripheral;
@@ -27,8 +27,8 @@ public partial class BluetoothPeripheralService
         characteristics.AddRange(missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)));
     }
 
-    private List<BluetoothPeripheralCharacteristic> characteristics = new List<BluetoothPeripheralCharacteristic>();
-    public partial List<BluetoothPeripheralCharacteristic> Characteristics => characteristics;
+    private List<IBluetoothPeripheralCharacteristic> characteristics = new List<IBluetoothPeripheralCharacteristic>();
+    public partial List<IBluetoothPeripheralCharacteristic> Characteristics => characteristics;
     public partial string UUID => nativeService?.UUID.ToString() ?? string.Empty;
     public partial bool IsPrimary => this.nativeService.Primary;
 }

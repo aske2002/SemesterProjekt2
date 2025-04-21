@@ -6,7 +6,7 @@ using tremorur.Messages;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.Services;
-public partial class BluetoothService
+public partial class BluetoothService : IBluetoothService
 {
     private readonly ILogger<BluetoothService> _logger;
     private Dictionary<Guid, TaskCompletionSource<BluetoothPeripheral>?> connectTasks = new();
@@ -64,12 +64,16 @@ public partial class BluetoothService
         AddDiscoveredPeripheral(discoveredPeripheral);
     }
 
-    public partial async Task<BluetoothPeripheral> ConnectPeripheralAsync(DiscoveredPeripheral device)
+    public partial async Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral)
     {
+        if (discoveredPeripheral is not BluetoothPeripheral bluetoothPeripheral)
+        {
+            throw new ArgumentException("Invalid peripheral type", nameof(discoveredPeripheral));
+        }
 
         var taskSource = new TaskCompletionSource<BluetoothPeripheral>();
-        connectTasks.Add(device.UUID, taskSource);
-        centralManager.ConnectPeripheral(device.NativePeripheral);
+        connectTasks.Add(discoveredPeripheral.UUID, taskSource);
+        centralManager.ConnectPeripheral(bluetoothPeripheral.NativePeripheral);
         return await taskSource.Task;
     }
 

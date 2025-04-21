@@ -4,7 +4,7 @@ using tremorur.Models.Bluetooth;
 
 namespace tremorur.Services;
 
-public partial class BluetoothService
+public partial class BluetoothService : IBluetoothService
 {
     internal readonly IMessenger _messenger;
     public BluetoothService(IMessenger messenger)
@@ -13,7 +13,7 @@ public partial class BluetoothService
     }
 
     private bool shouldScan = false;
-    public ObservableCollection<DiscoveredPeripheral> DiscoveredPeripherals { get; } = new ObservableCollection<DiscoveredPeripheral>();
+    public ObservableCollection<IDiscoveredPeripheral> DiscoveredPeripherals { get; } = new ObservableCollection<IDiscoveredPeripheral>();
     internal void AddDiscoveredPeripheral(DiscoveredPeripheral discoveredPeripheral)
     {
         if (DiscoveredPeripherals.All(p => p.UUID != discoveredPeripheral.UUID))
@@ -24,9 +24,9 @@ public partial class BluetoothService
         }
 
     }
-    public event EventHandler<DiscoveredPeripheral> DiscoveredPeripheral = delegate { };
+    public event EventHandler<IDiscoveredPeripheral> DiscoveredPeripheral = delegate { };
     public partial bool IsScanning { get; } // Defined per platform
-    public partial Task<BluetoothPeripheral> ConnectPeripheralAsync(DiscoveredPeripheral device);
+    public partial Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral);
     public partial void StartDiscovery(); // Defined per platform
     public partial void StopDiscovery(); // Defined per platform
 }

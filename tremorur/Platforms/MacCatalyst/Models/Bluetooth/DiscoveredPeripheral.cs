@@ -3,7 +3,7 @@ using CoreBluetooth;
 using Foundation;
 
 namespace tremorur.Models.Bluetooth;
-public partial class DiscoveredPeripheral
+public partial class DiscoveredPeripheral : IDiscoveredPeripheral
 {
     public CBPeripheral NativePeripheral { get; private set; }
     private NSDictionary advertisementData;

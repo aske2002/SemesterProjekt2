@@ -4,7 +4,7 @@ using Foundation;
 
 namespace tremorur.Models.Bluetooth;
 
-public partial class BluetoothPeripheralCharacteristic
+public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCharacteristic
 {
     private readonly CBCharacteristic nativeCharacteristic;
     private TaskCompletionSource? writeTaskCompletionSource;
