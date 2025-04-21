@@ -37,7 +37,7 @@
     
     <FlyoutItem Title="SetAlarmPage">
         <ShellContent
-        ContentTemplate="{DataTemplate vm:SetAlarmPage}"
+        ContentTemplate="{DataTemplate vw:SetAlarmPage}"
         Route="setAlarm"/>
     </FlyoutItem>
     
