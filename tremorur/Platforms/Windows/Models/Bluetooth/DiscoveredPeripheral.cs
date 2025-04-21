@@ -20,7 +20,7 @@ public partial class DiscoveredPeripheral
 
     public partial string? LocalName => NativePeripheral.DeviceInfo.Name;
     public partial string? Name => NativePeripheral.Name;
-    public partial Guid UUID => new Guid(NativePeripheral.DeviceInfo.Id);
+    public partial string UUID => NativePeripheral.DeviceInfo.Id;
     public partial async Task<IBluetoothPeripheral> ConnectAsync()
     {
         await NativePeripheral.ConnectAsync();
