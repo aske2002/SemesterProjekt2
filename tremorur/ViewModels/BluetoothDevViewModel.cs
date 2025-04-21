@@ -1,9 +1,7 @@
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
-using Microsoft.Maui.Controls.Internals;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.ViewModels
@@ -11,8 +9,8 @@ namespace tremorur.ViewModels
     [QueryProperty(nameof(ConnectedDevice), "ConnectedDevice")]
     public partial class BluetoothDevViewModel : INotifyPropertyChanged
     {
-        IBluetoothPeripheral? connectedDevice;
-        public IBluetoothPeripheral? ConnectedDevice
+        BluetoothPeripheral? connectedDevice;
+        public BluetoothPeripheral? ConnectedDevice
         {
             get => connectedDevice;
             set
@@ -97,14 +95,6 @@ namespace tremorur.ViewModels
 
             characteristic.ValueUpdated += (s, e) => action();
             characteristic.NotifyingUpdated += (s, e) => action();
-        }
-
-
-        [RelayCommand]
-        public async Task Connect(IDiscoveredPeripheral peripheral)
-        {
-            var device = await bluetoothService.ConnectPeripheralAsync(peripheral);
-            ConnectedDevice = device;
         }
 
         public async Task ToggleNotify(BluetoothPeripheralCharacteristic characteristic, bool isEnabled)

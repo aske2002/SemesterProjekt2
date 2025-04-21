@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Threading.Tasks;
 using CoreBluetooth;
 using Microsoft.Extensions.Logging;
 using tremorur.Messages;
@@ -9,7 +7,7 @@ namespace tremorur.Services;
 public partial class BluetoothService : IBluetoothService
 {
     private readonly ILogger<BluetoothService> _logger;
-    private Dictionary<Guid, TaskCompletionSource<BluetoothPeripheral>?> connectTasks = new();
+    private Dictionary<string, TaskCompletionSource<BluetoothPeripheral>?> connectTasks = new();
     CBCentralManager centralManager;
     public BluetoothService(IMessenger messenger, ILogger<BluetoothService> logger)
     {
@@ -45,7 +43,7 @@ public partial class BluetoothService : IBluetoothService
     }
     private void CM_ConnectedPeripheral(object? sender, CBPeripheralEventArgs e)
     {
-        Guid identifier = new Guid(e.Peripheral.Identifier.ToString());
+        string identifier = e.Peripheral.Identifier.ToString();
         var taskSource = connectTasks.GetValueOrDefault(identifier);
         if (taskSource != null)
         {
@@ -66,7 +64,7 @@ public partial class BluetoothService : IBluetoothService
 
     public partial async Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral)
     {
-        if (discoveredPeripheral is not BluetoothPeripheral bluetoothPeripheral)
+        if (discoveredPeripheral is not DiscoveredPeripheral bluetoothPeripheral)
         {
             throw new ArgumentException("Invalid peripheral type", nameof(discoveredPeripheral));
         }

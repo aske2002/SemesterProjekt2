@@ -17,7 +17,7 @@ namespace tremorur
                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
-            builder.Services.AddSingleton<BluetoothService>();
+            builder.Services.AddSingleton<IBluetoothService,BluetoothService>();
             builder.Services.AddSingleton<IButtonService, ButtonService>();
             
             builder.Services.AddTransient<AlarmService>();

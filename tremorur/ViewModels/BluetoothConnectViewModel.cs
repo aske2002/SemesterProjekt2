@@ -9,10 +9,10 @@ namespace tremorur.ViewModels
     {
         public ObservableCollection<IDiscoveredPeripheral> Peripherals { get; } = new();
 
-        private readonly BluetoothService bluetoothService;
+        private readonly IBluetoothService bluetoothService;
         private readonly IDialogService dialogService;
         private readonly INavigationService navigationService;
-        public BluetoothConnectViewModel(BluetoothService bluetoothService, IDialogService dialogService, INavigationService navigationService)
+        public BluetoothConnectViewModel(IBluetoothService bluetoothService, IDialogService dialogService, INavigationService navigationService)
         {
             this.bluetoothService = bluetoothService;
             this.navigationService = navigationService;
@@ -30,7 +30,7 @@ namespace tremorur.ViewModels
         }
 
         [RelayCommand]
-        public async Task Connect(DiscoveredPeripheral peripheral)
+        public async Task Connect(IDiscoveredPeripheral peripheral)
         {
             var device = await bluetoothService.ConnectPeripheralAsync(peripheral);
             await navigationService.GoToAsync("///bluetoothDev", new Dictionary<string, object>

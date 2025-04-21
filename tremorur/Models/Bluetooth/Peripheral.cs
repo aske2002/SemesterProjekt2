@@ -7,7 +7,7 @@ namespace tremorur.Models.Bluetooth;
 public partial class BluetoothPeripheral : IBluetoothPeripheral
 {
     public partial ObservableCollection<IBluetoothPeripheralService> Services { get; }
-    public partial Guid UUID { get; }
+    public partial string UUID { get; }
     public float? RSSI { get; private set; }
     partial BluetoothPeripheralState State { get; }
     public partial string? Name { get; }

@@ -57,5 +57,5 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
     }
     public partial string? LocalName => advertisementData.TryGetValue(CBAdvertisement.DataLocalNameKey, out var localName) ? localName.ToString() : null;
     public partial string? Name => NativePeripheral.Name;
-    public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
+    public partial string UUID => NativePeripheral.Identifier.AsString();
 }

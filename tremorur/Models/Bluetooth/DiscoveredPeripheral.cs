@@ -3,7 +3,7 @@ namespace tremorur.Models.Bluetooth;
 public partial class DiscoveredPeripheral : IDiscoveredPeripheral
 {
     public partial List<string> Services { get; }
-    public partial Guid UUID { get; }
+    public partial string UUID { get; }
     public partial string? Name { get; }
     public partial string? LocalName { get; }
 

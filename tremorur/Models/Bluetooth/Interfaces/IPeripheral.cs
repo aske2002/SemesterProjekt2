@@ -7,7 +7,7 @@ namespace tremorur.Models.Bluetooth;
 public interface IBluetoothPeripheral
 {
     ObservableCollection<IBluetoothPeripheralService> Services { get; }
-    Guid UUID { get; }
+    string UUID { get; }
     float? RSSI { get; }
     string? Name { get; }
     Task<float?> GetSsriAsync();

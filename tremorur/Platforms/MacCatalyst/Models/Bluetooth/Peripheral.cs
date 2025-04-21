@@ -47,7 +47,7 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
     private ObservableCollection<IBluetoothPeripheralService> services = new ObservableCollection<IBluetoothPeripheralService>();
     public partial ObservableCollection<IBluetoothPeripheralService> Services => services;
 
-    public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
+    public partial string UUID => NativePeripheral.Identifier.AsString();
     public partial async Task<float?> GetSsriAsync()
     {
         if (_rssiTaskCompletionSource != null)
