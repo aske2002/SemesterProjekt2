@@ -25,7 +25,7 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
             }
         }
     }
-    public partial async Task<BluetoothPeripheral> ConnectAsync()
+    public partial async Task<IBluetoothPeripheral> ConnectAsync()
     {
         return await bluetoothService.ConnectPeripheralAsync(this);
     }

@@ -9,7 +9,7 @@ public interface IBluetoothService
     ObservableCollection<IDiscoveredPeripheral> DiscoveredPeripherals { get; }
     event EventHandler<IDiscoveredPeripheral> DiscoveredPeripheral;
     bool IsScanning { get; }
-    Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral device);
+    public Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral device);
     void StartDiscovery();
     void StopDiscovery();
 }

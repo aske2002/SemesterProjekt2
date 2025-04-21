@@ -8,4 +8,5 @@ public interface IDiscoveredPeripheral
     string? LocalName { get; }
     float RSSI { get; }
     bool IsConnectable { get; }
+    public Task<IBluetoothPeripheral> ConnectAsync();
 }

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
-using ObjCRuntime;
 
 namespace tremorur.Models.Bluetooth;
 
@@ -14,7 +13,6 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
     public BluetoothPeripheral(CBPeripheral cBPeripheral) : base()
     {
         NativePeripheral = cBPeripheral;
-        Name = cBPeripheral.Name;
         NativePeripheral.DiscoveredService += DiscoveredService;
         NativePeripheral.RssiRead += RssiRead;
 
@@ -46,8 +44,8 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
         }
     }
 
-    private ObservableCollection<BluetoothPeripheralService> services = new ObservableCollection<BluetoothPeripheralService>();
-    public partial ObservableCollection<BluetoothPeripheralService> Services => services;
+    private ObservableCollection<IBluetoothPeripheralService> services = new ObservableCollection<IBluetoothPeripheralService>();
+    public partial ObservableCollection<IBluetoothPeripheralService> Services => services;
 
     public partial Guid UUID => new Guid(NativePeripheral.Identifier.AsString());
     public partial async Task<float?> GetSsriAsync()
@@ -99,4 +97,7 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
             }
         }
     }
+
+    public partial string? Name => NativePeripheral.Name;
+    public partial string? LocalName => NativePeripheral.Name;
 }

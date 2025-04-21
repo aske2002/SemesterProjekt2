@@ -28,18 +28,18 @@ namespace tremorur.ViewModels
             }
         }
 
-        private readonly BluetoothService bluetoothService;
+        private readonly IBluetoothService bluetoothService;
         private readonly IDialogService dialogService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public BluetoothDevViewModel(BluetoothService bluetoothService, IDialogService dialogService)
+        public BluetoothDevViewModel(IBluetoothService bluetoothService, IDialogService dialogService)
         {
             this.bluetoothService = bluetoothService;
             this.dialogService = dialogService;
         }
 
-        private void SubscribeToCharacteristic(BluetoothPeripheral peripheral)
+        private void SubscribeToCharacteristic(IBluetoothPeripheral peripheral)
         {
             foreach (var service in peripheral.Services)
             {
@@ -57,7 +57,7 @@ namespace tremorur.ViewModels
             };
         }
 
-        private void SubscribeToService(BluetoothPeripheralService service)
+        private void SubscribeToService(IBluetoothPeripheralService service)
         {
             foreach (var characteristic in service.Characteristics)
             {
@@ -75,7 +75,7 @@ namespace tremorur.ViewModels
             };
         }
 
-        private void SubscribeToCharacteristic(BluetoothPeripheralCharacteristic characteristic, BluetoothPeripheralService service)
+        private void SubscribeToCharacteristic(IBluetoothPeripheralCharacteristic characteristic, IBluetoothPeripheralService service)
         {
             var action = () =>
             {
@@ -87,7 +87,7 @@ namespace tremorur.ViewModels
                 {
                     switchElement.IsToggled = characteristic.IsNotifying;
                 }
-                
+
                 if (valueLabel != null)
                 {
                     valueLabel.Text = characteristic.LastValueString;
@@ -101,7 +101,7 @@ namespace tremorur.ViewModels
 
 
         [RelayCommand]
-        public async Task Connect(DiscoveredPeripheral peripheral)
+        public async Task Connect(IDiscoveredPeripheral peripheral)
         {
             var device = await bluetoothService.ConnectPeripheralAsync(peripheral);
             ConnectedDevice = device;

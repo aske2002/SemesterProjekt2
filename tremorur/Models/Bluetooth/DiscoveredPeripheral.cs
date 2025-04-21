@@ -9,5 +9,5 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
 
     public partial float RSSI { get; }
     public partial bool IsConnectable { get; }
-    public partial Task<BluetoothPeripheral> ConnectAsync();
+    public partial Task<IBluetoothPeripheral> ConnectAsync();
 }
