@@ -27,8 +27,8 @@ public class Messenger : IMessenger
         [CallerLineNumber] int callerLineNumber = 0)
         where TMessage : class
     {
-        _logger.Log(LogLevel.Information, "On<{MessageType}>({Handler}, {CallerFilePath}, {CallerMemberName}, {CallerLineNumber})",
-                            typeof(TMessage), handler, callerFilePath, callerMemberName, callerLineNumber);
+        // _logger.Log(LogLevel.Information, "On<{MessageType}>({Handler}, {CallerFilePath}, {CallerMemberName}, {CallerLineNumber})",
+        //                     typeof(TMessage), handler, callerFilePath, callerMemberName, callerLineNumber);
 
         var recipient = new object();
 
@@ -63,8 +63,8 @@ public class Messenger : IMessenger
         [CallerLineNumber] int callerLineNumber = 0)
         where TMessage : class
     {
-        _logger.Log(LogLevel.Information, "Send<{MessageType}>({Message}, {CallerFilePath}, {CallerMemberName}, {CallerLineNumber})",
-                            typeof(TMessage), message, callerFilePath, callerMemberName, callerLineNumber);
+        // _logger.Log(LogLevel.Information, "Send<{MessageType}>({Message}, {CallerFilePath}, {CallerMemberName}, {CallerLineNumber})",
+        //                     typeof(TMessage), message, callerFilePath, callerMemberName, callerLineNumber);
 
         _messenger.Send(message);
     }

@@ -1,14 +1,17 @@
 <Grid  x:Class="tremorur.Controls.BorderButton"
+       x:Name="BorderButtonRoot"
        xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-        <Border StrokeThickness="0">
+        <Border StrokeThickness="0"
+                x:Name="Border">
                 <Border.StrokeShape>
                         <RoundRectangle CornerRadius="25,25,0,0"/>
                 </Border.StrokeShape>
                 <Button x:Name="InnerButton"
+                        Pressed="InnerButton_Pressed"
+                        Released="InnerButton_Released"
                         Text="{Binding ButtonText}"
-                        TextColor="White"
-                        Clicked="InnerButton_Clicked">
+                        TextColor="White">
                         <Button.Style>
                                 <Style TargetType="Button">
                                         <Setter Property="TextColor"
@@ -28,6 +31,33 @@
                                 </Style>
 
                         </Button.Style>
+                        <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal">
+                                                        <VisualState.Setters>
+                                                                <Setter TargetName="BorderButtonRoot"
+                                                                        Property="Scale"
+                                                                        Value="1"/>
+                                                                <Setter TargetName="BorderButtonRoot"
+                                                                        Property="Scale"
+                                                                        Value="1"/>
+                                                        </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Pressed">
+                                                        <VisualState.Setters>
+                                                                <Setter TargetName="BorderButtonRoot"
+                                                                        Property="Scale"
+                                                                        Value="0.8"/>
+                                                                <Setter TargetName="BorderButtonRoot"
+                                                                        Property="Scale"
+                                                                        Value="0.8"/>
+                                                        </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="PointerOver"/>
+                                        </VisualStateGroup>
+                                </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
                 </Button>
         </Border>
 </Grid>

@@ -17,9 +17,14 @@ public partial class BorderButton : Grid
         set => SetValue(ButtonBackgroundColorProperty, value);
     }
 
-    private void InnerButton_Clicked(object? sender, EventArgs e)
+    private void InnerButton_Pressed(object? sender, EventArgs e)
     {
-        messenger.SendMessage(new ButtonClickedMessage(ButtonType));
+        messenger.SendMessage(new ButtonPressedMessage(ButtonType));
+    }
+
+    private void InnerButton_Released(object? sender, EventArgs e)
+    {
+        messenger.SendMessage(new ButtonReleasedMessage(ButtonType));
     }
 
     public WatchButton ButtonType;
