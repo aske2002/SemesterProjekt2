@@ -4,7 +4,6 @@ using shared.Models.Vibrations;
 using shared.Models.Vibrations.Patterns;
 using tremorur.Development.HotReload;
 using tremorur.Messages;
-using UIKit;
 
 namespace tremorur.Views
 {
@@ -24,17 +23,6 @@ namespace tremorur.Views
             this.navigationService = navigationService;
             StartClock();
             this.vibrationsService = vibrationsService;
-
-            HandlerChanged += (s, e) =>
-            {
-                var shell = Shell.Current;
-                var view = Handler?.PlatformView;
-                if (view is UIView uIView)
-                {
-                    Debug.WriteLine($"AppShell: {uIView.Frame}");
-                }
-
-            };
         }
         async void StartClock()
         {
