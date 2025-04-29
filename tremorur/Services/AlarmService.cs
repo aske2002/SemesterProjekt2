@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
+using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 
@@ -68,5 +68,16 @@ namespace tremorur.Services
                 Console.WriteLine($"Alarm({alarm.Id})triggered at {DateTime.Now}");
             }
         }
+        public void DeleteAlarm(string id)
+        {
+            var alarm = _alarms.FirstOrDefault(a => a.Id == id);
+            if (alarm != null)
+            {
+                _alarms.Remove(alarm);
+            }
+
+
+        }
+
     }
 }
