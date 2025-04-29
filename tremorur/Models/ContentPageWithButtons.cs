@@ -70,33 +70,27 @@ namespace tremorur.Models
         private void OnButtonHeld(object? sender, ButtonHeldEventArgs message)
         {
             Debug.WriteLine($"{message.Button} held for {message.HeldMS}");
-            var handled = false;
             Dispatcher.Dispatch(() =>
             {
                 switch (message.Button)
                 {
                     case WatchButton.Cancel:
-                        handled = OnCancelButtonHeld(this, message.HeldMS);
+                        OnCancelButtonHeld(this, message.HeldMS, () => _buttonService.Hold_Handled(message.Button));
                         break;
                     case WatchButton.Ok:
-                        handled = OnOKButtonHeld(this, message.HeldMS);
+                        OnOKButtonHeld(this, message.HeldMS, () => _buttonService.Hold_Handled(message.Button));
                         break;
                     case WatchButton.Up:
-                        handled = OnUpButtonHeld(this, message.HeldMS);
+                        OnUpButtonHeld(this, message.HeldMS, () => _buttonService.Hold_Handled(message.Button));
                         break;
                     case WatchButton.Down:
-                        handled = OnDownButtonHeld(this, message.HeldMS);
+                        OnDownButtonHeld(this, message.HeldMS, () => _buttonService.Hold_Handled(message.Button));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
 
             });
-
-            if (handled)
-            {
-                _buttonService.Hold_Handled(message.Button);
-            }
         }
 
         protected virtual void OnCancelButtonClicked(object? sender, EventArgs e)
@@ -115,24 +109,20 @@ namespace tremorur.Models
         {
         }
 
-        protected virtual bool OnCancelButtonHeld(object? sender, int duration)
+        protected virtual void OnCancelButtonHeld(object? sender, int duration, Action didHandle)
         {
-            return false;
         }
 
-        protected virtual bool OnOKButtonHeld(object? sender, int duration)
+        protected virtual void OnOKButtonHeld(object? sender, int duration, Action didHandle)
         {
-            return false;
         }
 
-        protected virtual bool OnUpButtonHeld(object? sender, int duration)
+        protected virtual void OnUpButtonHeld(object? sender, int duration, Action didHandle)
         {
-            return false;
         }
 
-        protected virtual bool OnDownButtonHeld(object? sender, int duration)
+        protected virtual void OnDownButtonHeld(object? sender, int duration, Action didHandle)
         {
-            return false;
         }
 
         protected virtual void OnOKButtonMultiClicked(object? sender, int clickTimes)

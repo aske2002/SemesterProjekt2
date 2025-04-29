@@ -5,6 +5,7 @@ using shared.Models.Vibrations;
 using shared.Models.Vibrations.Patterns;
 using tremorur.Development.HotReload;
 using tremorur.Messages;
+
 using Windows.ApplicationModel.DataTransfer.DragDrop.Core;
 using Windows.Graphics.Display;
 
@@ -70,7 +71,7 @@ namespace tremorur.Views
         //    Debug.WriteLine($"Parsed: {parsed}");
         //}
 
-        protected async override void OnOKButtonHeld(object? sender, int ms)
+        protected async override void OnOKButtonHeld(object? sender, int ms, Action didHandle)
         {
             if(ms>3000) //hvis ok-knappen holdes nede i 3 sekunder 
             {
@@ -78,7 +79,7 @@ namespace tremorur.Views
                 await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
             }
         }
-        protected async override void OnUpButtonHeld(object? sender, int ms)
+        protected async override void OnUpButtonHeld(object? sender, int ms, Action didHandle)
         {
             if (ms > 3000) //hvis up-knappen holdes nede i 3 sekunder 
             {
