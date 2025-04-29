@@ -5,4 +5,5 @@ public enum VibrationMode
     Dynamic = 0,
     Expression = 1,
     Constant = 2,
+    Mixed = 3,
 }

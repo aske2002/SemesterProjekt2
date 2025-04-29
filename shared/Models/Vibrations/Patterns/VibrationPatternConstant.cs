@@ -6,7 +6,7 @@ public record VibrationPatternConstant : VibrationPatternBase
     public override VibrationMode Mode => VibrationMode.Constant;
     private double intensity;
 
-    public override double GetIntensityValue()
+    public override double GetIntensityValue(double _)
     {
         return intensity;
     }
@@ -23,22 +23,18 @@ public record VibrationPatternConstant : VibrationPatternBase
     /// <param name="resolution">The resolution of the vibration pattern, default is double.MaxValue.</param>
     /// <returns>A Task that represents the asynchronous operation. The task result contains the VibrationPatternConstant object.</returns>
     /// <exception cref="ArgumentException">Thrown when the byte array is not valid.</exception>
-    public static Task<VibrationPatternConstant> ParseAsync(byte[] data, double resolution = double.MaxValue)
+    public static Task<VibrationPatternConstant> ParseAsync(BinaryAdapter reader, double resolution = double.MaxValue)
     {
-        if (data.Length != 2)
+        if (reader.RemainingBytes != 8)
         {
-            throw new ArgumentException("Data must be 2 bytes long.");
+            throw new ArgumentException("Data must be at least 2 bytes long.");
         }
 
-        var intensity = BitConverter.ToInt16(data, 0) / (double)short.MaxValue;
+        var intensity = reader.ReadDouble();
         return Task.FromResult(new VibrationPatternConstant(intensity, resolution));
     }
-
-    internal override void Recalculate() { }
-
-    public override byte[] ToBytes()
+    public override byte[] GetDataBytes()
     {
-        var data = BitConverter.GetBytes((short)(intensity * short.MaxValue));
-        return data;
+        return BitConverter.GetBytes(intensity);
     }
 }

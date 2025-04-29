@@ -3,26 +3,17 @@ using System.Diagnostics;
 namespace shared.Models.Vibrations.Patterns;
 public abstract record VibrationPatternBase : IVibrationPattern
 {
-    private double _resolution;
-    public double Resolution
-    {
-        get => _resolution;
-        set
-        {
-            _resolution = value;
-            Recalculate();
-        }
-    }
+    public double Resolution { get; set; }
     public VibrationPatternBase(double resolution)
     {
-        _stopwatch.Start();
-        this._resolution = resolution;
+        Resolution = resolution;
     }
-    public VibrationIntensity CurrentIntensity => new VibrationIntensity(GetIntensityValue());
-    internal double time => _stopwatch.Elapsed.TotalMilliseconds;
-    private Stopwatch _stopwatch = new Stopwatch();
+    public VibrationIntensity GetCurrentIntensity(double time)
+    {
+        var intensity = GetIntensityValue(time);
+        return new VibrationIntensity(intensity);
+    }
     public abstract VibrationMode Mode { get; }
-    public abstract double GetIntensityValue();
-    public abstract byte[] ToBytes();
-    internal abstract void Recalculate();
+    public abstract double GetIntensityValue(double time);
+    public abstract byte[] GetDataBytes();
 }

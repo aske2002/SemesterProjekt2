@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using shared.Models.Vibrations.Patterns;
 
 namespace shared.Models.Vibrations;
@@ -12,6 +13,16 @@ public record VibrationSettings
         Pattern = new VibrationPatternConstant(0)
     };
 
+    public static VibrationSettings CreateExpressionSettings(Expression<Func<double, double>> expression)
+    {
+        var pattern = new VibrationPatternExpression(expression, 1);
+        return new VibrationSettings
+        {
+            Id = Guid.NewGuid(),
+            Pattern = pattern
+        };
+    }
+
     /// <summary>
     /// Creates a VibrationSettings object with a sine pattern.
     /// </summary>
@@ -19,14 +30,12 @@ public record VibrationSettings
     /// The frequency of the sine wave in Hz.
     /// </param>
     /// <returns>VibrationSettings object</returns>
-    public static VibrationSettings CreateSinePatternSettings(float frequency)
+    public static VibrationSettings CreateSinePatternSettings(double frequency)
     {
-        var expression = $"Math.Sin(t * 2 * Math.PI * {frequency} / 1000) * 0.5 + 0.5";
-        var pattern = VibrationPatternExpression.ParseAsync(expression, 1).Result;
         return new VibrationSettings
         {
             Id = Guid.NewGuid(),
-            Pattern = pattern
+            Pattern = new VibrationPatternExpression((t) => Math.Sin(2 * Math.PI * frequency * (t / 1000)) * 0.5 + 0.5, 1)
         };
     }
 
@@ -73,17 +82,9 @@ public record VibrationSettings
     }
     public byte[] ToBytes()
     {
-        var idBytes = Id.ToByteArray();
-        var resolutionBytes = BitConverter.GetBytes(Pattern.Resolution);
-        var dataBytes = Pattern.ToBytes();
-
-
-        byte[] bytes = new byte[1] { (byte)Pattern.Mode }
-            .Concat(idBytes)
-            .Concat(resolutionBytes)
-            .Concat(dataBytes)
+        return Id.ToByteArray()
+            .Concat(Pattern.ToBytes())
             .ToArray();
-        return bytes;
     }
 
     /// <summary>
@@ -111,16 +112,10 @@ public record VibrationSettings
     /// <exception cref="ArgumentException">Thrown when the pattern is not valid.</exception>
     public static async Task<VibrationSettings> FromBytes(byte[] bytes)
     {
-        if (bytes.Length < 27)
-        {
-            throw new ArgumentException("Byte array must be at least 27 bytes long.");
-        }
-
-        var mode = (VibrationMode)bytes[0];
-        var id = new Guid(bytes.Skip(1).Take(16).ToArray());
-        var resolution = BitConverter.ToDouble(bytes, 17);
-        var data = bytes.Skip(25).ToArray();
-        var pattern = await VibrationDataFactory.ParseAsVibrationData(data, mode, resolution);
+        var reader = BinaryAdapter.Create(bytes);
+        var id = reader.ReadGuid();
+        var pattern = await VibrationHelpers.ParseAsVibrationData(reader);
+        reader.Dispose();
 
         return new VibrationSettings
         {

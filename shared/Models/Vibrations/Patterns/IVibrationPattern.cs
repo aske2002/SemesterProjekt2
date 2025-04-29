@@ -5,8 +5,8 @@ namespace shared.Models.Vibrations.Patterns;
 public interface IVibrationPattern
 {
     VibrationMode Mode { get; }
-    VibrationIntensity CurrentIntensity { get; }
+    VibrationIntensity GetCurrentIntensity(double time);
     double Resolution { get; set; }
-    double GetIntensityValue();
-    byte[] ToBytes();
+    double GetIntensityValue(double time);
+    byte[] GetDataBytes();
 }

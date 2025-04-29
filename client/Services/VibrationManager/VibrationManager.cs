@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using client.Models;
 using shared.Models.Vibrations;
 using shared.Models.Vibrations.Patterns;
+using System.Diagnostics;
 
 public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsMessage>, IRecipient<ToggleVibrationsMessage>
 {
@@ -12,6 +13,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
     private readonly ILogger<VibrationManager> _logger;
     private bool _isVibrationEnabled = false;
     private VibrationSettings _vibrationSettings = VibrationSettings.Default;
+    private Stopwatch stopwatch = new Stopwatch();
     public bool VibrationEnabled
     {
         get => _isVibrationEnabled;
@@ -52,7 +54,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
 
     private void TimerTicked(object? state)
     {
-        var intensity = Pattern.CurrentIntensity;
+        var intensity = Pattern.GetCurrentIntensity(stopwatch.Elapsed.TotalMilliseconds);
         pwmChannel.DutyCycle = intensity.AsDutyCycle(HardwareConstants.VIBRATION_PWM_MIN_DUTY_CYCLE, HardwareConstants.VIBRATION_PWM_MAX_DUTY_CYCLE);
     }
 
@@ -69,6 +71,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
             ClearInterval();
         }
 
+        stopwatch.Restart();
         _timer = new Timer(TimerTicked, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(resolution));
     }
 

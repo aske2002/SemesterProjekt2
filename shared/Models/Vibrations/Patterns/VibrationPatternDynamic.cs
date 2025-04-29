@@ -3,32 +3,39 @@ namespace shared.Models.Vibrations.Patterns;
 
 public record VibrationPatternDynamic : VibrationPatternBase
 {
+    private const int SegmentDurationSize = 4; // 4 bytes for duration
+    private const int SegmentIntensitySize = 8; // 8 bytes for intensity
+    private const int SegmentSize = SegmentDurationSize + SegmentIntensitySize; // Total size of a segment in bytes
+
     public record VibrationPatternSegment(int DurationMS, double Intensity);
     public override VibrationMode Mode => VibrationMode.Dynamic;
-    private List<VibrationPatternSegment> _segments = new List<VibrationPatternSegment>();
+    public double Duration => Segments.Sum(x => x.DurationMS);
+    private Dictionary<double, VibrationPatternSegment> durationMap { get; set; } = new Dictionary<double, VibrationPatternSegment>();
     public List<VibrationPatternSegment> Segments
     {
-        get => _segments;
+        get => durationMap.Values.ToList();
         set
         {
-            _segments = value;
-            Recalculate();
+            var map = new Dictionary<double, VibrationPatternSegment>();
+            double currentDuration = 0;
+            foreach (var segment in value)
+            {
+                map[currentDuration] = segment;
+                currentDuration += segment.DurationMS;
+            }
+            durationMap = map;
         }
     }
-    private double[] intensities = Array.Empty<double>();
-
-    public override double GetIntensityValue()
+    public override double GetIntensityValue(double time)
     {
-        var indexRepeatable = (int)(time / Resolution) % intensities.Length;
-        var intensity = intensities[indexRepeatable];
-        return intensity;
-
+        var loopTime = time % Duration;
+        var segment = durationMap.FirstOrDefault(x => x.Key >= loopTime).Value;
+        return segment == null ? 0 : segment.Intensity;
     }
 
-    public VibrationPatternDynamic(IEnumerable<VibrationPatternSegment> segments, double resolution) : base(resolution)
+    public VibrationPatternDynamic(List<VibrationPatternSegment> segments, double resolution) : base(resolution)
     {
         Segments = segments.ToList();
-        Recalculate();
     }
 
     /// <summary>
@@ -38,42 +45,36 @@ public record VibrationPatternDynamic : VibrationPatternBase
     /// <param name="resolution"></param>
     /// <returns> A Task that represents the asynchronous operation. The task result contains the VibrationPatternDynamic object.</returns>
     /// <exception cref="ArgumentException">Thrown when the byte array is not valid.</exception>
-    public static Task<VibrationPatternDynamic> ParseAsync(byte[] data, double resolution)
+    public static Task<VibrationPatternDynamic> ParseAsync(BinaryAdapter reader, double resolution)
     {
-        if (data.Length < 4 || data.Length % 4 != 0)
+        if (reader.RemainingBytes < SegmentSize || reader.RemainingBytes % SegmentSize != 0)
         {
             throw new ArgumentException("Data must be a multiple of 4 bytes and at least 4 bytes long.");
         }
 
-        var segments = data.Chunk(4).Select(segment =>
-         {
-             var duration = BitConverter.ToInt16(segment, 0);
-             var intensityShort = BitConverter.ToInt16(segment, 2);
-             double intensity = intensityShort / short.MaxValue;
-             return new VibrationPatternSegment(duration, intensity);
-         }).ToList();
+        var segments = new List<VibrationPatternSegment>();
+        while (!reader.IsEmpty)
+        {
+            var duration = reader.ReadInt32();
+            var intensity = reader.ReadDouble();
+            segments.Add(new VibrationPatternSegment(duration, intensity));
+
+        }
         return Task.FromResult(new VibrationPatternDynamic(segments, resolution));
     }
-
-    internal override void Recalculate()
+    public override byte[] GetDataBytes()
     {
-        intensities = Segments.SelectMany(segment =>
+        var stream = new MemoryStream();
+        var writer = new BinaryWriter(stream);
+        foreach (var segment in Segments)
         {
-            var subSegmentsCount = (int)(segment.DurationMS / Resolution);
-            return Enumerable.Repeat(segment.Intensity, subSegmentsCount);
-        }).ToArray();
-
-    }
-
-    public override byte[] ToBytes()
-    {
-        var data = new byte[Segments.Count * 4];
-        for (int i = 0; i < Segments.Count; i++)
-        {
-            var segment = Segments[i];
-            Array.Copy(BitConverter.GetBytes((short)segment.DurationMS), 0, data, i * 4, 2);
-            Array.Copy(BitConverter.GetBytes((short)(segment.Intensity * short.MaxValue)), 0, data, i * 4 + 2, 2);
+            writer.Write(segment.DurationMS);
+            writer.Write(segment.Intensity);
         }
-        return data;
+        writer.Flush();
+        var result = stream.ToArray();
+        stream.Dispose();
+        writer.Dispose();
+        return result;
     }
 }
