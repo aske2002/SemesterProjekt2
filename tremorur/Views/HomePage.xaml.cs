@@ -1,13 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
-using shared.Models.Vibrations;
-using shared.Models.Vibrations.Patterns;
-using tremorur.Development.HotReload;
-using tremorur.Messages;
-
-using Windows.ApplicationModel.DataTransfer.DragDrop.Core;
-using Windows.Graphics.Display;
+﻿using Microsoft.Extensions.Logging;
 
 namespace tremorur.Views
 {
@@ -75,6 +66,7 @@ namespace tremorur.Views
         {
             if(ms>3000) //hvis ok-knappen holdes nede i 3 sekunder 
             {
+                didHandle();
                 await vibrationsService.StartStopVibration(); //starter vibrationer
                 await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
             }
@@ -83,6 +75,7 @@ namespace tremorur.Views
         {
             if (ms > 3000) //hvis up-knappen holdes nede i 3 sekunder 
             {
+                didHandle();
                 await navigationService.GoToAsync("//setAlarm"); //går til SetAlarmPage
             }
         }
