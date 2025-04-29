@@ -1,9 +1,12 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using shared.Models.Vibrations;
 using shared.Models.Vibrations.Patterns;
 using tremorur.Development.HotReload;
 using tremorur.Messages;
+using Windows.ApplicationModel.DataTransfer.DragDrop.Core;
+using Windows.Graphics.Display;
 
 namespace tremorur.Views
 {
@@ -39,80 +42,48 @@ namespace tremorur.Views
             }
         }
 
+        //protected async override void OnUpButtonHeld(object? sender, int ms)
+        //{
+        //    var id = Guid.NewGuid();
+        //    Debug.WriteLine($"Id: {id}");
+        //    var constant = new VibrationPatternConstant(0.5, 1000);
+        //    var expression = VibrationSettings.CreateSinePatternSettings(1.0).Pattern;
+        //    var dynamic = new VibrationPatternDynamic(new List<VibrationPatternDynamic.VibrationPatternSegment>()
+        //        {
+        //            new VibrationPatternDynamic.VibrationPatternSegment(100, 0.5),
+        //            new VibrationPatternDynamic.VibrationPatternSegment(1000, 0.25),
+        //            new VibrationPatternDynamic.VibrationPatternSegment(10000, 1.0)
+        //        }, 1000);
+        //    var mixed = new VibrationPatternMixed(new List<VibrationPatternMixed.VibrationPatternSegment>()
+        //        {
+        //            new VibrationPatternMixed.VibrationPatternSegment(constant, 1000),
+        //            new VibrationPatternMixed.VibrationPatternSegment(expression, 1000),
+        //            new VibrationPatternMixed.VibrationPatternSegment(dynamic, 1000)
+        //        }, 1000);
+        //    VibrationSettings settings = new VibrationSettings()
+        //    {
+        //        Id = id,
+        //        Pattern = mixed
+        //    };
+        //    var binary = settings.ToBytes();
+        //    var parsed = await VibrationSettings.FromBytes(binary);
+        //    Debug.WriteLine($"Parsed: {parsed}");
+        //}
+
+        protected async override void OnOKButtonHeld(object? sender, int ms)
+        {
+            if(ms>3000) //hvis ok-knappen holdes nede i 3 sekunder 
+            {
+                await vibrationsService.StartStopVibration(); //starter vibrationer
+                await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
+            }
+        }
         protected async override void OnUpButtonHeld(object? sender, int ms)
         {
-            var id = Guid.NewGuid();
-            Debug.WriteLine($"Id: {id}");
-            var constant = new VibrationPatternConstant(0.5, 1000);
-            var expression = VibrationSettings.CreateSinePatternSettings(1.0).Pattern;
-            var dynamic = new VibrationPatternDynamic(new List<VibrationPatternDynamic.VibrationPatternSegment>()
-                {
-                    new VibrationPatternDynamic.VibrationPatternSegment(100, 0.5),
-                    new VibrationPatternDynamic.VibrationPatternSegment(1000, 0.25),
-                    new VibrationPatternDynamic.VibrationPatternSegment(10000, 1.0)
-                }, 1000);
-            var mixed = new VibrationPatternMixed(new List<VibrationPatternMixed.VibrationPatternSegment>()
-                {
-                    new VibrationPatternMixed.VibrationPatternSegment(constant, 1000),
-                    new VibrationPatternMixed.VibrationPatternSegment(expression, 1000),
-                    new VibrationPatternMixed.VibrationPatternSegment(dynamic, 1000)
-                }, 1000);
-            VibrationSettings settings = new VibrationSettings()
+            if (ms > 3000) //hvis up-knappen holdes nede i 3 sekunder 
             {
-                Id = id,
-                Pattern = mixed
-            };
-            var binary = settings.ToBytes();
-            var parsed = await VibrationSettings.FromBytes(binary);
-            Debug.WriteLine($"Parsed: {parsed}");
+                await navigationService.GoToAsync("//setAlarm"); //går til SetAlarmPage
+            }
         }
-
-        //private CancellationTokenSource? okHoldCts;//hold ok nede
-        //private CancellationTokenSource? upHoldCts;//hold up nede
-
-        //protected override void OnOKButtonClicked(object? sender, EventArgs e)
-        //{
-        //    if (okHoldCts != null)
-        //    { 
-        //        okHoldCts.Cancel();//hvis knappen trykkes igen afbrydes der
-        //        okHoldCts = null;
-        //        return;
-        //    }
-        //    okHoldCts = new CancellationTokenSource();
-        //    StartOkHoldTimer(okHoldCts.Token);
-        //}
-        //private async void StartOkHoldTimer(CancellationToken token)
-        //{
-        //    try
-        //    {
-        //        await Task.Delay(3000, token); //hold nede i 3 sekunder
-        //        await vibrationsService.StartStopVibration(); //starter vibrationer
-        //        await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
-        //    }
-        //    catch(TaskCanceledException){ }//der slippes inden 3 sekunder - afbryd   
-        //    finally { okHoldCts= null; }
-        //}
-
-        //protected override void OnUpButtonClicked(object? sender, EventArgs e)
-        //{
-        //    if (upHoldCts != null)
-        //    {
-        //        upHoldCts.Cancel();//hvis knappen trykkes igen afbrydes der
-        //        upHoldCts = null;
-        //        return;
-        //    }
-        //    okHoldCts = new CancellationTokenSource();
-        //    StartUpHoldTimer(upHoldCts.Token);
-        //}
-        //private async void StartUpHoldTimer(CancellationToken token)
-        //{
-        //    try
-        //    {
-        //        await Task.Delay(3000, token); //hold nede i 3 sekunder
-        //        await navigationService.GoToAsync("//setAlarm"); //går til SetAlarmPage
-        //    }
-        //    catch (TaskCanceledException) { }//der slippes inden 3 sekunder - afbryd   
-        //    finally { upHoldCts = null; }
-        //}
     }
 }
