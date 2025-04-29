@@ -50,16 +50,16 @@ namespace tremorur.Models
                 switch (message.Button)
                 {
                     case WatchButton.Cancel:
-                        OnCancelButtonHeld(this, 0);
+                        OnCancelButtonClicked(this, EventArgs.Empty);
                         break;
                     case WatchButton.Ok:
-                        OnOKButtonHeld(this, 0);
+                        OnOKButtonClicked(this, EventArgs.Empty);
                         break;
                     case WatchButton.Up:
-                        OnUpButtonHeld(this, 0);
+                        OnUpButtonClicked(this, EventArgs.Empty);
                         break;
                     case WatchButton.Down:
-                        OnDownButtonHeld(this, 0);
+                        OnDownButtonClicked(this, EventArgs.Empty);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -75,16 +75,16 @@ namespace tremorur.Models
                 switch (message.Button)
                 {
                     case WatchButton.Cancel:
-                        OnCancelButtonHeld(this, 0);
+                        OnCancelButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Ok:
-                        OnOKButtonHeld(this, 0);
+                        OnOKButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Up:
-                        OnUpButtonHeld(this, 0);
+                        OnUpButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Down:
-                        OnDownButtonHeld(this, 0);
+                        OnDownButtonHeld(this, message.HeldMS);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

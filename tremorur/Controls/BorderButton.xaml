@@ -48,10 +48,10 @@
                                                         <VisualState.Setters>
                                                                 <Setter TargetName="BorderButtonRoot"
                                                                         Property="Scale"
-                                                                        Value="0.8"/>
+                                                                        Value="0.9"/>
                                                                 <Setter TargetName="BorderButtonRoot"
                                                                         Property="Scale"
-                                                                        Value="0.8"/>
+                                                                        Value="0.9"/>
                                                         </VisualState.Setters>
                                                 </VisualState>
                                                 <VisualState x:Name="PointerOver"/>
