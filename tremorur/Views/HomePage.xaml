@@ -9,10 +9,14 @@
         xmlns:local="clr-namespace:tremorur.Views"
         xmlns:models="clr-namespace:tremorur.Models"
         ControlTemplate="{StaticResource LayoutTemplate}"
+        Background="Transparent"
+        Shell.PresentationMode="NotAnimated"
         BackgroundColor="Transparent"
+        Shell.BackgroundColor="Transparent"
         x:DataType="vm:HomeViewModel"
         mc:Ignorable="d">
         <Grid RowDefinitions="Auto,*,Auto"
+                BackgroundColor="Transparent"
               ColumnDefinitions="Auto,*,Auto">
                 <!--Deler skærmen i to rækker og to kolonner-->
                 <Label
@@ -37,7 +41,7 @@
                         VerticalOptions="Start"
                         HorizontalOptions="Center"/>
 
-        <Label
+                <Label
                         x:Name="DateLabel"
                         Text="tir. 12. jan."
                         FontSize="25"
@@ -47,5 +51,5 @@
                         Grid.ColumnSpan="2"
                         VerticalOptions="StartAndExpand"
                         HorizontalOptions="Center"/>
-    </Grid>
+        </Grid>
 </models:ContentPageWithButtons>
