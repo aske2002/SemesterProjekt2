@@ -1,4 +1,3 @@
-using tremorur.Services;
 
 public class VibrationManager
 {

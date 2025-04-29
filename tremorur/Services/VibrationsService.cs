@@ -14,7 +14,7 @@ namespace tremorur.Services
     {
         private readonly IBluetoothService _bluetoothService;
         private IBluetoothPeripheral? _connectedDevice = null; //null indtil der forbindes til bluetoothEnheden 
-        private IBluetoothPeripheralService? _vibrationService =>_connectedDevice?.Services?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationServiceUUID);
+        private IBluetoothPeripheralService? _vibrationService => _connectedDevice?.Services?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationServiceUUID);
         private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationPatternCharacteristicUUID);
         private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationEnabledCharacteristicUUID);
 

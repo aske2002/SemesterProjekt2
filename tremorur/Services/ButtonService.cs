@@ -71,7 +71,7 @@ public class ButtonService : IButtonService
             timer.Dispose();
             _holdTimers.Remove(e.Button);
         }
-        else if (_clickCounts.TryGetValue(e.Button, out var clickCount))
+        if (_clickCounts.TryGetValue(e.Button, out var clickCount))
         {
             OnButtonClicked?.Invoke(this, new ButtonClickedEventArgs(e.Button));
             _clickTimers.GetValueOrDefault(e.Button)?.Dispose();
