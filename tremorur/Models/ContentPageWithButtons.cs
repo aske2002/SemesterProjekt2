@@ -8,9 +8,9 @@ namespace tremorur.Models
     public abstract class ContentPageWithButtons : ContentPage
     {
         public readonly IButtonService _buttonService;
-        public ContentPageWithButtons(IButtonService messenger)
+        public ContentPageWithButtons(IButtonService buttonService)
         {
-            _buttonService = messenger ?? throw new ArgumentNullException(nameof(messenger));
+            _buttonService = buttonService ?? throw new ArgumentNullException(nameof(buttonService));
             BindingContext = BindingContext;
             _buttonService.OnButtonClicked += OnButtonClicked;
             _buttonService.OnButtonHeld += OnButtonHeld;
@@ -70,26 +70,33 @@ namespace tremorur.Models
         private void OnButtonHeld(object? sender, ButtonHeldEventArgs message)
         {
             Debug.WriteLine($"{message.Button} held for {message.HeldMS}");
+            var handled = false;
             Dispatcher.Dispatch(() =>
             {
                 switch (message.Button)
                 {
                     case WatchButton.Cancel:
-                        OnCancelButtonHeld(this, message.HeldMS);
+                        handled = OnCancelButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Ok:
-                        OnOKButtonHeld(this, message.HeldMS);
+                        handled = OnOKButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Up:
-                        OnUpButtonHeld(this, message.HeldMS);
+                        handled = OnUpButtonHeld(this, message.HeldMS);
                         break;
                     case WatchButton.Down:
-                        OnDownButtonHeld(this, message.HeldMS);
+                        handled = OnDownButtonHeld(this, message.HeldMS);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
             });
+
+            if (handled)
+            {
+                _buttonService.Hold_Handled(message.Button);
+            }
         }
 
         protected virtual void OnCancelButtonClicked(object? sender, EventArgs e)
@@ -108,20 +115,24 @@ namespace tremorur.Models
         {
         }
 
-        protected virtual void OnCancelButtonHeld(object? sender, int duration)
+        protected virtual bool OnCancelButtonHeld(object? sender, int duration)
         {
+            return false;
         }
 
-        protected virtual void OnOKButtonHeld(object? sender, int duration)
+        protected virtual bool OnOKButtonHeld(object? sender, int duration)
         {
+            return false;
         }
 
-        protected virtual void OnUpButtonHeld(object? sender, int duration)
+        protected virtual bool OnUpButtonHeld(object? sender, int duration)
         {
+            return false;
         }
 
-        protected virtual void OnDownButtonHeld(object? sender, int duration)
+        protected virtual bool OnDownButtonHeld(object? sender, int duration)
         {
+            return false;
         }
 
         protected virtual void OnOKButtonMultiClicked(object? sender, int clickTimes)

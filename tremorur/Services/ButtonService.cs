@@ -6,12 +6,12 @@ public interface IButtonService
     event EventHandler<ButtonClickedEventArgs> OnButtonClicked;
     event EventHandler<ButtonMultipleClickedEventArgs> OnButtomMultipleClicked;
     event EventHandler<ButtonHeldEventArgs> OnButtonHeld;
+    void Hold_Handled(WatchButton e);
 }
 
 public record ButtonMultipleClickedEventArgs(WatchButton Button, int ClickCount);
 public record ButtonClickedEventArgs(WatchButton Button);
 public record ButtonHeldEventArgs(WatchButton Button, int HeldMS);
-
 public class ButtonService : IButtonService
 {
     private Dictionary<WatchButton, int> _clickCounts = new();
@@ -29,6 +29,14 @@ public class ButtonService : IButtonService
         _messenger.On<ButtonReleasedMessage>(Button_Released);
     }
 
+    public void Hold_Handled(WatchButton btn)
+    {
+        if (_holdTimers.TryGetValue(btn, out var timer))
+        {
+            timer.Dispose();
+            _holdTimers.Remove(btn);
+        }
+    }
     private void FireMultiClickedEvent(object? state)
     {
         if (state is not WatchButton btn)
