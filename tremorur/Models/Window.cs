@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.Maui.Platform;
+﻿#if MACCATALYST
 using UIKit;
+#endif
+
 namespace tremorur.Models
 {
 
