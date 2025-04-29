@@ -1,6 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using shared.Models.Vibrations;
+using shared.Models.Vibrations.Patterns;
 using tremorur.Development.HotReload;
 using tremorur.Messages;
+using UIKit;
 
 namespace tremorur.Views
 {
@@ -20,6 +24,17 @@ namespace tremorur.Views
             this.navigationService = navigationService;
             StartClock();
             this.vibrationsService = vibrationsService;
+
+            HandlerChanged += (s, e) =>
+            {
+                var shell = Shell.Current;
+                var view = Handler?.PlatformView;
+                if (view is UIView uIView)
+                {
+                    Debug.WriteLine($"AppShell: {uIView.Frame}");
+                }
+
+            };
         }
         async void StartClock()
         {
@@ -34,6 +49,34 @@ namespace tremorur.Views
 
                 await Task.Delay(1000); // Opdater hvert sekund
             }
+        }
+
+        protected async override void OnUpButtonHeld(object? sender, int ms)
+        {
+            var id = Guid.NewGuid();
+            Debug.WriteLine($"Id: {id}");
+            var constant = new VibrationPatternConstant(0.5, 1000);
+            var expression = VibrationSettings.CreateSinePatternSettings(1.0).Pattern;
+            var dynamic = new VibrationPatternDynamic(new List<VibrationPatternDynamic.VibrationPatternSegment>()
+                {
+                    new VibrationPatternDynamic.VibrationPatternSegment(100, 0.5),
+                    new VibrationPatternDynamic.VibrationPatternSegment(1000, 0.25),
+                    new VibrationPatternDynamic.VibrationPatternSegment(10000, 1.0)
+                }, 1000);
+            var mixed = new VibrationPatternMixed(new List<VibrationPatternMixed.VibrationPatternSegment>()
+                {
+                    new VibrationPatternMixed.VibrationPatternSegment(constant, 1000),
+                    new VibrationPatternMixed.VibrationPatternSegment(expression, 1000),
+                    new VibrationPatternMixed.VibrationPatternSegment(dynamic, 1000)
+                }, 1000);
+            VibrationSettings settings = new VibrationSettings()
+            {
+                Id = id,
+                Pattern = mixed
+            };
+            var binary = settings.ToBytes();
+            var parsed = await VibrationSettings.FromBytes(binary);
+            Debug.WriteLine($"Parsed: {parsed}");
         }
 
         //private CancellationTokenSource? okHoldCts;//hold ok nede
