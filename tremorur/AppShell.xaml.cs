@@ -1,10 +1,9 @@
-﻿
-using System.Diagnostics;
-using System.Reflection.Metadata;
-using Foundation;
-using Microsoft.Maui.Controls.Handlers.Compatibility;
+﻿using Microsoft.Maui.Controls.Handlers.Compatibility;
 using Microsoft.Maui.Controls.Platform.Compatibility;
+
+#if MACCATALYST
 using UIKit;
+#endif
 
 namespace tremorur
 {
