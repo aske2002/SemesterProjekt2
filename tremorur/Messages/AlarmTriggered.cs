@@ -11,7 +11,7 @@ namespace tremorur.Messages
         public Alarm Alarm { get; set; }
         public AlarmTriggered(Alarm alarm)
         {
-            alarm = Alarm;
+            Alarm = alarm;
         }
     }
 }
