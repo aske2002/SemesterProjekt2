@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
-using AVKit;//tilføjet for notifycollectionChangedEventArgs
 
 namespace tremorur.Services
 {

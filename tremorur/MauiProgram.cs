@@ -52,13 +52,9 @@ namespace tremorur
             builder.Services.AddSingleton(loggerFactory);
             var messenger = new Messenger(loggerFactory.CreateLogger<Messenger>());
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
-            var messenger = new DefaultMessenger(loggerFactory.CreateLogger<DefaultMessenger>());
-            builder.Services.AddSingleton<Services.IMessenger>(messenger); //singelton - statisk object - har ikke nogen instans metode. 
 
             var mauiApp = builder.Build();
             messenger.SendMessage<AppBuilt>(new(mauiApp.Services));
-            return mauiApp;
-            messenger.Send<AppBuilt>(new(mauiApp.Services));
             return mauiApp; //n�r dette er k�rt igennem, starter vinduet op 
         }
     }
