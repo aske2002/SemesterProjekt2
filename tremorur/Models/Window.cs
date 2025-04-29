@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Microsoft.Maui.Platform;
+using UIKit;
 namespace tremorur.Models
 {
 
@@ -8,23 +10,52 @@ namespace tremorur.Models
     {
         public WatchWindow(Page page) : base(page)
         {
-            SizeChanged += KeepWindowSquare;
-        }
-        private void KeepWindowSquare(object? sender, EventArgs e)
-        {
-            Debug.WriteLine($"Window size changed: {Width}x{Height}");
-            if (Width == 0 || Height == 0)
-                return;
+            TitleBar = new TitleBar
+            {
+                IsVisible = false,
+            };
 
-            // Keep the window square
-            if (Width > Height)
-            {
-                Width = Height;
-            }
-            else
-            {
-                Height = Width;
-            }
+#if MACCATALYST
+            SizeChanged += (s, e) =>
+                        {
+
+                            var uiWindow = Handler?.PlatformView as UIWindow;
+                            if (uiWindow != null)
+                            {
+                                uiWindow.Center = new CoreGraphics.CGPoint(uiWindow.Frame.Width / 2, uiWindow.Frame.Height / 2);
+
+                                var nsWindow = CatalystWindowHelper.TryGetNSWindowFromUIWindow(uiWindow);
+                                if (nsWindow != null)
+                                {
+                                    nsWindow.IsMoveableByWindowBackground = true;
+                                    nsWindow.StyleMask &= ~NSWindowStyle.Titled;
+                                    nsWindow.StyleMask &= NSWindowStyle.Borderless;
+                                    nsWindow.StyleMask &= ~NSWindowStyle.TexturedBackground;
+                                    nsWindow.BackgroundColor = NSColor.Clear;
+                                    nsWindow.TitlebarAppearsTransparent = true;
+                                    nsWindow.Opaque = false;
+                                }
+                            }
+                        };
+            PropertyChanged += (s, e) =>
+                {
+                    var uiWindow = Handler?.PlatformView as UIWindow;
+                    if (uiWindow != null)
+                    {
+
+                        var nsWindow = CatalystWindowHelper.TryGetNSWindowFromUIWindow(uiWindow);
+                    }
+                };
+#endif
+            Initialize();
+        }
+
+        public void Initialize()
+        {
+            MaximumHeight = 800;
+            MaximumWidth = 800;
+            MinimumHeight = 800;
+            MinimumWidth = 800;
         }
     }
 }
