@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
+using tremorur.Messages;
 
 namespace tremorur.Services
 {
@@ -49,7 +50,7 @@ namespace tremorur.Services
 
         private List<Timer> activeTimers = new(); //gemmer alle aktive timere
 
-        public void ScheduleAlarms()
+        public void ScheduleAlarms() //har et alarm tidspunkt og undersøger om tidspunktet er overskredet - hvis det ikke er, kører alarmen på tidspunktet, hvis tidspunktet er overskredet, bliver alarmet sat til dagen efter
         {
             foreach (var alarm in SettingsService.Alarms)
             {
@@ -61,11 +62,20 @@ namespace tremorur.Services
             }
 
         }
+        private readonly Messenger messenger;
+        public AlarmService(Messenger messenger)
+        {
+            this.messenger = messenger;
+            _alarms=new ObservableCollection<Alarm>(SettingsService.Alarms);
+            _alarms.CollectionChanged += OnAlarmsChanged;
+        }
         private void TriggerAlarm(object? state)
         {
             if (state is Alarm alarm)
             {
                 Console.WriteLine($"Alarm({alarm.Id})triggered at {DateTime.Now}");
+
+                messenger.SendMessage(new AlarmTriggered(alarm));
             }
         }
     }
