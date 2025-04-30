@@ -77,10 +77,6 @@
     <BundleResource Include="Platforms\MacCatalyst\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Messages/" />
-  </ItemGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\shared\shared.csproj" />
     </ItemGroup>

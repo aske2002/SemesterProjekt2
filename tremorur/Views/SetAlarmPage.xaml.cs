@@ -45,7 +45,7 @@ namespace tremorur.Views
             }
             UpdateAlarmLabel();
         }
-        private async Task SetStep(int _step)//returnerer en Tas
+        private async Task SetStep(int _step)//returnerer en Task
         {
             step = _step;
 
@@ -89,7 +89,7 @@ namespace tremorur.Views
                 UpdateAlarmLabel();
             }
         }
-        private void UpdateAlarmLabel()
+        private void UpdateAlarmLabel() //opdaterer alarmLabel
         {
             SetAlarm.Text = $"{hours:D2}:{minutes:D2}";
         }

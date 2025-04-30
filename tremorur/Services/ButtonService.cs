@@ -86,7 +86,6 @@ public class ButtonService : IButtonService
             _clickTimers[e.Button] = new Timer(FireMultiClickedEvent, e.Button, ClickDelay, Timeout.Infinite);
         }
     }
-
     public event EventHandler<ButtonClickedEventArgs> OnButtonClicked = delegate { };
     public event EventHandler<ButtonMultipleClickedEventArgs> OnButtomMultipleClicked = delegate { };
     public event EventHandler<ButtonHeldEventArgs> OnButtonHeld = delegate { };

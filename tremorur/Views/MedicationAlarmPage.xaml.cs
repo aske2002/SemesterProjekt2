@@ -1,44 +1,46 @@
 using System.Diagnostics;
-using tremorur.Models.Bluetooth;
 
 namespace tremorur.Views;
 
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
-    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService) : base(buttonService)
+    private readonly AlarmService alarmService;
+    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
     {
         InitializeComponent();
         StartClock();
         this.navigationService = navigationService;
+        this.alarmService = alarmService;
     }
-    protected override void OnOKButtonClicked(object? sender, EventArgs e)
+    public Alarm Alarm {  get; }
+
+    protected void AlarmAppearing()
+    {
+        if (Alarm != null)
+        {
+            MedicationLabel.Text = "Tag din medicin";
+            //godkend afvis
+        }
+    }
+    protected override async void OnOKButtonClicked(object? sender, EventArgs e)
     {
         MedicationLabel.Text = "Medicinpåmindelse godkendt";
+        await Task.Delay(3000); //venter 3 sekunder med at navigerer til hjemmeskærm
+        await navigationService.GoToAsync("//home");
     }
-
-    protected override void OnCancelButtonClicked(object? sender, EventArgs e)  
+    public int cancelPressCount;
+    protected override async void OnCancelButtonClicked(object? sender, EventArgs e)  
     {
-        MedicationLabel.Text = "Medicinpåmindelse annulleret";
-        navigationService.GoToAsync("///home");
+        cancelPressCount++;
+        
+        if (cancelPressCount >= 2) //hvis cancel bliver trykket mere end 2 gange navigeres tilbage til HomePage
+        {
+            MedicationLabel.Text = "Medicinpåmindelse annulleret";
+            await Task.Delay(3000); //venter 3 sekunder med at navigerer til hjemmeskærm
+            await navigationService.GoToAsync("//home");
+        }
     }
-    protected override void OnDownButtonClicked(object? sender, EventArgs e)
-    {
-
-    }
-
-    protected override void OnUpButtonClicked(object? sender, EventArgs e)
-    {
-        MedicationLabel.Text = "Op blev trykket";
-    }
-    //protected override async void OnCancelButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
-    //{
-    //    bool confirm = await DisplayAlert("Annuller", "Udskyd 5 minutter", "Ja", "Nej");
-    //    if (confirm)
-    //    {
-    //        await Navigation.PopAsync();
-    //    }
-    //}
     async void StartClock()
     {
         while (true)
@@ -50,5 +52,15 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         }
     }
 
-
+    public void RegisterResponse(Alarm alarm, bool accepted)
+    {
+        if (accepted)
+        {
+            Debug.WriteLine($"Alarm blev godkendt");
+        }
+        else
+        {
+            Debug.WriteLine($"Alarm blev afvist");
+        }
+    }
 }
