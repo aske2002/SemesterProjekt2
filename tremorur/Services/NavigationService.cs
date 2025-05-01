@@ -46,5 +46,10 @@ namespace tremorur.Services
             _messenger.SendMessage(navigateionState);
             return Shell.Current.GoToAsync(navigateionState);
         }
+
+        public Task GoBackAsync(string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

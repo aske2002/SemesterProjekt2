@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using tremorur.Services;
 
 namespace tremorur.Views
 {
@@ -19,6 +20,7 @@ namespace tremorur.Views
             StartClock();
             this.vibrationsService = vibrationsService;
         }
+
         async void StartClock()
         {
             while (true)
@@ -26,7 +28,6 @@ namespace tremorur.Views
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay; // Henter tidspunktet som TimeSpan
                 string date = now.ToString("ddd dd. MMM"); // Formatterer dato som ugedag/dato/måned
-
                 ClockLabel.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}"; // Viser tid
                 DateLabel.Text = date; // Opdaterer datoen i en separat label
 
@@ -68,9 +69,29 @@ namespace tremorur.Views
             {
                 didHandle();
                 await vibrationsService.StartStopVibration(); //starter vibrationer
-                await navigationService.GoToAsync("//setVibration"); //går til SetVibrationsPage
+                if(BindingContext is HomeViewModel vm)
+                {
+                    vm.Level = vm.Level == 0 ? 1 : 0;
+                }
+                
             }
         }
+     
+        protected override async void OnUpButtonClicked(object sender, EventArgs e)
+        {
+            if (BindingContext is HomeViewModel vm && vm.Level>=1&&vm.Level<7)
+                vm.Level++;
+
+            await vibrationsService.NavigateLevelUp();
+        }
+        protected override async void OnDownButtonClicked(object sender, EventArgs e)
+        {
+            if (BindingContext is HomeViewModel vm && vm.Level > 1)
+                vm.Level--;
+
+            await vibrationsService.NavigateLevelDown();
+        }
+
         protected async override void OnUpButtonHeld(object? sender, int ms, Action didHandle)
         {
             if (ms > 3000) //hvis up-knappen holdes nede i 3 sekunder 

@@ -32,7 +32,7 @@
 
                 <Label
                         x:Name="LevelLabel"
-                        Text="Level: 0"
+                        Text="{Binding LevelText}"
                         FontSize="Caption"
                         FontAttributes="Bold"
                         TextColor="White"

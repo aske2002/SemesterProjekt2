@@ -24,11 +24,6 @@
             ContentTemplate="{DataTemplate vw:SetAlarmPage}"
             Route="setAlarm"/>
     </FlyoutItem>
-    <FlyoutItem Title="SetVibrationPage">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:SetVibrationsPage}"
-            Route="setVibration"/>
-    </FlyoutItem>
     <FlyoutItem Title="MedicationAlarmPage">
         <ShellContent
             ContentTemplate="{DataTemplate vw:MedicationAlarmPage}"
