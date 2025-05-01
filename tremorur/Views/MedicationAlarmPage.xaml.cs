@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Speech.Recognition;
+using tremorur.Models;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.Views;
@@ -20,11 +22,11 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     protected override void OnAppearing() //alarmen håndteres gennem metode 
     {
         alarmToShow = alarmService.CurrentAlarm; //henter aktuelle alarm fra AlarmServive
-        if (alarmToShow !=null)
+        if (alarmToShow != null)
         {
             MedicationLabel.Text = $"Tag din medicin! ({alarmToShow.TimeSpan})"; //viser alarmtid
         }
-        else 
+        else
         {
             MedicationLabel.Text = "Ingen gemte alarmer!";
         }
@@ -33,14 +35,14 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     protected override async void OnOKButtonClicked(object? sender, EventArgs e)
     {
         MedicationLabel.Text = "Medicinpåmindelse godkendt";
-        if (alarmToShow != null) 
+        if (alarmToShow != null)
         {
             RegisterResponse(alarmToShow, true); //registerer at brugeren godkender
         }
         await Task.Delay(3000); //venter 3 sekunder med at navigerer til HomePage
         await navigationService.GoToAsync("//home");
     }
-    protected override async void OnCancelButtonClicked(object? sender, EventArgs e)  
+    protected override async void OnCancelButtonClicked(object? sender, EventArgs e)
     {
         MedicationLabel.Text = "Medicinpåmindelse annulleret";
         if (alarmToShow != null)
@@ -62,7 +64,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     }
     public void RegisterResponse(Alarm alarm, bool accepted) //registerer brugerens respons
     {
-        if (accepted)   
+        if (accepted)
         {
             Debug.WriteLine($"Alarm {alarm.Id} blev godkendt");
         }

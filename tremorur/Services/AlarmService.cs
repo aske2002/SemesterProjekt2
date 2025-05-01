@@ -21,6 +21,7 @@ namespace tremorur.Services
             var alarm = new Alarm { Id = Guid.NewGuid().ToString(), TimeSpan = givenTimeSpan }; //opretter en alarm med et unikt Id (kaldt i Alarm.cs)
             _alarms.Add(alarm);
             SettingsService.Alarms = _alarms.ToList(); //opdaterer SettingService med nye alarmer
+            ScheduleAlarms(); //de satte alarmer bliver kaldt
             return alarm;
         }
         private void OnAlarmsChanged(object sender, NotifyCollectionChangedEventArgs e) //funktion til at håndterer ændringer i ObservableCollection

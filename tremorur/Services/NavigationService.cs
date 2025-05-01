@@ -11,9 +11,8 @@ namespace tremorur.Services
             _messenger.On<AlarmTriggeredEvent>(AlarmTriggered); //når AlarmTriggered-event bliver sendt via messengeren vil AlarmTriggered metoden blive kaldt
             _alarmService = alarmService;
         }
-        public async void AlarmTriggered(AlarmTriggeredEvent evt)
+        public async void AlarmTriggered(AlarmTriggeredEvent evt) //metode der reagerer på event og starter navigation
         {
-
             _alarmService.CurrentAlarm = evt.Alarm; //gemmer alarmen
             await GoToAsync("medicationPage"); //navigerer til MedicationAlarmPage
         }
@@ -46,11 +45,6 @@ namespace tremorur.Services
             var navigateionState = new ShellNavigationState("..");
             _messenger.SendMessage(navigateionState);
             return Shell.Current.GoToAsync(navigateionState);
-        }
-
-        public Task GoBackAsync(string v)
-        {
-            throw new NotImplementedException();
         }
     }
 }
