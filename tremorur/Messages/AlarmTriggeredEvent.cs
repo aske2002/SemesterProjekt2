@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace tremorur.Messages
 {
-    public class AlarmTriggered
+    public class AlarmTriggeredEvent
     {
         public Alarm Alarm { get; set; }
-        public AlarmTriggered(Alarm alarm)
+        public AlarmTriggeredEvent(Alarm alarm)
         {
             Alarm = alarm;
         }

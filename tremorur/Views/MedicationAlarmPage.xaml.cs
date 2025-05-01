@@ -1,11 +1,15 @@
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Speech.Recognition;
+using tremorur.Models.Bluetooth;
 
 namespace tremorur.Views;
-
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
     private readonly AlarmService alarmService;
+
+    private Alarm? alarmToShow;
     public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
     {
         InitializeComponent();
@@ -13,33 +17,38 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         this.navigationService = navigationService;
         this.alarmService = alarmService;
     }
-    public Alarm Alarm {  get; }
-
-    protected void AlarmAppearing()
+    protected override void OnAppearing() //alarmen håndteres gennem metode 
     {
-        if (Alarm != null)
+        alarmToShow = alarmService.CurrentAlarm; //henter aktuelle alarm fra AlarmServive
+        if (alarmToShow !=null)
         {
-            MedicationLabel.Text = "Tag din medicin";
-            //godkend afvis
+            MedicationLabel.Text = $"Tag din medicin! ({alarmToShow.TimeSpan})"; //viser alarmtid
         }
+        else 
+        {
+            MedicationLabel.Text = "Ingen gemte alarmer!";
+        }
+        base.OnAppearing(); //kalder base-implementation
     }
     protected override async void OnOKButtonClicked(object? sender, EventArgs e)
     {
         MedicationLabel.Text = "Medicinpåmindelse godkendt";
-        await Task.Delay(3000); //venter 3 sekunder med at navigerer til hjemmeskærm
+        if (alarmToShow != null) 
+        {
+            RegisterResponse(alarmToShow, true); //registerer at brugeren godkender
+        }
+        await Task.Delay(3000); //venter 3 sekunder med at navigerer til HomePage
         await navigationService.GoToAsync("//home");
     }
-    public int cancelPressCount;
     protected override async void OnCancelButtonClicked(object? sender, EventArgs e)  
     {
-        cancelPressCount++;
-        
-        if (cancelPressCount >= 2) //hvis cancel bliver trykket mere end 2 gange navigeres tilbage til HomePage
+        MedicationLabel.Text = "Medicinpåmindelse annulleret";
+        if (alarmToShow != null)
         {
-            MedicationLabel.Text = "Medicinpåmindelse annulleret";
-            await Task.Delay(3000); //venter 3 sekunder med at navigerer til hjemmeskærm
-            await navigationService.GoToAsync("//home");
+            RegisterResponse(alarmToShow, false); //registerer at brugeren annullerer
         }
+        await Task.Delay(3000); //venter 3 sekunder med at navigerer til HomePage
+        await navigationService.GoToAsync("//home");
     }
     async void StartClock()
     {
@@ -51,16 +60,15 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
             await Task.Delay(1000); // Opdater hvert sekund
         }
     }
-
-    public void RegisterResponse(Alarm alarm, bool accepted)
+    public void RegisterResponse(Alarm alarm, bool accepted) //registerer brugerens respons
     {
-        if (accepted)
+        if (accepted)   
         {
-            Debug.WriteLine($"Alarm blev godkendt");
+            Debug.WriteLine($"Alarm {alarm.Id} blev godkendt");
         }
         else
         {
-            Debug.WriteLine($"Alarm blev afvist");
+            Debug.WriteLine($"Alarm {alarm.Id} blev afvist");
         }
     }
 }

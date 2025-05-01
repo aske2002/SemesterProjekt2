@@ -17,7 +17,6 @@ namespace tremorur.Services
         }
         public Alarm CreateAlarm(TimeSpan givenTimeSpan)
         {
-
             var currentAlarms = SettingsService.Alarms;
             var alarm = new Alarm { Id = Guid.NewGuid().ToString(), TimeSpan = givenTimeSpan }; //opretter en alarm med et unikt Id (kaldt i Alarm.cs)
             _alarms.Add(alarm);
@@ -75,8 +74,9 @@ namespace tremorur.Services
             {
                 Console.WriteLine($"Alarm({alarm.Id})triggered at {DateTime.Now}");
 
-                messenger.SendMessage(new AlarmTriggered(alarm));
+                messenger.SendMessage(new AlarmTriggeredEvent(alarm));
             }
         }
+        public Alarm? CurrentAlarm { get; set; }
     }
 }

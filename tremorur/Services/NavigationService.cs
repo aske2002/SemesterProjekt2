@@ -4,19 +4,20 @@ namespace tremorur.Services
     public partial class NavigationService : INavigationService
     {
         private readonly IMessenger _messenger;
-        public NavigationService(IMessenger messenger)
+        private readonly AlarmService _alarmService;
+        public NavigationService(IMessenger messenger, AlarmService alarmService)
         {
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-            _messenger.On<AlarmTriggered>(AlarmTriggered); //når AlarmTriggered-event bliver sendt via messengeren vil AlarmTriggered metoden blive kaldt
+            _messenger.On<AlarmTriggeredEvent>(AlarmTriggered); //når AlarmTriggered-event bliver sendt via messengeren vil AlarmTriggered metoden blive kaldt
+            _alarmService = alarmService;
         }
-        public async void AlarmTriggered(AlarmTriggered evt)
+        public async void AlarmTriggered(AlarmTriggeredEvent evt)
         {
-            var triggered = new Dictionary<string, object>() //opretter et Dictionary når AlarmTriggered-event modtages
-            {
-                {"alarm",evt.Alarm}//"alarm" er navnet på parameteren som sendes til medicationPage
-            };
-            await GoToAsync("medicationPage",triggered); //går til medicationPage, når event er triggered
+
+            _alarmService.CurrentAlarm = evt.Alarm; //gemmer alarmen
+            await GoToAsync("medicationPage"); //navigerer til MedicationAlarmPage
         }
+
         public Task GoToAsync(string route, IDictionary<string, object>? parameters = null)//metode der nagiverer til andre pages i Shell
         {
             if (Shell.Current is null)
