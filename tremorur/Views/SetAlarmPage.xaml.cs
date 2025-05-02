@@ -49,25 +49,29 @@ namespace tremorur.Views
         private async Task SetStep(int _step)//returnerer en Task
         {
             step = _step;
-
-            if (step == 0) // Timer indstilles
+            switch (step)
             {
-                AlarmLabel.Text = "Indstil Timer";
+                case 0:
+                    AlarmLabel.Text = "Indstil Timer";
+                    break;
+                case 1:
+                    AlarmLabel.Text = "Indstil Minutter";
+                    break;
+                case 2:
+                    AlarmLabel.Text = "Tryk OK for at gemme";
+                    break;
+                case 3:// gemmer alarmen i alarmService og navigerer til HomePage
+                    var time = TimeSpan.FromHours(hours).Add(TimeSpan.FromMinutes(minutes)); //laver om til timeSpan
+                    alarmService.CreateAlarm(time);
+                    Debug.WriteLine("Alarm oprettet");
+                    await navigationService.GoToAsync("//home");
+                    break;
+                default: //hvis noget går galt, startes forfra
+                    step = 0;
+                    AlarmLabel.Text = "Indstil Timer";
+                    break;
             }
-            else if (step == 1)
-            {
-                AlarmLabel.Text = "Indstil Minutter";
-            }
-            else if (step == 2)
-            {
-                AlarmLabel.Text = "Tryk OK for at gemme";
-            }
-            else if (step >= 2) //gemmer alarmen i alarmService og navigerer til HomePage
-            {
-                var time = TimeSpan.FromHours(hours).Add(TimeSpan.FromMinutes(minutes)); //laver om til timeSpan
-                alarmService.CreateAlarm(time);
-                await navigationService.GoToAsync("//home");
-            }
+            UpdateAlarmLabel(); //opdaterer tal-visning efter hvert trin
         }
         protected override async void OnOKButtonClicked(object? sender, EventArgs e) //async, da der bliver brugt await
         {

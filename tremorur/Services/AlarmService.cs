@@ -14,8 +14,9 @@ namespace tremorur.Services
         //    _alarms = new ObservableCollection<Alarm>(SettingsService.Alarms); //henter eksisterende alarmer og initialiserer observableCollection
         //    _alarms.CollectionChanged += OnAlarmsChanged; //reagerer på ændringer i observableCollection
         //}
-        //flyttet op længere nede fra siden
 
+
+        //flyttet op længere nede fra siden
         private readonly IMessenger messenger;
         public AlarmService(IMessenger messenger)
         {
@@ -70,7 +71,6 @@ namespace tremorur.Services
                 Timer timer = new Timer(TriggerAlarm, alarm, delay, Timeout.InfiniteTimeSpan);
                 activeTimers.Add(timer);
             }
-
         }
         private void TriggerAlarm(object? state)
         {
@@ -92,6 +92,8 @@ namespace tremorur.Services
             activeTimers.Clear(); //tømmer listen med aktive timere
             _alarms.Clear(); //collectionchanges tømmes og UI opdateres
             SettingsService.Alarms = new List<Alarm>(); //tømmer alarmene i settingsService
+
+            ScheduleAlarms();//starter forfra og sætter nye timere
         }
     }
 }
