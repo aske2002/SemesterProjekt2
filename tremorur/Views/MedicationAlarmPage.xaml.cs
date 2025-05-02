@@ -6,45 +6,51 @@ using tremorur.Models;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.Views;
+[QueryProperty(nameof(AlarmId), "alarmId")]
 public partial class MedicationAlarmPage : ContentPageWithButtons
 {
     private readonly INavigationService navigationService;
     private readonly AlarmService alarmService;
 
     private Alarm? alarmToShow;
-    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
+    public MedicationAlarmPage(MedicationAlarmViewModel viewModel, IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
     {
+        BindingContext = viewModel;
         InitializeComponent();
         StartClock();
         this.navigationService = navigationService;
         this.alarmService = alarmService;
     }
-    protected override void OnAppearing() //alarmen håndteres gennem metode 
+    public string AlarmId //QueryProperty, som sættes af MAUI-shell, når alarmId sendes via navigationen
     {
-        alarmToShow = alarmService.CurrentAlarm; //henter aktuelle alarm fra AlarmServive
-        if (alarmToShow != null)
+        set
         {
-            MedicationLabel.Text = $"Tag din medicin! ({alarmToShow.TimeSpan})"; //viser alarmtid
+            var alarm = alarmService.GetAlarm(value); // Hent alarm baseret på id (value) fra alarmService
+            if (alarm != null)
+            {
+                alarmToShow = alarm; //hvis alarmen findes gemmes den lokalt i AlarmToShow og siden opdaterer medicationLabel
+                MedicationLabel.Text = "Tag din medicin!";
+            }
+            else
+            {
+                MedicationLabel.Text = "Kunne ikke hente alarm";
+            }
         }
-        else
-        {
-            MedicationLabel.Text = "Ingen gemte alarmer!";
-        }
-        base.OnAppearing(); //kalder base-implementation
     }
-    protected override async void OnOKButtonClicked(object? sender, EventArgs e)
+    protected override async void OnOKButtonClicked(object? sender,EventArgs e)
     {
-        MedicationLabel.Text = "Medicinpåmindelse godkendt";
-        if (alarmToShow != null)
-        {
-            RegisterResponse(alarmToShow, true); //registerer at brugeren godkender
+        MedicationLabel.Text = "Påmindelse godkendt";
+        if (alarmToShow != null) 
+        { 
+            RegisterResponse(alarmToShow,true);//registerer at brugeren godkender
         }
-        await Task.Delay(3000); //venter 3 sekunder med at navigerer til HomePage
-        await navigationService.GoToAsync("//home");
+        await Task.Delay(3000);
+        await navigationService.GoToAsync("//home");//venter 3 sekunder med at navigerer til HomePage
     }
+
     protected override async void OnCancelButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Medicinpåmindelse annulleret";
+        MedicationLabel.Text = "Påmindelse annulleret";
         if (alarmToShow != null)
         {
             RegisterResponse(alarmToShow, false); //registerer at brugeren annullerer
@@ -62,15 +68,18 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
             await Task.Delay(1000); // Opdater hvert sekund
         }
     }
-    public void RegisterResponse(Alarm alarm, bool accepted) //registerer brugerens respons
+    public void RegisterResponse(Alarm alarm, bool accepted) //registerer brugerens respons i debug med dato og alarm-id
     {
+        DateTime now = DateTime.Now;
+        TimeSpan currentTime = now.TimeOfDay;
+        string date = now.ToString("dd.MM.yyyy");
         if (accepted)
         {
-            Debug.WriteLine($"Alarm {alarm.Id} blev godkendt");
+            Debug.WriteLine($"Alarm {alarm.Id} blev godkendt {alarm.TimeSpan} {date}");
         }
         else
         {
-            Debug.WriteLine($"Alarm {alarm.Id} blev afvist");
+            Debug.WriteLine($"Alarm {alarm.Id} blev afvist {alarm.TimeSpan} {date}");
         }
     }
 }

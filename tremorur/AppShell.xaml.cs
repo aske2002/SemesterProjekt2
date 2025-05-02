@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui.Controls.Handlers.Compatibility;
 using Microsoft.Maui.Controls.Platform.Compatibility;
+using tremorur.Views;
 
 #if MACCATALYST
 using UIKit;
@@ -13,6 +14,7 @@ namespace tremorur
         {
             InitializeComponent();
             RegisterRoutes();
+
 
 #if MACCATALYST
             HandlerChanged += (s, e) =>
@@ -33,6 +35,7 @@ namespace tremorur
         private void RegisterRoutes()
         {
             BackgroundColor = Transparent;
+            Routing.RegisterRoute("medicationPage", typeof(MedicationAlarmPage));
         }
 
         private async void OnMenuItemClicked(object sender, EventArgs e)

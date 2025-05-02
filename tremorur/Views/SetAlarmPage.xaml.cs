@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace tremorur.Views
@@ -28,7 +29,7 @@ namespace tremorur.Views
             }
             else if (step == 1) // Justerer minutter
             {
-                minutes = (minutes + 5) % 60;
+                minutes = (minutes + 1) % 60;
             }
             UpdateAlarmLabel();
         }
@@ -92,6 +93,17 @@ namespace tremorur.Views
         private void UpdateAlarmLabel() //opdaterer alarmLabel
         {
             SetAlarm.Text = $"{hours:D2}:{minutes:D2}";
+        }
+        
+        protected override async void OnCancelButtonHeld(object? sender, int ms, Action didHandle)
+        {
+            if(ms > 5000)
+            {
+                didHandle();
+                alarmService.ClearAlarms();
+                Debug.WriteLine("Alle gemte alamer er slettet"); 
+            }
+            
         }
     }
 

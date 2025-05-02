@@ -20,6 +20,7 @@ namespace tremorur
             builder.Services.AddSingleton<IBluetoothService,BluetoothService>();
             builder.Services.AddSingleton<IButtonService, ButtonService>();
             builder.Services.AddSingleton<VibrationsService>();
+        
             
             builder.Services.AddTransient<AlarmService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
@@ -30,9 +31,13 @@ namespace tremorur
 
             builder.Services.AddSingleton<HomeViewModel>(); 
             builder.Services.AddSingleton<HomePage>();
-            builder.Services.AddSingleton<MedicationAlarmViewModel>();
+
+            builder.Services.AddTransient<MedicationAlarmViewModel>();
+            builder.Services.AddTransient<MedicationAlarmPage>();
+
             builder.Services.AddTransient<SetAlarmViewModel>();
             builder.Services.AddTransient<SetAlarmPage>();
+            
 
             builder.Services.AddTransient<BluetoothConnectPage>();
             builder.Services.AddTransient<BluetoothConnectViewModel>();
