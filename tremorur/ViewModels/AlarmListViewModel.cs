@@ -2,23 +2,32 @@
 using tremorur.Models;
 using tremorur.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace tremorur.ViewModels
 {
-    public partial class AlarmListViewModel : ObservableObject
+    public partial class AlarmListViewModel : ObservableObject,  INotifyPropertyChanged
     {
         private readonly AlarmService _alarmService;
 
         [ObservableProperty]
         private ObservableCollection<Alarm> alarms;
 
-        [ObservableProperty]
-        private Alarm? selectedAlarm;
+        private Alarm? _selectedAlarm;
+        public Alarm? SelectedAlarm
+        {
+            get => _selectedAlarm;
+            set
+            {
+                _selectedAlarm = value;
+                OnPropertyChanged(nameof(SelectedAlarm));
+            }
+        }
 
         public AlarmListViewModel(AlarmService alarmService)
         {
             _alarmService = alarmService;
-            Alarms = new ObservableCollection<Alarm>(_alarmService.GetAlarms());
+            Alarms = [.. _alarmService.GetAlarms()];
         }
 
         public void DeleteSelectedAlarm()

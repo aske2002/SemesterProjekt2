@@ -10,28 +10,34 @@
 
     <ContentPage.Resources>
         <converters:SelectedAlarmComparerConverter x:Key="SelectedAlarmComparerConverter" />
+        <Style TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal"/>
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Red"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+            
+        </Style>
     </ContentPage.Resources>
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
-            <ListView x:Name="_alarmListView"
+            <CollectionView x:Name="_alarmListView"
                       ItemsSource="{Binding Alarms}"
                       SelectionMode="Single"
-                      SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}">
-                <ListView.ItemTemplate>
+                      SelectedItem="{Binding SelectedAlarm}">
+                <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <ViewCell>
-                            <Grid Padding="10" VerticalOptions="Center" HorizontalOptions="FillAndExpand">
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup Name="CommonStates">
-                                        <VisualState Name="Normal" />
-                                        <VisualState Name="Selected">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="White" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
+                            <Grid Padding="10" VerticalOptions="Center" HorizontalOptions="Fill" >
+                                
+                                
 
                                 <Label
                     Text="{Binding TimeSpan}"
@@ -39,14 +45,15 @@
                     FontSize="Medium"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
                     HorizontalTextAlignment="Center"
                     VerticalTextAlignment="Center"/>
                             </Grid>
-                        </ViewCell>
                     </DataTemplate>
-                </ListView.ItemTemplate>
+                </CollectionView.ItemTemplate>
 
-            </ListView>
+            </CollectionView>
 
             <Button Text="Cancel Alarm"
                     BackgroundColor="Red"
