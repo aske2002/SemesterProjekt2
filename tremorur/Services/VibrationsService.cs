@@ -23,7 +23,7 @@ namespace tremorur.Services
             _bluetoothService = bluetoothService;
             ConnectBluetooth();
         }
-
+            
         private void ConnectBluetooth()
         {
             _bluetoothService.DiscoveredPeripheral += DiscoveredDevice;
@@ -101,6 +101,5 @@ namespace tremorur.Services
             var preLevel = vibrationsLevels[preLevelIndex];//finder forrige objekt i vibrations liste
             await _patternChar.WriteValueAsync(preLevel.ToBytes());//skriver level om til bytes og sender det til RPi
         }
-
     }
 }

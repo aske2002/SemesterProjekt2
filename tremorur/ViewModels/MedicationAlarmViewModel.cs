@@ -2,8 +2,6 @@
 
 namespace tremorur.ViewModels
 {
-    
-
     public partial class MedicationAlarmViewModel(IDialogService dialogService, INavigationService navigationService) : BaseViewModel(dialogService, navigationService)
     {
         private Alarm? alarm { get; set; }

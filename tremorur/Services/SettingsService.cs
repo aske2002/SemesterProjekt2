@@ -9,29 +9,27 @@ public static class SettingsService
 {
     public static List<Alarm> Alarms
     {
-        get => GetClassFromStorage<List<Alarm>>("Alarms").ToList();
-        set => SetClassInStorage("Alarms", value);
+        get => GetClassFromStorage<List<Alarm>>("Alarms").ToList();//læser liser af alarmer fra storage og håndterer JSON-fil
+        set => SetClassInStorage("Alarms", value);//skriver ny liste af alarmer til storage JSON-fil 
     }
-
-
-    private static ImmutableDictionary<string, object?> _cache = ImmutableDictionary<string, object?>.Empty;
-    private static IPreferences DefaultPreferences => Microsoft.Maui.Storage.Preferences.Default;
-    private static IPreferences Preferences { get; set; } = DefaultPreferences;
-    public static T GetClassFromStorage<T>(string storageKey, T defaultValue)
+    private static ImmutableDictionary<string, object?> _cache = ImmutableDictionary<string, object?>.Empty;//undgår unødvendig læsning af data
+    private static IPreferences DefaultPreferences => Microsoft.Maui.Storage.Preferences.Default;//bruger MAUI Preferences til at læse og lagre data
+    private static IPreferences Preferences { get; set; } = DefaultPreferences;//har som standard DefaultPreferences men kan overskrives
+    public static T GetClassFromStorage<T>(string storageKey, T defaultValue)//Henter værdi fra storage, med default hvis værdien ikke deserialiseres
     {
-        if (_cache.TryGetValue(storageKey, out var weaklyTypedCachedValue)
+        if (_cache.TryGetValue(storageKey, out var weaklyTypedCachedValue)//tjekker om _cache er typen T
             && weaklyTypedCachedValue is T value)
             return value;
 
 
-        var serializedValue = Preferences.Get(storageKey, "");
+        var serializedValue = Preferences.Get(storageKey, "");//
 
         if (serializedValue.Length == 0)
             return defaultValue;
 
         try
         {
-            value = JsonSerializer.Deserialize<T>(serializedValue)!;
+            value = JsonSerializer.Deserialize<T>(serializedValue)!; //
             ImmutableInterlocked.AddOrUpdate(ref _cache, storageKey, value, (_, _) => value);
 
             return value;
@@ -46,9 +44,9 @@ public static class SettingsService
         where T : class, new()
         => GetClassFromStorage(storageKey, new T());
 
-    public static void SetClassInStorage<T>(string storageKey, T value)
+    public static void SetClassInStorage<T>(string storageKey, T value) //serialiserer object til JSON
     {
-        Preferences.Set(storageKey, JsonSerializer.Serialize(value));
-        ImmutableInterlocked.AddOrUpdate(ref _cache, storageKey, value, (_, _) => value);
+        Preferences.Set(storageKey, JsonSerializer.Serialize(value));//gemmer i Preferences
+        ImmutableInterlocked.AddOrUpdate(ref _cache, storageKey, value, (_, _) => value);//opdaterer _cache
     }
 }

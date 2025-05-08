@@ -73,7 +73,6 @@ namespace tremorur.Views
                 {
                     vm.Level = vm.Level == 0 ? 1 : 0;
                 }
-                
             }
         }
      
