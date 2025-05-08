@@ -20,7 +20,6 @@ namespace tremorur.Views
             StartClock();
             this.vibrationsService = vibrationsService;
         }
-
         async void StartClock()
         {
             while (true)
@@ -34,35 +33,6 @@ namespace tremorur.Views
                 await Task.Delay(1000); // Opdater hvert sekund
             }
         }
-
-        //protected async override void OnUpButtonHeld(object? sender, int ms)
-        //{
-        //    var id = Guid.NewGuid();
-        //    Debug.WriteLine($"Id: {id}");
-        //    var constant = new VibrationPatternConstant(0.5, 1000);
-        //    var expression = VibrationSettings.CreateSinePatternSettings(1.0).Pattern;
-        //    var dynamic = new VibrationPatternDynamic(new List<VibrationPatternDynamic.VibrationPatternSegment>()
-        //        {
-        //            new VibrationPatternDynamic.VibrationPatternSegment(100, 0.5),
-        //            new VibrationPatternDynamic.VibrationPatternSegment(1000, 0.25),
-        //            new VibrationPatternDynamic.VibrationPatternSegment(10000, 1.0)
-        //        }, 1000);
-        //    var mixed = new VibrationPatternMixed(new List<VibrationPatternMixed.VibrationPatternSegment>()
-        //        {
-        //            new VibrationPatternMixed.VibrationPatternSegment(constant, 1000),
-        //            new VibrationPatternMixed.VibrationPatternSegment(expression, 1000),
-        //            new VibrationPatternMixed.VibrationPatternSegment(dynamic, 1000)
-        //        }, 1000);
-        //    VibrationSettings settings = new VibrationSettings()
-        //    {
-        //        Id = id,
-        //        Pattern = mixed
-        //    };
-        //    var binary = settings.ToBytes();
-        //    var parsed = await VibrationSettings.FromBytes(binary);
-        //    Debug.WriteLine($"Parsed: {parsed}");
-        //}
-
         protected async override void OnOKButtonHeld(object? sender, int ms, Action didHandle)
         {
             if(ms>3000) //hvis ok-knappen holdes nede i 3 sekunder 
@@ -75,7 +45,6 @@ namespace tremorur.Views
                 }
             }
         }
-     
         protected override async void OnUpButtonClicked(object sender, EventArgs e)
         {
             if (BindingContext is HomeViewModel vm && vm.Level>=1&&vm.Level<7)
@@ -90,7 +59,6 @@ namespace tremorur.Views
 
             await vibrationsService.NavigateLevelDown();
         }
-
         protected async override void OnUpButtonHeld(object? sender, int ms, Action didHandle)
         {
             if (ms > 3000) //hvis up-knappen holdes nede i 3 sekunder 
