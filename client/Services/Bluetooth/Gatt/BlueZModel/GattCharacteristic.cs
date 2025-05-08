@@ -1,0 +1,94 @@
+﻿using System.Diagnostics;
+using System.Text;
+using client.Services.Bluetooth.Core;
+using client.Services.Bluetooth.Models;
+using client.Services.Bluetooth.Utilities;
+using CommunityToolkit.Mvvm.Messaging;
+using Tmds.DBus;
+
+namespace client.Services.Bluetooth.Gatt.BlueZModel
+{
+    public class GattCharacteristic : PropertiesBase<GattCharacteristic1Properties>, IGattCharacteristic1
+    {
+        public string UUID => Properties.UUID;
+        private readonly IMessenger _messenger;
+        public IList<GattDescriptor> Descriptors { get; } = new List<GattDescriptor>();
+
+        public GattCharacteristic(ObjectPath objectPath, GattCharacteristic1Properties properties, IMessenger messenger) : base(objectPath, properties)
+        {
+            _messenger = messenger;
+        }
+
+        public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
+        {
+
+            return Task.FromResult(Properties.Value);
+        }
+
+        public async Task WriteValueAsync(byte[] value, IDictionary<string, object> options)
+        {
+            var response = await _messenger.Send(new CharChangeEvent(new CharChangeData
+            {
+                DeviceId = options["device"]?.ToString() ?? string.Empty,
+                CharacteristicId = Properties.UUID,
+                Data = value
+            }));
+            if (response != null && response.Error)
+            {
+                await SetAsync("Value", value);
+                Debug.WriteLine($"Value set to: {BitConverter.ToString(value)}");
+            }
+            else
+            {
+                Debug.WriteLine($"Failed to write value: {response?.Message}");
+                throw new DBusException("org.bluez.Error.Failed", response?.Message);
+            }
+        }
+
+        public GattDescriptor AddDescriptor(GattDescriptor1Properties gattDescriptorProperties)
+        {
+            gattDescriptorProperties.Characteristic = ObjectPath;
+            var gattDescriptor = new GattDescriptor(NextDescriptorPath(), gattDescriptorProperties);
+            Descriptors.Add(gattDescriptor);
+            return gattDescriptor;
+        }
+
+        private ObjectPath NextDescriptorPath()
+        {
+            return ObjectPath + "/descriptor" + Descriptors.Count;
+        }
+
+        public Task<IDictionary<string, IDictionary<string, object>>> GetAllPropsAsync()
+        {
+            IDictionary<string, IDictionary<string, object>> allprops = new Dictionary<string, IDictionary<string, object>>
+            {
+                {
+                    "org.bluez.GattCharacteristic1", new Dictionary<string, object>
+                    {
+                        {"Service", Properties.Service},
+                        {"UUID", Properties.UUID},
+                        {"Flags", Properties.Flags},
+                        {"Descriptors", Descriptors.Select(d => d.ObjectPath).ToArray()},
+                        {"Value", Properties.Value},
+                        {"Notifying", Properties.Notifying},
+                    }
+                }
+            };
+            return Task.FromResult(allprops);
+        }
+
+        public Task StartNotifyAsync()
+        {
+            Properties.Notifying = true;
+            var options = new Dictionary<string, object> { { "flags", "notify" } };
+            return WriteValueAsync(Properties.Value, options);
+        }
+
+        public Task StopNotifyAsync()
+        {
+            Properties.Notifying = false;
+            var options = new Dictionary<string, object> { { "flags", "stop-notify" } };
+            return WriteValueAsync(Properties.Value, options);
+        }
+    }
+}

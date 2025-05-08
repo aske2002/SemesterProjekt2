@@ -1,51 +1,63 @@
 ﻿using tremorur.Messages;
-
 namespace tremorur.Services
 {
     public partial class NavigationService : INavigationService
     {
         private readonly IMessenger _messenger;
-        public NavigationService(IMessenger messenger)
+        private readonly AlarmService _alarmService;
+        public NavigationService(IMessenger messenger, AlarmService alarmService)
         {
-            _messenger = messenger;
+            _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
+            _messenger.On<AlarmTriggeredEvent>(AlarmTriggered); //når AlarmTriggered-event bliver sendt via messengeren vil AlarmTriggered metoden blive kaldt
+            _alarmService = alarmService;
         }
 
-        private void OnUpdateApplication(Type[]? types)
+        public Task GoToAsync(string route, IDictionary<string, object>? parameters = null)//metode der nagiverer til andre pages i Shell
         {
             if (Shell.Current is null)
             {
-                throw new NotSupportedException($"Navigation with the '{nameof(OnUpdateApplication)}' method is currently supported only with a Shell-enabled application.");
+                throw new NotSupportedException($"Navigation with the '{nameof(GoToAsync)}' method is currently supported only with a Shell-enabled application.");
             }
 
-            var navigateionState = new ShellNavigationState("..");
-            _messenger.SendBegivenhed(navigateionState);
-            Shell.Current.GoToAsync(navigateionState);
-        }
+            var navigateionState = new ShellNavigationState(route); //opretter navigations rute i shell
+            _messenger.SendMessage(navigateionState); //sender messenger, så andre kan reagere på det???
 
-        public Task GåTilSideAsync(string route)
-        {
-            if (Shell.Current is null)
+            if (parameters == null) //navigere til page med eller uden parameter
             {
-                throw new NotSupportedException($"Navigation with the '{nameof(GåTilSideAsync)}' method is currently supported only with a Shell-enabled application.");
+                return Shell.Current.GoToAsync(navigateionState);
             }
-
-            var navigateionState = new ShellNavigationState(route);
-            _messenger.SendBegivenhed(navigateionState);
-            return Shell.Current.GoToAsync(navigateionState);
+            else
+            {
+                return Shell.Current.GoToAsync(navigateionState, parameters);
+            }
         }
-
-        public Task GoBackAsync()
+        public Task GoBackAsync() //bliver denne metode brugt nogen steder???!!!
         {
-
-
             if (Shell.Current is null)
             {
                 throw new NotSupportedException($"Navigation with the '{nameof(GoBackAsync)}' method is currently supported only with a Shell-enabled application.");
             }
-
             var navigateionState = new ShellNavigationState("..");
-            _messenger.SendBegivenhed(navigateionState);
+            _messenger.SendMessage(navigateionState);
             return Shell.Current.GoToAsync(navigateionState);
+        }
+
+        public async void AlarmTriggered(AlarmTriggeredEvent evt) //metode der reagerer på event og starter navigation - modtager event-objekt, der indeholder den alarm der bliver trigget
+        {
+            _alarmService.CurrentAlarm = evt.Alarm; //gemmer den triggede alarm i AlarmService, så den kan hentes i UI senere
+            Shell.Current?.Dispatcher.Dispatch(async () => //hvis shell og UI er klar, udføres koden i MAUI
+            {
+                var dict = new Dictionary<string, object> 
+                {
+                    { "alarmId", evt.Alarm.Id } //sender alarmId med som parameter
+                };
+
+                try
+                {
+                    await GoToAsync("///medicationPage", dict); //navigerer til medicationAlarmPage med alarm-ID som parameter
+                }
+                catch (Exception ex) { } //håndterer eventuelle fejl
+            });
         }
     }
 }

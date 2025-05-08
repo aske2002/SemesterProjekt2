@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch on RPi",
+      "type": "coreclr",
+      "preLaunchTask": "run",
+      "postDebugTask": "stop",
+      "request": "attach",
+      "processName": "dotnet",
+      "presentation": {
+        "hidden": false,
+        "group": "",
+        
+        "order": 1
+      },
+      "pipeTransport": {
+        "pipeProgram": "ssh",
+        "pipeArgs": ["-T", "aske1131@raspberrypi.local"],
+        "debuggerPath": "/home/aske1131/vsdbg/vsdbg",
+        "pipeCwd": "${workspaceFolder}",
+        "quoteArgs": true
+      },
+      "sourceFileMap": {
+        "/home/aske1131/tremorur": "${workspaceFolder}"
+      }
+    }
+  ]
+}

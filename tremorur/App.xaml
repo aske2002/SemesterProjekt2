@@ -7,16 +7,18 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:tremorur"
     xmlns:vw="clr-namespace:tremorur.Views"
+    xmlns:utils="clr-namespace:tremorur.Utils"
     mc:Ignorable="d">
     <Application.Resources>
+        <ResourceDictionary>
+            <utils:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        </ResourceDictionary>
         <ControlTemplate x:Key="LayoutTemplate">
             <AbsoluteLayout
                 BackgroundColor="Transparent"
                 Loaded="AbsoluteLayoutLoaded">
                 <Grid
-                    AbsoluteLayout.LayoutBounds="0,0,1,1"
-                    AbsoluteLayout.LayoutFlags="All"
-                    HorizontalOptions="Fill"
+                    HorizontalOptions="Fill"    
                     VerticalOptions="Fill"
                     Loaded="GridLoaded"
                     RowDefinitions="*"

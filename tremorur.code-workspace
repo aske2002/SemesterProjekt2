@@ -1,0 +1,21 @@
+{
+    "folders": [
+        {
+            "path": "tremorur"
+        },
+        {
+            "path": "client"
+        },
+        {
+            "path": "shared"
+        }
+    ],
+    "settings": {},
+    "extensions": {
+        "recommendations": [
+            "ms-dotnettools.csharp",
+            "ms-dotnettools.dotnet-maui",
+            "VisualStudioExptTeam.vscodeintellicode"
+        ]
+    }
+}

@@ -1,0 +1,76 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ssh",
+      "args": [
+        "aske1131@raspberrypi",
+        "/home/aske1131/.dotnet/dotnet /home/aske1131/tremorur/client.dll --environment Development"
+      ],
+      "problemMatcher": {
+        "owner": "dotnet",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": [
+          {
+            "regexp": "^\\s*\\[\\d+\\]\\s*(.*)\\s*:\\s*(.*)\\s*:\\s*(.*)$",
+            "file": 1,
+            "line": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "==Application started=="
+        }
+      },
+      "dependsOn": ["publish", "copy", "stop"],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "stop",
+      "type": "shell",
+      "command": "ssh",
+      "args": ["aske1131@raspberrypi", "bash -c \"pkill dotnet || true\""],
+      "problemMatcher": [],
+      "detail": "Stop the running application on the PI"
+    },
+    {
+      "type": "shell",
+      "command": "scp",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": [
+        "-r",
+        "publish/*",
+        "aske1131@raspberrypi:/home/aske1131/tremorur/"
+      ],
+      "problemMatcher": [],
+      "dependsOn": ["delete"],
+      "label": "copy",
+      "detail": "Copy the published files to the PI"
+    },
+    {
+      "label": "delete",
+      "type": "shell",
+      "command": "ssh",
+      "args": [
+        "aske1131@raspberrypi",
+        "bash -c \"rm -rf /home/aske1131/tremorur/*\""
+      ],
+      "problemMatcher": [],
+      "detail": "Delete the publish directory on the PI"
+    },
+    {
+      "command": "dotnet",
+      "args": ["publish", "-c", "Release", "-o", "publish"],
+      "problemMatcher": "$msCompile",
+      "label": "publish",
+      "detail": "Publish the project to the publish directory"
+    }
+  ]
+}

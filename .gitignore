@@ -5,4 +5,12 @@ obj
 .vs/SemesterProjekt2/FileContentIndex/86c830f6-4ae9-4985-b52f-e2755a28a838.vsidx
 *.vsidx
 */**/.vs/
+.vs/tremorur/CopilotIndices
 tremorur/tremorur.csproj.user
+
+.DS_Store
+
+.vs/tremorur/DesignTimeBuild/
+
+.vs/tremorur/v17/
+.vs/
