@@ -36,7 +36,7 @@
     </FlyoutItem>
 
 	<FlyoutItem Title="Alarmer" Route="AlarmListPage">
-		<ShellContent ContentTemplate="{DataTemplate local:AlarmListPage}" />
+		<ShellContent ContentTemplate="{DataTemplate vw:AlarmListPage}" />
 	</FlyoutItem>
     <FlyoutItem Title="Bluetooth List">
         <ShellContent

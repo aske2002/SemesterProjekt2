@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<models:ContentPageWithButtons
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:tremorur.Models"
+    xmlns:viewModels="clr-namespace:tremorur.ViewModels"
+    xmlns:converters="clr-namespace:tremorur.Converters"
+    x:Class="tremorur.Views.AlarmListPage"
+    ControlTemplate="{StaticResource LayoutTemplate}">
+
+    <ContentPage.Resources>
+        <converters:SelectedAlarmComparerConverter x:Key="SelectedAlarmComparerConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+            <ListView x:Name="_alarmListView"
+                      ItemsSource="{Binding Alarms}"
+                      SelectionMode="Single"
+                      SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid Padding="10" VerticalOptions="Center" HorizontalOptions="FillAndExpand">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal" />
+                                        <VisualState Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="White" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <Label
+                    Text="{Binding TimeSpan}"
+                    TextColor="Black"
+                    FontSize="Medium"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"/>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+            </ListView>
+
+            <Button Text="Cancel Alarm"
+                    BackgroundColor="Red"
+                    TextColor="White"
+                    Clicked="Cancel" />
+        </StackLayout>
+    </ScrollView>
+</models:ContentPageWithButtons>
