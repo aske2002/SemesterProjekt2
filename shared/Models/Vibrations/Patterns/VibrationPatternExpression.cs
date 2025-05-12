@@ -40,15 +40,16 @@ public record VibrationPatternExpression : VibrationPatternBase
     {
         // Compile it using Roslyn
         var options = ScriptOptions.Default
-            .AddReferences(typeof(Math).Assembly)
-            .AddImports("System", "System.Math");
+            .AddReferences([typeof(Math).Assembly, typeof(Expression).Assembly])
+            .AddImports("System", "System.Math", "System.Linq", "System.Linq.Expressions", "System.Collections.Generic");
 
         var expression = await CSharpScript.EvaluateAsync<Expression<Func<double, double>>>(stringExpression, options);
         return new VibrationPatternExpression(expression, resolution);
     }
     public override byte[] GetDataBytes()
     {
-        var data = System.Text.Encoding.UTF8.GetBytes(_function.ToString());
+        var stringExpression = _function.ToString();
+        var data = System.Text.Encoding.UTF8.GetBytes(stringExpression);
         return data;
     }
     private double estimateRefreshInterval()
