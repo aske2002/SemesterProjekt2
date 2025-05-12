@@ -1,7 +1,5 @@
-using System.Globalization;
-using Microsoft.Maui.HotReload;
-using tremorur.Messages;
-using tremorur.Utils;
+using shared.Messages;
+using shared.Models;
 
 namespace tremorur.Controls;
 public partial class BorderButton : Grid

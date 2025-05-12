@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using tremorur.Services;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using shared.Models.Vibrations;
 
 namespace tremorur.Views
 {

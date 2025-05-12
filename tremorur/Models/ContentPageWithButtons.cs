@@ -1,6 +1,7 @@
 
 
 using System.Diagnostics;
+using shared.Models;
 using tremorur.Messages;
 
 namespace tremorur.Models

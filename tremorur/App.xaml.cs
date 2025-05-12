@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
-using tremorur.Messages;
+using shared.Models;
 
 namespace tremorur
 {
@@ -95,7 +94,7 @@ namespace tremorur
                     double angleDeg = button.ButtonPosition;
                     double angleRad = angleDeg * Math.PI / 180;
 
-                    double buttonRadius = radius + button.DesiredSize.Height;;
+                    double buttonRadius = radius + button.DesiredSize.Height;
 
                     // Get x/y position in absolute layout terms (0.0 to 1.0)
                     double x = (_absoluteLayout.Width / 2) + (buttonRadius * Math.Cos(angleRad));
