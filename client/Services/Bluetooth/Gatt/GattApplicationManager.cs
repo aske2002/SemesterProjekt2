@@ -160,6 +160,33 @@ namespace client.Services.Bluetooth.Gatt
             {
                 await _serverContext.Connection.UnregisterServiceAsync(service.ObjectPath.ToString());
             }
+
+            var deviceManager = _serverContext.Connection.CreateProxy<IObjectManager>("org.bluez", "/");
+            var managedObjects = await deviceManager.GetManagedObjectsAsync();
+
+            foreach (var kvp in managedObjects)
+            {
+                var path = kvp.Key;
+                var interfaces = kvp.Value;
+
+                if (interfaces.ContainsKey("org.bluez.Device1"))
+                {
+                    var device = _serverContext.Connection.CreateProxy<IDevice1>("org.bluez", path);
+                    var deviceProperties = await device.GetAllAsync();
+                    try
+                    {
+                        if (deviceProperties.Connected )
+                        {
+                            logger.LogInformation($"Disconnecting device at {path}");
+                            await device.DisconnectAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning($"Failed to disconnect device at {path}: {ex.Message}");
+                    }
+                }
+            }
         }
     }
 }

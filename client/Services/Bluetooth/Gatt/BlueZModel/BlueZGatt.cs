@@ -18,16 +18,70 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
     [DBusInterface("org.bluez.Device1")]
     internal interface IDevice1 : IDBusObject
     {
-        Task<string> GetAliasAsync();
-        Task<string> GetAddressAsync();
-        Task<string> GetNameAsync();
-        Task<bool> GetConnectedAsync();
-        Task<bool> GetTrustedAsync();
-        Task<bool> GetBlockedAsync();
-        Task<bool> GetLegacyPairingAsync();
-        Task<string[]> GetUUIDsAsync();
+        Task DisconnectAsync();
+        Task<Device1Properties> GetAllAsync();
         Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
     }
+
+    [Dictionary]
+    public class Device1Properties
+    {
+        private string _Alias = default(string);
+        public string Alias
+        {
+            get
+            {
+                return _Alias;
+            }
+
+            set
+            {
+                _Alias = (value);
+            }
+        }
+
+        private string _Address = default(string);
+        public string Address
+        {
+            get
+            {
+                return _Address;
+            }
+
+            set
+            {
+                _Address = (value);
+            }
+        }
+
+        private string _Name = default(string);
+        public string Name
+        {
+            get
+            {
+                return _Name;
+            }
+
+            set
+            {
+                _Name = (value);
+            }
+        }
+        private bool _Connected = default(bool);
+        public bool Connected
+        {
+            get
+            {
+                return _Connected;
+            }
+
+            set
+            {
+                _Connected = (value);
+            }
+        }
+    }
+
 
     [Dictionary]
     public class GattService1Properties
