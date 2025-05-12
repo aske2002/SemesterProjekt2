@@ -1,43 +1,35 @@
-using System.Diagnostics;
-using System.Threading.Tasks;
 using client.Models;
-using client.Services.Bluetooth.Advertisements;
 using client.Services.Bluetooth.Core;
 using client.Services.Bluetooth.Gatt;
-using client.Services.Bluetooth.Gatt.BlueZModel;
 using client.Services.Bluetooth.Gatt.Description;
 using client.Services.Bluetooth.Models;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using shared.Messages;
+using shared.Models;
 using shared.Models.Vibrations;
 
 namespace client.Services.Bluetooth
 {
-    public static class BluetoothIdentifiers
+    public static class BluetoothFlags
     {
-        // UUIDs for the Advertisement
-        public const string AdvertisementType = "peripheral";
-        public const string AdvertisementName = "Tremorur";
-
-        // UUIDs for the Vibration Service and its characteristics
-        public const string VibrationServiceUUID = "12345678-0000-1000-8000-00805F9B34FB";
-
-        // UUIDs for motor control characteristic Pattern
-        public const string VibrationPatternCharacteristicUUID = "12345678-0001-1000-8000-00805F9B34FB";
         public const CharacteristicFlags VibrationPatternFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
-
-        // UUIDs for motor status characteristic on/off
-        public const string VibrationEnabledCharacteristicUUID = "12345678-0003-1000-8000-00805F9B34FB";
         public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
+        public const CharacteristicFlags ButtonStateFlags = CharacteristicFlags.Notify | CharacteristicFlags.Read;
     }
 
-    public class BluetoothService : IHostedService, IRecipient<VibrationsDidToggleEvent>, IRecipient<VibrationSettingsChangedEvent>
+    public class BluetoothService : IHostedService, IRecipient<VibrationsDidToggleEvent>, IRecipient<VibrationSettingsChangedEvent>, IRecipient<ButtonStateChangedMessage>
     {
-        private readonly List<Tuple<string, CharacteristicFlags>> _characteristics = new()
+        private readonly Dictionary<string, Dictionary<string, CharacteristicFlags>> _services = new()
         {
-            new Tuple<string, CharacteristicFlags>(BluetoothIdentifiers.VibrationPatternCharacteristicUUID, BluetoothIdentifiers.VibrationPatternFlags),
-            new Tuple<string, CharacteristicFlags>(BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, BluetoothIdentifiers.VibrationEnabledFlags),
+            {BluetoothIdentifiers.ButtonServiceUUID, BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.ToDictionary(x => x.Key, x => BluetoothFlags.ButtonStateFlags)},
+            {BluetoothIdentifiers.VibrationServiceUUID, new Dictionary<string, CharacteristicFlags>
+                {
+                    {BluetoothIdentifiers.VibrationPatternCharacteristicUUID, BluetoothFlags.VibrationPatternFlags},
+                    {BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, BluetoothFlags.VibrationEnabledFlags}
+                }
+            }
         };
         private readonly ServerContext serverContext;
         private readonly GattApplicationManager app;
@@ -49,27 +41,32 @@ namespace client.Services.Bluetooth
             this.messenger = messenger;
             messenger.RegisterAll(this);
             serverContext = new ServerContext();
-            app = new GattApplicationManager(serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.AdvertisementType);
+            app = new GattApplicationManager(serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.VibrationServiceUUID, BluetoothIdentifiers.AdvertisementType);
         }
 
         private void registerGattApplication()
         {
-            var vibrationServiceDescription = new GattServiceDescription
+            for (var i = 0; i < _services.Count; i++)
             {
-                UUID = BluetoothIdentifiers.VibrationServiceUUID,
-                Primary = true
-            };
-            var sb = app.Builder.AddService(vibrationServiceDescription);
-
-            foreach (var characteristic in _characteristics)
-            {
-                var gattCharacteristicDescription = new GattCharacteristicDescription
+                var service = _services.ElementAt(i);
+                logger.LogInformation($"Registering service {i + 1}/{_services.Count}: {service.Key}");
+                var serviceDescription = new GattServiceDescription
                 {
-                    UUID = characteristic.Item1,
-                    Flags = characteristic.Item2,
+                    UUID = service.Key,
+                    Primary = true,
                 };
+                var sb = app.Builder.AddService(serviceDescription);
+                foreach (var characteristic in service.Value)
+                {
+                    logger.LogInformation($" - Registering characteristic {characteristic.Key} with flags {characteristic.Value}");
+                    var gattCharacteristicDescription = new GattCharacteristicDescription
+                    {
+                        UUID = characteristic.Key,
+                        Flags = characteristic.Value,
+                    };
 
-                sb.WithCharacteristic(gattCharacteristicDescription, []);
+                    sb.WithCharacteristic(gattCharacteristicDescription, []);
+                }
             }
         }
 
@@ -79,12 +76,12 @@ namespace client.Services.Bluetooth
             {
                 logger.LogInformation("Vibration settings set");
                 logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
-                
+
                 var settings = await VibrationSettings.FromBytes(args.Value.Data);
                 await messenger.Send(new SetVibrationSettingsMessage(settings));
                 return MessageResponse.Success();
             }
-            catch
+            catch (Exception ex)
             {
                 logger.LogError(ex, "Failed to parse vibration settings");
                 logger.LogError($"Data: {BitConverter.ToString(args.Value.Data)}");
@@ -112,6 +109,30 @@ namespace client.Services.Bluetooth
             }
         }
 
+        // public async Task<MessageResponse?> ButtonStateChanged(AsyncRequestProxy<CharChangeData, MessageResponse> args)
+        // {
+        //     try
+        //     {
+        //         logger.LogInformation("Button state changed");
+        //         logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
+
+        //         if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(args.Value.CharacteristicId, out var button))
+        //         {
+        //             logger.LogError("Failed to parse button state");
+        //             return MessageResponse.Failure("Failed to parse button state");
+        //         }
+
+        //         var state = args.Value.Data[0] == 1 ? ButtonState.Depressed : ButtonState.Pressed;
+        //         await messenger.Send(new ButtonStateChangedMessage(button, state));
+        //         return MessageResponse.Success();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         logger.LogError(ex, "Failed to parse button state");
+        //         return MessageResponse.Failure("Failed to parse button state");
+        //     }
+        // }
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             registerGattApplication();
@@ -124,11 +145,11 @@ namespace client.Services.Bluetooth
             await app.RunAsync();
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
+            await app.DisposeAsync();
             serverContext.Dispose();
             messenger.UnregisterAll(this);
-            return Task.CompletedTask;
         }
 
         public async void Receive(VibrationSettingsChangedEvent message)
@@ -139,6 +160,17 @@ namespace client.Services.Bluetooth
         public async void Receive(VibrationsDidToggleEvent message)
         {
             await app.WriteValueAsync(BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, [Convert.ToByte(message.Value)]);
+        }
+
+        public async void Receive(ButtonStateChangedMessage message)
+        {
+            var uuid = BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.FirstOrDefault(x => x.Value == message.Value.Button).Key;
+            if (uuid == null)
+            {
+                logger.LogError("Failed to parse button state");
+                return;
+            }
+            await app.WriteValueAsync(uuid, message.Value.ToBytes());
         }
     }
 }
