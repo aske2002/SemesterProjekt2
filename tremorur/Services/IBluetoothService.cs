@@ -11,5 +11,6 @@ public interface IBluetoothService
     bool IsScanning { get; }
     public Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral device);
     void StartDiscovery();
+    void StartDiscovery(string serviceUUID);
     void StopDiscovery();
 }

@@ -31,5 +31,6 @@ public partial class BluetoothService : IBluetoothService
     public partial bool IsScanning { get; } // Defined per platform
     public partial Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral);
     public partial void StartDiscovery(); // Defined per platform
+    public partial void StartDiscovery(string serviceUuid); // Defined per platform
     public partial void StopDiscovery(); // Defined per platform
 }
