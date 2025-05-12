@@ -7,7 +7,7 @@ using tremorur.Models.Bluetooth;
 namespace tremorur.Services;
 public partial class BluetoothService : IBluetoothService
 {
-    private readonly ILogger<BluetoothService> _logger;
+    internal readonly ILogger<BluetoothService> _logger;
     private Dictionary<string, TaskCompletionSource<BluetoothPeripheral>?> connectTasks = new();
     CBCentralManager centralManager;
     public BluetoothService(IMessenger messenger, ILogger<BluetoothService> logger)
@@ -49,7 +49,11 @@ public partial class BluetoothService : IBluetoothService
         {
             _logger.Log(LogLevel.Information, "Bluetooth is powered on.");
             _messenger.SendMessage(new BluetoothStateUpdated(BluetoothState.Available));
-            if (shouldScan)
+            if (shouldScan != null && shouldScan.Length > 0)
+            {
+                StartDiscovery(shouldScan[0]);
+            }
+            else if (shouldScan != null)
             {
                 StartDiscovery();
             }
@@ -107,8 +111,9 @@ public partial class BluetoothService : IBluetoothService
             _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
             return;
         }
-        shouldScan = true;
+        shouldScan = [];
         centralManager.ScanForPeripherals(peripheralUuids: []);
+        _logger.Log(LogLevel.Information, "Bluetooth scan started.");
     }
 
     public partial void StartDiscovery(string serviceUuid)
@@ -118,8 +123,9 @@ public partial class BluetoothService : IBluetoothService
             _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
             return;
         }
-        shouldScan = true;
+        shouldScan = [serviceUuid];
         centralManager.ScanForPeripherals(serviceUuid: CBUUID.FromString(serviceUuid), options: null);
+        _logger.Log(LogLevel.Information, "Bluetooth scan started for service UUID: " + serviceUuid);
     }
 
     public partial void StopDiscovery()
@@ -129,7 +135,7 @@ public partial class BluetoothService : IBluetoothService
             _logger.Log(LogLevel.Information, "Bluetooth scan is not in progress.");
             return;
         }
-        shouldScan = false;
+        shouldScan = null;
         centralManager.StopScan();
     }
 
