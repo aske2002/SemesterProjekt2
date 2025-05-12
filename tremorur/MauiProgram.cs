@@ -22,11 +22,11 @@ namespace tremorur
                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                        fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                    });
-            builder.Services.AddSingleton<IBluetoothService,BluetoothService>();
+            builder.Services.AddSingleton<IBluetoothService, BluetoothService>();
+            builder.Services.AddSingleton<IBluetoothStateManager, BluetoothStateManager>();
             builder.Services.AddSingleton<IButtonService, ButtonService>();
             builder.Services.AddSingleton<VibrationsService>();
-        
-            
+
             builder.Services.AddTransient<AlarmService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
@@ -34,7 +34,7 @@ namespace tremorur
             builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<INavigationService, NavigationService>(); //bruges til at navigere rundt med. Har en goto, hvordan vi navigerer rundt mellem mapperne. 
 
-            builder.Services.AddSingleton<HomeViewModel>(); 
+            builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<HomePage>();
 
             builder.Services.AddTransient<MedicationAlarmViewModel>();
