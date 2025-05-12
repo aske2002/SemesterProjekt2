@@ -10,7 +10,8 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
 
     public readonly CBPeripheral NativePeripheral;
     private TaskCompletionSource<float?>? _rssiTaskCompletionSource;
-    public BluetoothPeripheral(CBPeripheral cBPeripheral) : base()
+    private readonly BluetoothService _bluetoothService;
+    public BluetoothPeripheral(CBPeripheral cBPeripheral, BluetoothService bluetoothService) : base()
     {
         NativePeripheral = cBPeripheral;
         NativePeripheral.DiscoveredService += DiscoveredService;
@@ -18,6 +19,16 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
 
         NativePeripheral.DiscoverServices();
         NativePeripheral.ReadRSSI();
+        _bluetoothService = bluetoothService;
+        _bluetoothService.DisconnectedPeripheral += DisconnectedPeripheral;
+    }
+
+    public void DisconnectedPeripheral(object? sender, string identifier)
+    {
+        if (identifier == UUID)
+        {
+            Disconnected?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     void DiscoveredService(object? sender, NSErrorEventArgs e)
@@ -47,7 +58,8 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
     private ObservableCollection<IBluetoothPeripheralService> services = new ObservableCollection<IBluetoothPeripheralService>();
     public partial ObservableCollection<IBluetoothPeripheralService> Services => services;
 
-    public partial string UUID => NativePeripheral.Identifier.AsString();
+    public partial bool IsConnected => NativePeripheral.State == CBPeripheralState.Connected;
+
     public partial async Task<float?> GetSsriAsync()
     {
         if (_rssiTaskCompletionSource != null)

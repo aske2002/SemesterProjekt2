@@ -10,5 +10,6 @@ public interface IBluetoothPeripheral
     string UUID { get; }
     float? RSSI { get; }
     string? Name { get; }
+    event EventHandler Disconnected;
     Task<float?> GetSsriAsync();
 }
