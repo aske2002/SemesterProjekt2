@@ -1,36 +1,73 @@
 using System.Diagnostics;
 using CommunityToolkit.WinUI.Connectivity;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Devices.Enumeration;
 
 namespace tremorur.Models.Bluetooth;
 public partial class DiscoveredPeripheral
 {
-    public ObservableBluetoothLEDevice NativePeripheral { get; private set; }
-    public partial float RSSI => NativePeripheral.RSSI;
+    public BluetoothLEAdvertisementReceivedEventArgs AdvertisementData { get; private set; }
+    public partial float RSSI => AdvertisementData.RawSignalStrengthInDBm;
 
-    public DiscoveredPeripheral(ObservableBluetoothLEDevice device)
+    public DiscoveredPeripheral(BluetoothLEAdvertisementReceivedEventArgs advertisementData)
     {
-        NativePeripheral = device;
+        AdvertisementData = advertisementData;
     }
-    public partial bool IsConnectable => NativePeripheral.DeviceInfo.Pairing.CanPair;
+    public partial bool IsConnectable => AdvertisementData.IsConnectable;
 
-    public partial List<string> Services => NativePeripheral.Services
-        .Select(service => service.UUID)
+    public partial List<string> Services => AdvertisementData.Advertisement.ServiceUuids
+        .Select(uuid => uuid.ToString().ToUpper())
         .ToList();
 
-    public partial string? LocalName => NativePeripheral.DeviceInfo.Name;
-    public partial string? Name => NativePeripheral.Name;
-    public partial string UUID => NativePeripheral.DeviceInfo.Id.ToUpper();
+    public partial string? LocalName => AdvertisementData.Advertisement.LocalName;
+    public partial string? Name => AdvertisementData.BluetoothAddress.ToString();
+    public partial string UUID => AdvertisementData.BluetoothAddress.ToString().ToUpper();
     public partial async Task<IBluetoothPeripheral> ConnectAsync()
     {
-        await NativePeripheral.ConnectAsync();
-        if (NativePeripheral.IsConnected)
+        string aqsFilter = BluetoothLEDevice.GetDeviceSelectorFromBluetoothAddress(AdvertisementData.BluetoothAddress);
+        var devices = await DeviceInformation.FindAllAsync(aqsFilter);
+        var deviceInfo = devices.FirstOrDefault();
+
+        if (deviceInfo == null)
         {
-            return new BluetoothPeripheral(NativePeripheral);
+            throw new Exception("Failed to get device information");
         }
-        else
+
+        var nativeDevice = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id);
+
+
+        if (!nativeDevice.DeviceInformation.Pairing.IsPaired)
         {
-            throw new Exception("Failed to connect to peripheral");
+            var customPairing = nativeDevice.DeviceInformation.Pairing.Custom;
+            customPairing.PairingRequested += (sender, args) =>
+            {
+                args.Accept(); // or use args.Accept(pin) if required
+            };
+            var pairingResult = await customPairing.PairAsync(DevicePairingKinds.ConfirmOnly, DevicePairingProtectionLevel.Default);
+
+            if (pairingResult.Status != DevicePairingResultStatus.Paired)
+            {
+                throw new Exception("Failed to pair with device");
+            }
         }
+        // Get all the services for this device
+        var getGattServicesAsyncTokenSource = new CancellationTokenSource(15000);
+        var getGattServicesAsyncTask = await
+            Task.Run(
+                () => nativeDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached),
+                getGattServicesAsyncTokenSource.Token);
+
+        var result = await getGattServicesAsyncTask;
+
+        if (result.Status != GattCommunicationStatus.Success)
+        {
+            throw new Exception("Failed to get GATT services");
+        }
+
+        var peripheral = new BluetoothPeripheral(nativeDevice, AdvertisementData);
+        return peripheral;
+
     }
 }

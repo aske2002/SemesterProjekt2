@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using CommunityToolkit.Maui.Alerts;
 using Microsoft.Extensions.Logging;
 using shared.Models.Vibrations;
 using tremorur.Messages;
@@ -37,11 +38,11 @@ namespace tremorur.Views
         }
         protected async override void OnOKButtonHeld(object? sender, int ms, Action didHandle)
         {
-            if(ms>3000) //hvis ok-knappen holdes nede i 3 sekunder 
+            if (ms > 3000) //hvis ok-knappen holdes nede i 3 sekunder 
             {
                 didHandle();
                 await vibrationsService.StartStopVibration(); //starter vibrationer
-                if(BindingContext is HomeViewModel vm)
+                if (BindingContext is HomeViewModel vm)
                 {
                     vm.Level = vm.Level == 0 ? 1 : 0;
                 }
@@ -49,17 +50,31 @@ namespace tremorur.Views
         }
         protected override async void OnUpButtonClicked(object? sender, EventArgs e)
         {
-            if (BindingContext is HomeViewModel vm && vm.Level>=1&&vm.Level<7)
-                vm.Level++;
-
-            await vibrationsService.NavigateLevelUp();
+            try
+            {
+                await vibrationsService.NavigateLevelUp();
+                if (BindingContext is HomeViewModel vm && vm.Level >= 1 && vm.Level < 7)
+                    vm.Level++;
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, "Error navigating up: " + ex.Message);
+                Shell.Current.DisplayAlert("Error", "Error navigating up: " + ex.Message, "OK");
+            }
         }
         protected override async void OnDownButtonClicked(object? sender, EventArgs e)
         {
-            if (BindingContext is HomeViewModel vm && vm.Level > 1)
-                vm.Level--;
-
-            await vibrationsService.NavigateLevelDown();
+            try
+            {
+                await vibrationsService.NavigateLevelDown();
+                if (BindingContext is HomeViewModel vm && vm.Level > 1)
+                    vm.Level--;
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, "Error navigating down: " + ex.Message);
+                Shell.Current.DisplayAlert("Error", "Error navigating down: " + ex.Message, "OK");
+            }
         }
         protected async override void OnUpButtonHeld(object? sender, int ms, Action didHandle)
         {

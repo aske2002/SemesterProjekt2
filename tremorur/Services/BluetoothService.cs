@@ -8,7 +8,7 @@ namespace tremorur.Services;
 public partial class BluetoothService : IBluetoothService
 {
     internal readonly IMessenger _messenger;
-    internal string[]? shouldScan = null; //UUIDs to scan for, empty for all
+    internal string[]? ScanForUUIDs = null; //UUIDs to scan for, empty for all
     public ObservableCollection<IDiscoveredPeripheral> DiscoveredPeripherals { get; } = new ObservableCollection<IDiscoveredPeripheral>();
     internal void AddDiscoveredPeripheral(DiscoveredPeripheral discoveredPeripheral)
     {
@@ -36,7 +36,26 @@ public partial class BluetoothService : IBluetoothService
     public event EventHandler<IDiscoveredPeripheral> DiscoveredPeripheral = delegate { };
     public partial bool IsScanning { get; } // Defined per platform
     public partial Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral discoveredPeripheral);
-    public partial void StartDiscovery(); // Defined per platform
-    public partial void StartDiscovery(string serviceUuid); // Defined per platform
-    public partial void StopDiscovery(); // Defined per platform
+
+
+    public void StartDiscovery()
+    {
+        ScanForUUIDs = [];
+        startInternalDiscovery();
+    }
+
+    public void StartDiscovery(string serviceUuid)
+    {
+        ScanForUUIDs = [serviceUuid];
+        startInternalDiscovery();
+    }
+
+    public void StopDiscovery()
+    {
+        ScanForUUIDs = null;
+        stopInternalDiscovery();
+    }
+
+    internal partial void startInternalDiscovery(); // Defined per platform
+    internal partial void stopInternalDiscovery(); // Defined per platform
 }

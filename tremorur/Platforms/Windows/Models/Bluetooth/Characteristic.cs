@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Storage.Streams;
@@ -46,7 +48,12 @@ public partial class BluetoothPeripheralCharacteristic
     private void Characteristic_UpdatedValue(object? sender, GattValueChangedEventArgs e)
     {
         var data = e.CharacteristicValue.ToArray();
-        lastValue = data;
+        
+        if (data.Length == 0)
+        {
+            return;
+        }
+
         foreach (var action in notifyActions)
         {
             action?.Invoke(data);
@@ -63,12 +70,12 @@ public partial class BluetoothPeripheralCharacteristic
         {
             throw new InvalidOperationException("Characteristic does not support notifications.");
         }
-        var result = await nativeCharacteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(value ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None);
+        var result = await nativeCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(value ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None);
 
 
-        if (result?.Status != null && result.Status != GattCommunicationStatus.Success)
+        if (result != GattCommunicationStatus.Success)
         {
-            throw new Exception($"Failed to set notification: {result.Status} {result.ProtocolError}");
+            throw new Exception($"Failed to set notification: {result}");
         }
 
         await readDescriptors();

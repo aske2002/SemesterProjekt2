@@ -4,50 +4,51 @@ using CommunityToolkit.WinUI.Connectivity;
 using Microsoft.Extensions.Logging;
 using tremorur.Messages;
 using tremorur.Models.Bluetooth;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Enumeration;
 
 namespace tremorur.Services;
 public partial class BluetoothService
 {
+    private readonly string[] RequestedProperties =
+            {
+                "System.Devices.Aep.Category",
+                "System.Devices.Aep.ContainerId",
+                "System.Devices.Aep.DeviceAddress",
+                "System.Devices.Aep.IsConnected",
+                "System.Devices.Aep.IsPaired",
+                "System.Devices.Aep.IsPresent",
+                "System.Devices.Aep.ProtocolId",
+                "System.Devices.Aep.Bluetooth.Le.IsConnectable",
+                "System.Devices.Aep.SignalStrength"
+            };
     private readonly ILogger<BluetoothService> _logger;
-    BluetoothLEHelper bluetoothLEHelper = BluetoothLEHelper.Context;
+    BluetoothLEAdvertisementWatcher advertisementWatcher;
+
     public BluetoothService(IMessenger messenger, ILogger<BluetoothService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
         //Observable collection
-        bluetoothLEHelper.BluetoothLeDevices.CollectionChanged += DiscoveredDevicesChanged;
+
+        advertisementWatcher = new BluetoothLEAdvertisementWatcher();
+        advertisementWatcher.Received += AdvertisementWatcher_Received;
     }
 
     public partial bool IsScanning =>
-        bluetoothLEHelper.IsEnumerating;
+        advertisementWatcher.Status == BluetoothLEAdvertisementWatcherStatus.Started;
 
-    private void DiscoveredDevicesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void AdvertisementWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
     {
-        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
+        if (ScanForUUIDs != null && ScanForUUIDs.Count() > 0)
         {
-            foreach (var item in e.NewItems)
+            if (ScanForUUIDs.All(uuid => args.Advertisement.ServiceUuids.Any(s => s.ToString().ToUpper() == uuid.ToUpper())))
             {
-                if (item is ObservableBluetoothLEDevice discoveredPeripheral)
-                {
-                    AddDiscoveredPeripheral(new DiscoveredPeripheral(discoveredPeripheral));
-                }
+                AddDiscoveredPeripheral(new DiscoveredPeripheral(args));
             }
         }
-        else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems != null)
-        {
-            foreach (var item in e.OldItems)
-            {
-                if (item is ObservableBluetoothLEDevice discoveredPeripheral)
-                {
-                    var peripheral = DiscoveredPeripherals.OfType<DiscoveredPeripheral>()
-                        .FirstOrDefault(p => p.UUID.ToString() == discoveredPeripheral.DeviceInfo.Id);
-                    if (peripheral != null)
-                    {
-                        RemoveDiscoveredPeripheral(peripheral);
-                    }
-                }
-            }
-        }
+
     }
 
     public partial async Task<IBluetoothPeripheral> ConnectPeripheralAsync(IDiscoveredPeripheral device)
@@ -57,42 +58,30 @@ public partial class BluetoothService
             throw new ArgumentException("Invalid device type", nameof(device));
         }
 
-        var nativeDevice = discoveredPeripheral.NativePeripheral;
-        await nativeDevice.ConnectAsync();
-        return new BluetoothPeripheral(nativeDevice);
+        return await discoveredPeripheral.ConnectAsync();
     }
 
-    public partial void StartDiscovery()
+    internal partial void startInternalDiscovery()
     {
         if (IsScanning)
         {
             _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
             return;
         }
-        shouldScan = true;
-        bluetoothLEHelper.StartEnumeration();
+        advertisementWatcher.Start();
+
+        _logger.Log(LogLevel.Information, "Bluetooth scan started.");
     }
 
-    public partial void StartDiscovery(string serviceUuid)
-    {
-        if (IsScanning)
-        {
-            _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
-            return;
-        }
-        shouldScan = [serviceUuid];
-        bluetoothLEHelper.StartEnumeration();
-    }
-
-    public partial void StopDiscovery()
+    internal partial void stopInternalDiscovery()
     {
         if (!IsScanning)
         {
             _logger.Log(LogLevel.Information, "Bluetooth scan is not in progress.");
             return;
         }
-        shouldScan = null;
-        bluetoothLEHelper.StopEnumeration();
+        advertisementWatcher.Stop();
+        _logger.Log(LogLevel.Information, "Bluetooth scan stopped.");
     }
 
 }

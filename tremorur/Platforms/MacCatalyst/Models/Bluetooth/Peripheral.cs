@@ -91,7 +91,7 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
         throw new NotImplementedException();
     }
 
-    partial BluetoothPeripheralState State
+    public partial BluetoothPeripheralState State
     {
         get
         {

@@ -49,13 +49,9 @@ public partial class BluetoothService : IBluetoothService
         {
             _logger.Log(LogLevel.Information, "Bluetooth is powered on.");
             _messenger.SendMessage(new BluetoothStateUpdated(BluetoothState.Available));
-            if (shouldScan != null && shouldScan.Length > 0)
+            if (shouldScan != null)
             {
-                StartDiscovery(shouldScan[0]);
-            }
-            else if (shouldScan != null)
-            {
-                StartDiscovery();
+                startInternalDiscovery();
             }
         }
         else
@@ -104,31 +100,26 @@ public partial class BluetoothService : IBluetoothService
         return await taskSource.Task;
     }
 
-    public partial void StartDiscovery()
+    internal partial void startInternalDiscovery(string serviceUuid)
     {
         if (IsScanning)
         {
             _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
-            return;
+            stopInternalDiscovery();
         }
-        shouldScan = [];
-        centralManager.ScanForPeripherals(peripheralUuids: []);
-        _logger.Log(LogLevel.Information, "Bluetooth scan started.");
-    }
 
-    public partial void StartDiscovery(string serviceUuid)
-    {
-        if (IsScanning)
+        if (ShouldScan != null && ShouldScan.Length > 0)
         {
-            _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
-            return;
+            centralManager.ScanForPeripherals(shouldScan.Select(x => CBUUID.FromString(x)).ToArray(), options: null);
+            _logger.Log(LogLevel.Information, "Bluetooth scan started for service UUIDs: " + string.Join(", ", shouldScan));
+        } else 
+        {
+            centralManager.ScanForPeripherals(peripheralUuids: []);
+            _logger.Log(LogLevel.Information, "Bluetooth scan started.");
         }
-        shouldScan = [serviceUuid];
-        centralManager.ScanForPeripherals(serviceUuid: CBUUID.FromString(serviceUuid), options: null);
-        _logger.Log(LogLevel.Information, "Bluetooth scan started for service UUID: " + serviceUuid);
     }
 
-    public partial void StopDiscovery()
+    internal partial void stopInternalDiscovery()
     {
         if (!IsScanning)
         {

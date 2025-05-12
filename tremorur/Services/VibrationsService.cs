@@ -16,7 +16,7 @@ namespace tremorur.Services
         {
             _bluetoothStateManager = bluetoothStateManager;
         }
-    
+
         public async Task StartStopVibration()
         {
             if (_onOffChar == null)//hvis bluetooth ikke er forbundet stopper metoden
@@ -25,7 +25,7 @@ namespace tremorur.Services
             }
 
             var currentValue = await _onOffChar.ReadValueAsync(); //læser fra RPi om vibration er tændt
-            var vibrationRunning = currentValue[0] == 1;//checker om vibration er tændt
+            var vibrationRunning = currentValue.FirstOrDefault() == 1; //hvis vibration er tændt [1] så er vibrationRunning true, ellers false
 
             if (!vibrationRunning)
             {
