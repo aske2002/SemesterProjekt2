@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
@@ -16,7 +16,7 @@ namespace client.Services.Bluetooth.Gatt
 {
     public record CharacteristicCallback(GattCharacteristic Characteristic, byte[] Value);
     public record AdvertisementConfig(string LocalName, string Type = "peripheral");
-    public class GattApplicationManager
+    public class GattApplicationManager : IAsyncDisposable
     {
         private readonly ServerContext _serverContext;
         private readonly AdvertisingManager advertisingManager;
@@ -141,6 +141,16 @@ namespace client.Services.Bluetooth.Gatt
             var gattDescriptor1Properties = GattPropertiesFactory.CreateGattDescriptor(descriptor);
             var gattDescriptor = gattCharacteristic.AddDescriptor(gattDescriptor1Properties);
             await _serverContext.Connection.RegisterObjectAsync(gattDescriptor);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await advertisingManager.DisposeAsync();
+            await UnregisterApplicationInBluez(ApplicationObjectPath);
+            foreach (var service in Services)
+            {
+                await _serverContext.Connection.UnregisterServiceAsync(service.ObjectPath.ToString());
+            }
         }
     }
 }
