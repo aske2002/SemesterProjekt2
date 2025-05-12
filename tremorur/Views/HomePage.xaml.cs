@@ -1,17 +1,16 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using shared.Models.Vibrations;
+using tremorur.Messages;
 
 namespace tremorur.Views
 {
     public partial class HomePage : ContentPageWithButtons
     {
         private readonly ILogger _logger;
-        private readonly IButtonService _buttonService;
-        private readonly Services.IMessenger _messenger;
         private readonly INavigationService navigationService;
         private readonly VibrationsService vibrationsService;
-        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, Services.IMessenger messenger, INavigationService navigationService, VibrationsService vibrationsService) : base(buttonService)
+        public HomePage(HomeViewModel viewModel, ILogger<HomePage> logger, IButtonService buttonService, INavigationService navigationService, VibrationsService vibrationsService) : base(buttonService)
         {
             _logger = logger;
             _logger.Log(LogLevel.Information, "Initializing homepage");
@@ -21,6 +20,8 @@ namespace tremorur.Views
             StartClock();
             this.vibrationsService = vibrationsService;
         }
+
+
         async void StartClock()
         {
             while (true)
@@ -46,14 +47,14 @@ namespace tremorur.Views
                 }
             }
         }
-        protected override async void OnUpButtonClicked(object sender, EventArgs e)
+        protected override async void OnUpButtonClicked(object? sender, EventArgs e)
         {
             if (BindingContext is HomeViewModel vm && vm.Level>=1&&vm.Level<7)
                 vm.Level++;
 
             await vibrationsService.NavigateLevelUp();
         }
-        protected override async void OnDownButtonClicked(object sender, EventArgs e)
+        protected override async void OnDownButtonClicked(object? sender, EventArgs e)
         {
             if (BindingContext is HomeViewModel vm && vm.Level > 1)
                 vm.Level--;
