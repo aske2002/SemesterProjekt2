@@ -1,3 +1,4 @@
+using System.Globalization;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
@@ -9,6 +10,9 @@ namespace tremorur
     {
         public static MauiApp CreateMauiApp() //sker inden programmet starter op
         {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
             var builder = MauiApp.CreateBuilder();
             builder.UseMauiCommunityToolkit();
             builder.UseMauiApp<App>()
