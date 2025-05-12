@@ -7,12 +7,15 @@
       "isBackground": true,
       "command": "ssh",
       "args": [
-        "aske1131@raspberrypi",
+        "aske1131@raspberrypi.local",
         "/home/aske1131/.dotnet/dotnet /home/aske1131/tremorur/client.dll --environment Development"
       ],
       "problemMatcher": {
         "owner": "dotnet",
-        "fileLocation": ["relative", "${workspaceFolder}"],
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
         "pattern": [
           {
             "regexp": "^\\s*\\[\\d+\\]\\s*(.*)\\s*:\\s*(.*)\\s*:\\s*(.*)$",
@@ -27,14 +30,31 @@
           "endsPattern": "==Application started=="
         }
       },
-      "dependsOn": ["publish", "copy", "stop"],
+      "dependsOn": [
+        "publish",
+        "copy",
+        "stop"
+      ],
       "dependsOrder": "sequence"
+    },
+    {
+      "label": "deploy",
+      "type": "shell",
+      "dependsOn": [
+        "publish",
+        "copy"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
     },
     {
       "label": "stop",
       "type": "shell",
       "command": "ssh",
-      "args": ["aske1131@raspberrypi", "bash -c \"pkill dotnet || true\""],
+      "args": [
+        "aske1131@raspberrypi.local",
+        "bash -c \"pkill dotnet || true\""
+      ],
       "problemMatcher": [],
       "detail": "Stop the running application on the PI"
     },
@@ -47,10 +67,12 @@
       "args": [
         "-r",
         "publish/*",
-        "aske1131@raspberrypi:/home/aske1131/tremorur/"
+        "aske1131@raspberrypi.local:/home/aske1131/tremorur/"
       ],
       "problemMatcher": [],
-      "dependsOn": ["delete"],
+      "dependsOn": [
+        "delete"
+      ],
       "label": "copy",
       "detail": "Copy the published files to the PI"
     },
@@ -59,7 +81,7 @@
       "type": "shell",
       "command": "ssh",
       "args": [
-        "aske1131@raspberrypi",
+        "aske1131@raspberrypi.local",
         "bash -c \"rm -rf /home/aske1131/tremorur/*\""
       ],
       "problemMatcher": [],
@@ -67,7 +89,13 @@
     },
     {
       "command": "dotnet",
-      "args": ["publish", "-c", "Release", "-o", "publish"],
+      "args": [
+        "publish",
+        "-c",
+        "Release",
+        "-o",
+        "publish"
+      ],
       "problemMatcher": "$msCompile",
       "label": "publish",
       "detail": "Publish the project to the publish directory"
