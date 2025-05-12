@@ -55,8 +55,19 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
     private void TimerTicked(object? state)
     {
         var intensity = Pattern.GetCurrentIntensity(stopwatch.Elapsed.TotalMilliseconds);
-        pwmChannel.DutyCycle = intensity.AsDutyCycle(HardwareConstants.VIBRATION_PWM_MIN_DUTY_CYCLE, HardwareConstants.VIBRATION_PWM_MAX_DUTY_CYCLE);
+        var dutyCycle = intensity.AsDutyCycle(HardwareConstants.VIBRATION_PWM_MIN_DUTY_CYCLE, HardwareConstants.VIBRATION_PWM_MAX_DUTY_CYCLE);
         _logger.LogInformation("Vibration intensity: {Intensity} (Duty Cycle: {DutyCycle})", intensity, dutyCycle);
+        pwmChannel.DutyCycle = Math.Max(0.0, Math.Min(1.0, dutyCycle));
+
+        try
+        {
+            pwmChannel.Start();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error starting PWM channel");
+            return;
+        }
     }
 
     private void ClearInterval()
@@ -83,6 +94,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
         {
             _logger.LogInformation("Vibration enabled");
             StartInterval(Pattern.Resolution);
+            pwmChannel.Start();
         }
         else
         {
