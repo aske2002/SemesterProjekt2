@@ -1,5 +1,9 @@
 
+using Microsoft.Extensions.Logging;
+using shared.Messages;
+using shared.Models;
 using tremorur.Messages;
+using tremorur.Models.Bluetooth;
 
 public interface IButtonService
 {
@@ -22,11 +26,85 @@ public class ButtonService : IButtonService
     private const int HoldDelayCheckInterval = 100;
 
     private readonly tremorur.Services.IMessenger _messenger;
-    public ButtonService(tremorur.Services.IMessenger messenger)
+    private readonly ILogger<ButtonService> _logger;
+    public ButtonService(tremorur.Services.IMessenger messenger, ILogger<ButtonService> logger)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
         _messenger.On<ButtonPressedMessage>(Button_Pressed);
         _messenger.On<ButtonReleasedMessage>(Button_Released);
+        _messenger.On<DeviceConnected>(RegisterBluetoothHandlers);
+    }
+
+    private void RegisterBluetoothHandlers(DeviceConnected e)
+    {
+        e.Peripheral.Services.CollectionChanged += (sender, args) =>
+        {
+            if (args.NewItems == null)
+                return;
+
+            foreach (IBluetoothPeripheralService service in args.NewItems)
+            {
+                Service_Found(service);
+            }
+        };
+
+        foreach (var characteristic in e.Peripheral.Services)
+        {
+            Service_Found(characteristic);
+        }
+    }
+
+    private async void Service_Found(IBluetoothPeripheralService service)
+    {
+        // "A1B2C3D4-1000-4000-8000-ABCDEF123456"
+        if (service == null || service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
+            return;
+
+        service.Characteristics.CollectionChanged += (sender, args) =>
+        {
+            if (args.NewItems == null) 
+                return;
+
+            foreach (IBluetoothPeripheralCharacteristic characteristic in args.NewItems)
+            {
+                Characteristic_Found(characteristic);
+            }
+        };
+
+        foreach (var characteristic in service.Characteristics)
+        {
+            Characteristic_Found(characteristic);
+        }
+    }
+
+    private async void Characteristic_Found(IBluetoothPeripheralCharacteristic characteristic)
+    {
+        if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(characteristic.UUID, out var buttonType))
+            return;
+
+        characteristic.ValueUpdated += (sender, value) => Characteristic_ValueUpdated(buttonType, value);
+        await characteristic.SetNotifyingAsync(true);
+    }
+
+    private void Characteristic_ValueUpdated(WatchButton sender, byte[] data)
+    {
+
+        if (!ButtonStateChanged.TryParse(data, out var e))
+            return;
+
+        _logger.LogInformation($"Button {sender} state changed to {e?.State}");
+        switch (e?.State)
+        {
+            case ButtonState.Pressed:
+                _messenger.SendMessage(new ButtonPressedMessage(sender));
+                break;
+            case ButtonState.Depressed:
+                _messenger.SendMessage(new ButtonReleasedMessage(sender));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public void Hold_Handled(WatchButton btn)
