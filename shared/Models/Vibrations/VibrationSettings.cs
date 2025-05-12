@@ -32,10 +32,22 @@ public record VibrationSettings
     /// <returns>VibrationSettings object</returns>
     public static VibrationSettings CreateSinePatternSettings(double frequency)
     {
+        var t = Expression.Parameter(typeof(double), "t");
+        var freqConst = Expression.Constant(2 * Math.PI * frequency);
+        var divisor = Expression.Constant(1000.0);
+        var half = Expression.Constant(0.5);
+
+        var timeDiv = Expression.Divide(t, divisor);
+        var angle = Expression.Multiply(freqConst, timeDiv);
+        var sin = Expression.Call(typeof(Math).GetMethod("Sin", [typeof(double)]), angle);
+        var scaled = Expression.Add(Expression.Multiply(sin, half), half);
+
+        var expr = Expression.Lambda<Func<double, double>>(scaled, t);
+
         return new VibrationSettings
         {
             Id = Guid.NewGuid(),
-            Pattern = new VibrationPatternExpression((t) => Math.Sin(2 * Math.PI * frequency * (t / 1000)) * 0.5 + 0.5, 1)
+            Pattern = new VibrationPatternExpression(expr, 1)
         };
     }
 
@@ -73,7 +85,7 @@ public record VibrationSettings
         var segments = points
             .Select(point => new VibrationPatternDynamic.VibrationPatternSegment((int)point.durationMS, point.intensity))
             .ToList();
-        var pattern = new VibrationPatternDynamic(segments, 1);
+        var pattern = new VibrationPatternDynamic(segments, 20);
         return new VibrationSettings
         {
             Id = Guid.NewGuid(),
