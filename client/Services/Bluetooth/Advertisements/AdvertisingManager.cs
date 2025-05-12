@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using client.Services.Bluetooth.Core;
@@ -9,6 +9,7 @@ namespace client.Services.Bluetooth.Advertisements
     public class AdvertisingManager
     {
         private readonly ServerContext _Context;
+        private readonly ILogger<AdvertisingManager> _logger = CustomLoggingProvider.CreateLogger<AdvertisingManager>();
 
         public AdvertisingManager(ServerContext context)
         {
@@ -18,12 +19,12 @@ namespace client.Services.Bluetooth.Advertisements
         public async Task RegisterAdvertisement(Advertisement advertisement)
         {
             await _Context.Connection.RegisterObjectAsync(advertisement);
-            Console.WriteLine($"advertisement object {advertisement.ObjectPath} created");
+            _logger.LogInformation($"advertisement object {advertisement.ObjectPath} created");
 
             await GetAdvertisingManager().RegisterAdvertisementAsync(((IDBusObject)advertisement).ObjectPath,
                 new Dictionary<string, object>());
 
-            Console.WriteLine($"advertisement {advertisement.ObjectPath} registered in BlueZ advertising manager");
+            _logger.LogInformation($"advertisement {advertisement.ObjectPath} registered in BlueZ advertising manager");
         }
 
         private ILEAdvertisingManager1 GetAdvertisingManager()

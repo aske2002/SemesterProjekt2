@@ -56,6 +56,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
     {
         var intensity = Pattern.GetCurrentIntensity(stopwatch.Elapsed.TotalMilliseconds);
         pwmChannel.DutyCycle = intensity.AsDutyCycle(HardwareConstants.VIBRATION_PWM_MIN_DUTY_CYCLE, HardwareConstants.VIBRATION_PWM_MAX_DUTY_CYCLE);
+        _logger.LogInformation("Vibration intensity: {Intensity} (Duty Cycle: {DutyCycle})", intensity, dutyCycle);
     }
 
     private void ClearInterval()
@@ -72,6 +73,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
         }
 
         stopwatch.Restart();
+        _logger.LogInformation("Starting vibration timer with resolution {Resolution}", resolution);
         _timer = new Timer(TimerTicked, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(resolution));
     }
 
@@ -79,10 +81,12 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
     {
         if (VibrationEnabled)
         {
+            _logger.LogInformation("Vibration enabled");
             StartInterval(Pattern.Resolution);
         }
         else
         {
+            _logger.LogInformation("Vibration disabled");
             pwmChannel.Stop();
             ClearInterval();
         }
@@ -106,6 +110,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
     public void Receive(SetVibrationSettingsMessage message)
     {
         VibrationSettings = message.Value;
+        _logger.LogInformation("Vibration settings changed to pattern with id {Id} of type {Type} with resolution {Resolution}", message.Value.Id, message.Value.Pattern.GetType(), message.Value.Pattern.Resolution);
         message.Reply(Task.CompletedTask);
     }
 

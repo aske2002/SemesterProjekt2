@@ -27,6 +27,7 @@ namespace client.Services.Bluetooth.Gatt
         public string ApplicationObjectPath => $"/{AppId}";
         private GattApplication gattApplication;
         private IMessenger messenger = new WeakReferenceMessenger();
+        private readonly ILogger logger = CustomLoggingProvider.CreateLogger<GattApplicationManager>();
         public Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>> Handlers { get; } = new Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>>();
         public GattApplicationManager(ServerContext serverContext, string localName, string type = "peripheral")
         {

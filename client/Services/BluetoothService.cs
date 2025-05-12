@@ -86,7 +86,10 @@ namespace client.Services.Bluetooth
             }
             catch
             {
-                logger.LogError("Failed to parse vibration settings");
+                logger.LogError(ex, "Failed to parse vibration settings");
+                logger.LogError($"Data: {BitConverter.ToString(args.Value.Data)}");
+                logger.LogError($"Exception: {ex.Message}");
+                logger.LogError($"StackTrace: {ex.StackTrace}");
                 return MessageResponse.Failure("Failed to parse vibration settings");
             }
         }
