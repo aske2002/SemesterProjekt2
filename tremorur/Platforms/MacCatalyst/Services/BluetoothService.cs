@@ -1,4 +1,5 @@
 using CoreBluetooth;
+using Foundation;
 using Microsoft.Extensions.Logging;
 using tremorur.Messages;
 using tremorur.Models.Bluetooth;
@@ -19,10 +20,28 @@ public partial class BluetoothService : IBluetoothService
         centralManager.ConnectedPeripheral += CM_ConnectedPeripheral;
         centralManager.UpdatedState += CM_UpdatedState;
         centralManager.DiscoveredPeripheral += CM_DiscoveredPeripheral;
+        centralManager.DisconnectedPeripheral += CM_DisconnectedPeripheral;
     }
+
+    public event EventHandler<string> DisconnectedPeripheral = delegate { };
 
     public partial bool IsScanning =>
         centralManager.IsScanning;
+
+    private void CM_DisconnectedPeripheral(object? sender, CBPeripheralErrorEventArgs e)
+    {
+        var identifier = e.Peripheral.Identifier.AsString();
+        if (e.Error != null)
+        {
+            _logger.Log(LogLevel.Error, "Disconnected from peripheral: " + e.Peripheral.Name);
+            DisconnectedPeripheral.Invoke(this, identifier);
+        }
+        else
+        {
+            _logger.Log(LogLevel.Information, "Disconnected from peripheral: " + e.Peripheral.Name);
+            DisconnectedPeripheral.Invoke(this, identifier);
+        }
+    }
 
     private void CM_UpdatedState(object? sender, EventArgs e)
     {
@@ -47,7 +66,7 @@ public partial class BluetoothService : IBluetoothService
         var taskSource = connectTasks.GetValueOrDefault(identifier);
         if (taskSource != null)
         {
-            var peripheral = new BluetoothPeripheral(e.Peripheral);
+            var peripheral = new BluetoothPeripheral(e.Peripheral, this);
             taskSource.TrySetResult(peripheral);
             connectTasks.Remove(identifier);
         }
@@ -69,6 +88,12 @@ public partial class BluetoothService : IBluetoothService
             throw new ArgumentException("Invalid peripheral type", nameof(discoveredPeripheral));
         }
 
+        if (bluetoothPeripheral.NativePeripheral.State == CBPeripheralState.Connected)
+        {
+            _logger.Log(LogLevel.Information, "Peripheral is already connected.");
+            return new BluetoothPeripheral(bluetoothPeripheral.NativePeripheral, this);
+        }
+
         var taskSource = new TaskCompletionSource<BluetoothPeripheral>();
         connectTasks.Add(discoveredPeripheral.UUID, taskSource);
         centralManager.ConnectPeripheral(bluetoothPeripheral.NativePeripheral);
@@ -84,6 +109,17 @@ public partial class BluetoothService : IBluetoothService
         }
         shouldScan = true;
         centralManager.ScanForPeripherals(peripheralUuids: []);
+    }
+
+    public partial void StartDiscovery(string serviceUuid)
+    {
+        if (IsScanning)
+        {
+            _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
+            return;
+        }
+        shouldScan = true;
+        centralManager.ScanForPeripherals(serviceUuid: CBUUID.FromString(serviceUuid), options: null);
     }
 
     public partial void StopDiscovery()
