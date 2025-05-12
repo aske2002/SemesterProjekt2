@@ -20,7 +20,6 @@ namespace tremorur.Models
 
         private void OnButtonMultiClicked(object? sender, ButtonMultipleClickedEventArgs message)
         {
-            Debug.WriteLine($"{message.Button} clicked {message.ClickCount} times");
             Dispatcher.Dispatch(() =>
             {
                 switch (message.Button)
@@ -45,7 +44,6 @@ namespace tremorur.Models
 
         private void OnButtonClicked(object? sender, ButtonClickedEventArgs message)
         {
-            Debug.WriteLine($"{message.Button} clicked");
             Dispatcher.Dispatch(() =>
             {
                 switch (message.Button)
@@ -70,7 +68,6 @@ namespace tremorur.Models
 
         private void OnButtonHeld(object? sender, ButtonHeldEventArgs message)
         {
-            Debug.WriteLine($"{message.Button} held for {message.HeldMS}");
             Dispatcher.Dispatch(() =>
             {
                 switch (message.Button)

@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using CoreBluetooth;
 using Foundation;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 
 namespace tremorur.Models.Bluetooth;
 
@@ -12,7 +14,7 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
     private TaskCompletionSource? notifyTaskCompletionSource;
     private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
-
+    private ILogger<BluetoothPeripheralCharacteristic> _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheralCharacteristic>();
     public BluetoothPeripheralCharacteristic(CBCharacteristic cBCharacteristic)
     {
         nativeCharacteristic = cBCharacteristic;
@@ -27,8 +29,10 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
 
     private void Peripheral_UpdatedNotificationState(object? sender, CBCharacteristicEventArgs e)
     {
+        _logger.LogInformation($"Notification state updated for characteristic {e.Characteristic.UUID}");
         if (e.Characteristic.UUID == nativeCharacteristic.UUID)
         {
+            _logger.LogInformation($"Notification state updated for characteristic {e.Characteristic.UUID}");
 
             NotifyingUpdated?.Invoke(this, e.Characteristic.IsNotifying);
             if (e.Error == null)
