@@ -54,7 +54,7 @@ public partial class BluetoothPeripheralCharacteristic
         ValueUpdated.Invoke(this, data);
     }
 
-    public partial string UUID => nativeCharacteristic.Uuid.ToString();
+    public partial string UUID => nativeCharacteristic.Uuid.ToString().ToUpper();
 
     public partial async Task SetNotifyingAsync(bool value)
     {

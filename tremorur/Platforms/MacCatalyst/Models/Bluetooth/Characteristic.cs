@@ -90,7 +90,7 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
         }
     }
 
-    public partial string UUID => nativeCharacteristic.UUID.ToString();
+    public partial string UUID => nativeCharacteristic.UUID.ToString().ToUpper();
 
     public partial async Task SetNotifyingAsync(bool value)
     {

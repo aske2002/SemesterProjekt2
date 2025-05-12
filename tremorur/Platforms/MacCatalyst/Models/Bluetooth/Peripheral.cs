@@ -60,6 +60,7 @@ public partial class BluetoothPeripheral : IBluetoothPeripheral
 
     public partial bool IsConnected => NativePeripheral.State == CBPeripheralState.Connected;
 
+    public partial string UUID => NativePeripheral.Identifier.AsString().ToUpper();
     public partial async Task<float?> GetSsriAsync()
     {
         if (_rssiTaskCompletionSource != null)

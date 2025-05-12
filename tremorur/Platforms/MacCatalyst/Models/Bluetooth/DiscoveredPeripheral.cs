@@ -47,7 +47,7 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
                     {
                         if (uuid is CBUUID cbUUID)
                         {
-                            services.Add(cbUUID.ToString());
+                            services.Add(cbUUID.ToString().ToUpper());
                         }
                     }
                 }
@@ -57,5 +57,5 @@ public partial class DiscoveredPeripheral : IDiscoveredPeripheral
     }
     public partial string? LocalName => advertisementData.TryGetValue(CBAdvertisement.DataLocalNameKey, out var localName) ? localName.ToString() : null;
     public partial string? Name => NativePeripheral.Name;
-    public partial string UUID => NativePeripheral.Identifier.AsString();
+    public partial string UUID => NativePeripheral.Identifier.AsString().ToUpper();
 }

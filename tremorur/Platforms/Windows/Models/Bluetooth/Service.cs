@@ -26,6 +26,6 @@ public partial class BluetoothPeripheralService : IBluetoothPeripheralService
 
     private ObservableCollection<IBluetoothPeripheralCharacteristic> characteristics = new ObservableCollection<IBluetoothPeripheralCharacteristic>();
     public partial ObservableCollection<IBluetoothPeripheralCharacteristic> Characteristics => characteristics;
-    public partial string UUID => nativeService.Uuid.ToString();
+    public partial string UUID => nativeService.Uuid.ToString().ToUpper();
     public partial bool IsPrimary => false;
 }
