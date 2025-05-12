@@ -13,7 +13,7 @@ namespace client.Services.Bluetooth.Advertisements
 
         public Task ReleaseAsync()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

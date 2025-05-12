@@ -4,6 +4,8 @@ using client.Services.Bluetooth.Core;
 using client.Services.Bluetooth.Models;
 using client.Services.Bluetooth.Utilities;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 using Tmds.DBus;
 
 namespace client.Services.Bluetooth.Gatt.BlueZModel
@@ -11,6 +13,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
     public class GattCharacteristic : PropertiesBase<GattCharacteristic1Properties>, IGattCharacteristic1
     {
         public string UUID => Properties.UUID;
+        private  ILogger<GattCharacteristic> _logger { get; } = CustomLoggingProvider.CreateLogger<GattCharacteristic>();
         private readonly IMessenger _messenger;
         public IList<GattDescriptor> Descriptors { get; } = new List<GattDescriptor>();
 
@@ -29,18 +32,16 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
         {
             var response = await _messenger.Send(new CharChangeEvent(new CharChangeData
             {
-                DeviceId = options["device"]?.ToString() ?? string.Empty,
+                DeviceId = options.TryGetValue("device", out var deviceId) ? deviceId.ToString() : null,
                 CharacteristicId = Properties.UUID,
                 Data = value
             }));
             if (response != null && response.Error)
             {
                 await SetAsync("Value", value);
-                Debug.WriteLine($"Value set to: {BitConverter.ToString(value)}");
             }
             else
             {
-                Debug.WriteLine($"Failed to write value: {response?.Message}");
                 throw new DBusException("org.bluez.Error.Failed", response?.Message);
             }
         }
@@ -79,6 +80,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
 
         public Task StartNotifyAsync()
         {
+            _logger.LogInformation($"StartNotifyAsync: {Properties.UUID}");
             Properties.Notifying = true;
             var options = new Dictionary<string, object> { { "flags", "notify" } };
             return WriteValueAsync(Properties.Value, options);
@@ -86,6 +88,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
 
         public Task StopNotifyAsync()
         {
+            _logger.LogInformation($"StopNotifyAsync: {Properties.UUID}");
             Properties.Notifying = false;
             var options = new Dictionary<string, object> { { "flags", "stop-notify" } };
             return WriteValueAsync(Properties.Value, options);

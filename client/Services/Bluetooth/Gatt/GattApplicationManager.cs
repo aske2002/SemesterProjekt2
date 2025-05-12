@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
@@ -10,12 +10,14 @@ using client.Services.Bluetooth.Gatt.BlueZModel;
 using client.Services.Bluetooth.Gatt.Description;
 using client.Services.Bluetooth.Models;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 using Tmds.DBus;
 
 namespace client.Services.Bluetooth.Gatt
 {
     public record CharacteristicCallback(GattCharacteristic Characteristic, byte[] Value);
-    public record AdvertisementConfig(string LocalName, string Type = "peripheral");
+    public record AdvertisementConfig(string LocalName, string ServiceUUID, string Type = "peripheral");
     public class GattApplicationManager : IAsyncDisposable
     {
         private readonly ServerContext _serverContext;
@@ -29,15 +31,14 @@ namespace client.Services.Bluetooth.Gatt
         private IMessenger messenger = new WeakReferenceMessenger();
         private readonly ILogger logger = CustomLoggingProvider.CreateLogger<GattApplicationManager>();
         public Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>> Handlers { get; } = new Dictionary<string[], Func<AsyncRequestProxy<CharChangeData, MessageResponse>, Task<MessageResponse?>>>();
-        public GattApplicationManager(ServerContext serverContext, string localName, string type = "peripheral")
+        public GattApplicationManager(ServerContext serverContext, string localName, string serviceUUID, string type = "peripheral")
         {
             _serverContext = serverContext;
             advertisingManager = new AdvertisingManager(serverContext);
-            advertisementConfig = new AdvertisementConfig(localName, type);
+            advertisementConfig = new AdvertisementConfig(localName, serviceUUID, type);
             gattApplication = new GattApplication(ApplicationObjectPath, messenger);
             messenger.Register<GattApplicationManager, CharChangeEvent>(this, CharacteristicDataHandler);
         }
-
         public async Task<bool> WriteValueAsync(string uuid, byte[] value)
         {
             var characteristic = Services.SelectMany(x => x.Characteristics).FirstOrDefault(x => x.UUID == uuid);
@@ -81,15 +82,16 @@ namespace client.Services.Bluetooth.Gatt
             await adapter.SetAliasAsync(advertisementConfig.LocalName);
 
             var serviceDescriptions = Builder.BuildServiceDescriptions();
+            await BuildApplicationTree(serviceDescriptions);
+            await RegisterApplicationInBluez(ApplicationObjectPath);
+
             await advertisingManager.CreateAdvertisement(new AdvertisementProperties()
             {
                 LocalName = advertisementConfig.LocalName,
                 Type = advertisementConfig.Type,
-                ServiceUUIDs = serviceDescriptions.Select(x => x.UUID).ToArray(),
+                ServiceUUIDs = [advertisementConfig.ServiceUUID],
             }, AppId);
 
-            await BuildApplicationTree(serviceDescriptions);
-            await RegisterApplicationInBluez(ApplicationObjectPath);
         }
 
         private async Task BuildApplicationTree(IEnumerable<GattServiceDescription> gattServiceDescriptions)
@@ -116,6 +118,12 @@ namespace client.Services.Bluetooth.Gatt
         {
             var gattManager = _serverContext.Connection.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
             await gattManager.RegisterApplicationAsync(new ObjectPath(applicationObjectPath), new Dictionary<string, object>());
+        }
+
+        private async Task UnregisterApplicationInBluez(string applicationObjectPath)
+        {
+            var gattManager = _serverContext.Connection.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
+            await gattManager.UnregisterApplicationAsync(new ObjectPath(applicationObjectPath));
         }
 
         private async Task<GattService> AddNewService(
