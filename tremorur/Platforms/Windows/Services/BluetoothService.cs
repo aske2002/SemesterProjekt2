@@ -73,6 +73,17 @@ public partial class BluetoothService
         bluetoothLEHelper.StartEnumeration();
     }
 
+    public partial void StartDiscovery(string serviceUuid)
+    {
+        if (IsScanning)
+        {
+            _logger.Log(LogLevel.Information, "Bluetooth scan already in progress.");
+            return;
+        }
+        shouldScan = [serviceUuid];
+        bluetoothLEHelper.StartEnumeration();
+    }
+
     public partial void StopDiscovery()
     {
         if (!IsScanning)
@@ -80,7 +91,7 @@ public partial class BluetoothService
             _logger.Log(LogLevel.Information, "Bluetooth scan is not in progress.");
             return;
         }
-        shouldScan = false;
+        shouldScan = null;
         bluetoothLEHelper.StopEnumeration();
     }
 
