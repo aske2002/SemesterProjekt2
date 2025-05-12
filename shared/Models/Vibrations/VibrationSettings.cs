@@ -122,8 +122,13 @@ public record VibrationSettings
     /// <returns>A Task that represents the asynchronous operation. The task result contains the VibrationSettings object.</returns>
     /// <exception cref="ArgumentException">Thrown when the byte array is not valid.</exception>
     /// <exception cref="ArgumentException">Thrown when the pattern is not valid.</exception>
-    public static async Task<VibrationSettings> FromBytes(byte[] bytes)
+    public static async Task<VibrationSettings?> FromBytes(byte[] bytes)
     {
+        if (bytes.Length == 0)
+        {
+            return null;
+        }
+
         var reader = BinaryAdapter.Create(bytes);
         var id = reader.ReadGuid();
         var pattern = await VibrationHelpers.ParseAsVibrationData(reader);
