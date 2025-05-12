@@ -6,7 +6,7 @@ public partial class BorderButton : Grid
 {
 
     private const string Root = "Root";
-    private readonly Services.IMessenger messenger;
+    private readonly Services.IMessenger _messenger;
     public static readonly BindableProperty ButtonBackgroundColorProperty =
             BindableProperty.Create(nameof(ButtonBackgroundColor), typeof(Color), typeof(BorderButton), Blue);
     public Color ButtonBackgroundColor
@@ -17,12 +17,12 @@ public partial class BorderButton : Grid
 
     private void InnerButton_Pressed(object? sender, EventArgs e)
     {
-        messenger.SendMessage(new ButtonPressedMessage(ButtonType));
+        _messenger.SendMessage(new ButtonPressedMessage(ButtonType));
     }
 
     private void InnerButton_Released(object? sender, EventArgs e)
     {
-        messenger.SendMessage(new ButtonReleasedMessage(ButtonType));
+        _messenger.SendMessage(new ButtonReleasedMessage(ButtonType));
     }
 
     public WatchButton ButtonType;
@@ -36,12 +36,29 @@ public partial class BorderButton : Grid
         get => ButtonTypes.Positions[ButtonType];
     }
 
+    private void Button_Pressed(ButtonPressedMessage e)
+    {
+        if (e.Button == ButtonType)
+        {
+            Scale = 0.9;
+        }
+    }
+
+    private void Button_Released(ButtonReleasedMessage e)
+    {
+        if (e.Button == ButtonType)
+        {
+            Scale = 1;
+        }
+    }
 
     public BorderButton(Services.IMessenger messenger, WatchButton buttonType)
     {
         InitializeComponent();
         ButtonType = buttonType;
-        this.messenger = messenger;
+        _messenger = messenger;
+        _messenger.On<ButtonPressedMessage>(Button_Pressed);
+        _messenger.On<ButtonReleasedMessage>(Button_Released);
         InnerButton.Text = ButtonTypes.Names[ButtonType];
     }
 }
