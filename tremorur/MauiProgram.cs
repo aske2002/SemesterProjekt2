@@ -45,17 +45,15 @@ namespace tremorur
             builder.Services.AddTransient<BluetoothDevPage>();
             builder.Services.AddTransient<BluetoothDevViewModel>();
 
-            // Manually create LoggerFactory and Logger
-            var loggerFactory = LoggerFactory.Create(logging =>
-            {
-                logging.AddConsole(); // Add console logging or other providers
-#if DEBUG
-                logging.AddDebug();
-#endif
-            });
+            var loggerProvider = new CustomLoggingProvider();
+
             // Register the logger factory in services, so it's available later
-            builder.Services.AddSingleton(loggerFactory);
-            var messenger = new Messenger(loggerFactory.CreateLogger<Messenger>());
+            builder.Services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddProvider(loggerProvider);
+            });
+
+            var messenger = new Messenger(CustomLoggingProvider.CreateLogger<Services.IMessenger>()); // Create a new instance of the messenger with the logger
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
 
             var mauiApp = builder.Build();
