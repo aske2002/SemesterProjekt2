@@ -29,11 +29,8 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
 
     private void Peripheral_UpdatedNotificationState(object? sender, CBCharacteristicEventArgs e)
     {
-        _logger.LogInformation($"Notification state updated for characteristic {e.Characteristic.UUID}");
         if (e.Characteristic.UUID == nativeCharacteristic.UUID)
         {
-            _logger.LogInformation($"Notification state updated for characteristic {e.Characteristic.UUID}");
-
             NotifyingUpdated?.Invoke(this, e.Characteristic.IsNotifying);
             if (e.Error == null)
             {
