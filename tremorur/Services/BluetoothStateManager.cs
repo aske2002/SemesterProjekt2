@@ -29,11 +29,14 @@ public class BluetoothStateManager : IBluetoothStateManager
         _messenger = messenger;
         _bluetoothService = bluetoothService;
         _bluetoothService.DiscoveredPeripheral += OnDiscoveredPeripheral;
-        _bluetoothService.StartDiscovery();
+        _bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
     }
+
     public event EventHandler<bool>? ConnectionStateChanged;
     public event EventHandler<IBluetoothPeripheral>? PeripheralConnected;
     public event EventHandler? PeripheralDisconnected;
+
+    private async void OnDiscoveredPeripheral(object? sender, IDiscoveredPeripheral peripheral)
     {
         foreach (var service in peripheral.Services)
         {
@@ -63,7 +66,7 @@ public class BluetoothStateManager : IBluetoothStateManager
     {
         _logger.LogInformation("Peripheral disconnected: {Peripheral}", _peripheral?.Name);
         _peripheral = null;
-        _bluetoothService.StartDiscovery();
+        _bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
         ConnectionStateChanged?.Invoke(this, false);
         PeripheralDisconnected?.Invoke(this, EventArgs.Empty);
         _messenger.SendMessage(new DeviceDisconnected());
