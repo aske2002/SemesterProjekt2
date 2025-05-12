@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using shared.Models;
 using shared.Models.Vibrations;
 using tremorur.Models.Bluetooth;
@@ -12,16 +7,14 @@ namespace tremorur.Services
 {
     public class VibrationsService
     {
-        private readonly IBluetoothService _bluetoothService;
-        private IBluetoothPeripheral? _connectedDevice = null; //null indtil der forbindes til bluetoothEnheden 
-        private IBluetoothPeripheralService? _vibrationService => _connectedDevice?.Services?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationServiceUUID);
-        private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationPatternCharacteristicUUID);
-        private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothID.VibrationEnabledCharacteristicUUID);
+        private readonly IBluetoothStateManager _bluetoothStateManager;
+        private IBluetoothPeripheralService? _vibrationService => _bluetoothStateManager.Peripheral?.Services?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationServiceUUID);
+        private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationPatternCharacteristicUUID);
+        private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationEnabledCharacteristicUUID);
 
-        public VibrationsService(IBluetoothService bluetoothService)//initialiserer bluetoothService
+        public VibrationsService(IBluetoothStateManager bluetoothStateManager) //initialiserer bluetoothService
         {
-            _bluetoothService = bluetoothService;
-            ConnectBluetooth();
+            _bluetoothStateManager = bluetoothStateManager;
         }
             
         private void ConnectBluetooth()
@@ -36,6 +29,7 @@ namespace tremorur.Services
                 _connectedDevice = await _bluetoothService.ConnectPeripheralAsync(device);
             }
         }
+
 
         public async Task StartStopVibration()
         {
