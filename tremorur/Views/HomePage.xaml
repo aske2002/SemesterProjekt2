@@ -15,10 +15,22 @@
         Shell.BackgroundColor="Transparent"
         x:DataType="vm:HomeViewModel"
         mc:Ignorable="d">
-        <Grid RowDefinitions="Auto,*,Auto"
-                BackgroundColor="Transparent"
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
+              BackgroundColor="Transparent"
               ColumnDefinitions="Auto,*,Auto">
                 <!--Deler skærmen i to rækker og to kolonner-->
+                <Border
+                        BackgroundColor="{Binding ConnectionStatusBackgroundColor}"
+                        HorizontalOptions="Center"
+                        Grid.ColumnSpan="2"
+                        StrokeShape="RoundRectangle 15"
+                        Grid.Row="0">
+                        <Label
+                                Text="{Binding ConnectionStatusText}"
+                                HorizontalTextAlignment="Center"
+                                Padding="10"
+                                FontSize="Default"/>
+                </Border>
                 <Label
                         x:Name="ClockLabel"
                         Text="00:00"
@@ -36,7 +48,7 @@
                         FontSize="Caption"
                         FontAttributes="Bold"
                         TextColor="White"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.ColumnSpan="2"
                         VerticalOptions="Start"
                         HorizontalOptions="Center"/>
@@ -47,7 +59,7 @@
                         FontSize="25"
                         FontAttributes="Bold"
                         TextColor="White"
-                        Grid.Row="2"
+                        Grid.Row="3"
                         Grid.ColumnSpan="2"
                         VerticalOptions="StartAndExpand"
                         HorizontalOptions="Center"/>

@@ -8,6 +8,10 @@ using tremorur.Models.Bluetooth;
 public interface IBluetoothStateManager
 {
     IBluetoothPeripheral? Peripheral { get; }
+    bool IsConnected { get; }
+    event EventHandler<bool>? ConnectionStateChanged;
+    event EventHandler<IBluetoothPeripheral>? PeripheralConnected;
+    event EventHandler? PeripheralDisconnected;
 }
 
 public class BluetoothStateManager : IBluetoothStateManager
@@ -17,6 +21,7 @@ public class BluetoothStateManager : IBluetoothStateManager
     private readonly IBluetoothService _bluetoothService;
     private IBluetoothPeripheral? _peripheral;
     public IBluetoothPeripheral? Peripheral => _peripheral;
+    public bool IsConnected => _peripheral != null;
 
     public BluetoothStateManager(ILogger<BluetoothStateManager> logger, tremorur.Services.IMessenger messenger, IBluetoothService bluetoothService)
     {
@@ -25,10 +30,10 @@ public class BluetoothStateManager : IBluetoothStateManager
         _bluetoothService = bluetoothService;
         _bluetoothService.DiscoveredPeripheral += OnDiscoveredPeripheral;
         _bluetoothService.StartDiscovery();
-        _logger.LogInformation("Bluetooth discovery started");
     }
-
-    public async void OnDiscoveredPeripheral(object? sender, IDiscoveredPeripheral peripheral)
+    public event EventHandler<bool>? ConnectionStateChanged;
+    public event EventHandler<IBluetoothPeripheral>? PeripheralConnected;
+    public event EventHandler? PeripheralDisconnected;
     {
         foreach (var service in peripheral.Services)
         {
@@ -47,8 +52,11 @@ public class BluetoothStateManager : IBluetoothStateManager
             return;
         }
         _logger.LogInformation("Connected to peripheral: {Peripheral}", _peripheral.Name);
+        ConnectionStateChanged?.Invoke(this, true);
+        PeripheralConnected?.Invoke(this, _peripheral);
         _messenger.SendMessage(new DeviceConnected(_peripheral));
         _peripheral.Disconnected += OnPeripheralDisconnected;
+
     }
 
     private void OnPeripheralDisconnected(object? sender, EventArgs e)
@@ -56,6 +64,8 @@ public class BluetoothStateManager : IBluetoothStateManager
         _logger.LogInformation("Peripheral disconnected: {Peripheral}", _peripheral?.Name);
         _peripheral = null;
         _bluetoothService.StartDiscovery();
+        ConnectionStateChanged?.Invoke(this, false);
+        PeripheralDisconnected?.Invoke(this, EventArgs.Empty);
         _messenger.SendMessage(new DeviceDisconnected());
     }
 }
