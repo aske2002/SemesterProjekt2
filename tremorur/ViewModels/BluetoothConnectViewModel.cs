@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
+using shared.Models;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.ViewModels
@@ -18,7 +19,7 @@ namespace tremorur.ViewModels
             this.navigationService = navigationService;
             this.dialogService = dialogService;
             bluetoothService.DiscoveredPeripheral += OnDiscoveredPeripheral;
-            bluetoothService.StartDiscovery();
+            bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
         }
 
         private void OnDiscoveredPeripheral(object? sender, IDiscoveredPeripheral e)
