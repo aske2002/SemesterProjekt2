@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Speech.Recognition;
 using tremorur.Models;
 using tremorur.Models.Bluetooth;
 

@@ -16,21 +16,7 @@ namespace tremorur.Services
         {
             _bluetoothStateManager = bluetoothStateManager;
         }
-            
-        private void ConnectBluetooth()
-        {
-            _bluetoothService.DiscoveredPeripheral += DiscoveredDevice;
-        }
-
-        private async void DiscoveredDevice(object? sender, IDiscoveredPeripheral device)
-        {
-            if (device.Name == "Tremorur")
-            {
-                _connectedDevice = await _bluetoothService.ConnectPeripheralAsync(device);
-            }
-        }
-
-
+    
         public async Task StartStopVibration()
         {
             if (_onOffChar == null)//hvis bluetooth ikke er forbundet stopper metoden
