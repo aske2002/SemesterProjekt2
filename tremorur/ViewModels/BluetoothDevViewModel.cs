@@ -1,7 +1,12 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Windows.Input;
+using shared.Models;
+using shared.Models.Vibrations;
+using shared.Models.Vibrations.Patterns;
 using tremorur.Models.Bluetooth;
 
 namespace tremorur.ViewModels
@@ -10,6 +15,7 @@ namespace tremorur.ViewModels
     public partial class BluetoothDevViewModel : INotifyPropertyChanged
     {
         BluetoothPeripheral? connectedDevice;
+        public INavigationService _navigationService { get; set; }
         public BluetoothPeripheral? ConnectedDevice
         {
             get => connectedDevice;
@@ -19,6 +25,7 @@ namespace tremorur.ViewModels
 
                 if (value != null)
                 {
+                    SubscribeToDisconnected(value);
                     SubscribeToCharacteristic(value);
                 }
 
@@ -31,10 +38,24 @@ namespace tremorur.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public BluetoothDevViewModel(IBluetoothService bluetoothService, IDialogService dialogService)
+        public BluetoothDevViewModel(IBluetoothService bluetoothService, IDialogService dialogService, INavigationService navigationService)
         {
             this.bluetoothService = bluetoothService;
             this.dialogService = dialogService;
+            this._navigationService = navigationService;
+            EntryCompletedCommand = new Command<string>(SendTextPattern);
+
+        }
+
+        private void SubscribeToDisconnected(IBluetoothPeripheral peripheral)
+        {
+            if (peripheral is BluetoothPeripheral bluetoothPeripheral)
+            {
+                bluetoothPeripheral.Disconnected += async (s, e) =>
+                {
+                    await _navigationService.GoBackAsync();
+                };
+            }
         }
 
         private void SubscribeToCharacteristic(IBluetoothPeripheral peripheral)
@@ -135,6 +156,97 @@ namespace tremorur.ViewModels
                 return;
 
             await characteristic.WriteValueAsync(Encoding.UTF8.GetBytes(data));
+        }
+
+        [RelayCommand]
+        public async Task Send1()
+        {
+            var pattern = VibrationSettings.CreateDynamicPatternSettings((500, 1.0), (500, 0.5), (500, 0.0)).Pattern;
+            await SendVibrationPattern(pattern);
+        }
+
+        [RelayCommand]
+        public async Task Send2()
+        {
+            var pattern = VibrationSettings.CreateSinePatternSettings(1).Pattern;
+            await SendVibrationPattern(pattern);
+        }
+
+        [RelayCommand]
+        public async Task Send3()
+        {
+            var pattern = VibrationSettings.CreateConstantPatternSettings(0.5).Pattern;
+            await SendVibrationPattern(pattern);
+        }
+
+        [RelayCommand]
+        public async Task Send4()
+        {
+            var pattern = VibrationSettings.CreateDynamicPatternSettings((500, 1.0), (250, 0.0), (250, 0.0)).Pattern;
+            await SendVibrationPattern(pattern);
+
+        }
+        public ICommand EntryCompletedCommand { get; }
+        public async void SendTextPattern(string text)
+        {
+            try
+            {
+                var pattern = await VibrationPatternExpression.ParseAsync(text, 1);
+                await SendVibrationPattern(pattern);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error parsing pattern: {ex.Message}");
+                return;
+            }
+
+        }
+
+
+        public async Task SendVibrationPattern(IVibrationPattern pattern)
+        {
+            var settings = new VibrationSettings
+            {
+                Id = Guid.NewGuid(),
+                Pattern = pattern
+            };
+            var characteristic = connectedDevice?.Services
+                .FirstOrDefault(s => s.UUID.Equals(BluetoothIdentifiers.VibrationServiceUUID, StringComparison.OrdinalIgnoreCase))?.Characteristics
+                .FirstOrDefault(c => c.UUID.Equals(BluetoothIdentifiers.VibrationPatternCharacteristicUUID, StringComparison.OrdinalIgnoreCase));
+
+            if (characteristic != null)
+            {
+                await characteristic.WriteValueAsync(settings.ToBytes());
+            }
+            else
+            {
+                Debug.WriteLine("Characteristic not found");
+            }
+        }
+
+        [RelayCommand]
+        public async Task GoBack()
+        {
+            bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
+            await _navigationService.GoToAsync("///bluetoothConnect");
+        }
+
+        [RelayCommand]
+        public async Task ToggleVibrations()
+        {
+            var characteristic = connectedDevice?.Services.FirstOrDefault(s => s.UUID.Equals(BluetoothIdentifiers.VibrationServiceUUID, StringComparison.OrdinalIgnoreCase))?.Characteristics
+                .FirstOrDefault(c => c.UUID.Equals(BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, StringComparison.OrdinalIgnoreCase));
+            if (characteristic != null)
+            {
+                var currentVal = await characteristic.ReadValueAsync();
+                var isOn = currentVal.Length > 0 && currentVal.First() == 1;
+                Debug.WriteLine(isOn ? "Turning off vibrations" : "Turning on vibrations");
+                await characteristic.WriteValueAsync(isOn ? [0] : [1]);
+            }
+            else
+            {
+                Debug.WriteLine("Characteristic not found");
+            }
         }
     }
 }

@@ -34,6 +34,35 @@
                        HorizontalTextAlignment="Center"/>
                 <Label Text="{Binding Path=ConnectedDevice.RSSI, StringFormat='RSSI: {0}'}"
                        HorizontalTextAlignment="Center"/>
+                <Button
+                    Text="Set vibration pattern 1"
+                    Command="{Binding Send1Command}"/>
+                <Button
+                    Text="Set vibration pattern 2"
+                    Command="{Binding Send2Command}"/>
+                <Button
+                    Text="Set vibration pattern 3"
+                    Command="{Binding Send3Command}"/>
+                <Button
+                    Text="Set vibration pattern 4"
+                    Command="{Binding Send4Command}"/>
+                <Entry
+                    x:Name="VibrationPatternEntry"
+                    Placeholder="Enter vibration pattern (e.g., 1000,500,1000)"
+                    HorizontalOptions="Fill">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior
+                            EventName="Completed"
+                            Command="{Binding Source={x:Reference BluetoothTest}, Path=BindingContext.EntryCompletedCommand}"
+                            CommandParameter="{Binding Source={x:Reference VibrationPatternEntry}, Path=Text}"/>
+                    </Entry.Behaviors>
+                </Entry>
+                <Button
+                    Text="Go back"
+                    Command="{Binding GoBackCommand}"/>
+                <Button
+                    Text="Toggle vibrations"
+                    Command="{Binding ToggleVibrationsCommand}"/>
             </StackLayout>
             <CollectionView
                 Grid.Row="1"
