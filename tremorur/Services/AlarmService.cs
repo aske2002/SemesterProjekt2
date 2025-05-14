@@ -23,8 +23,6 @@ namespace tremorur.Services
             var currentAlarms = SettingsService.Alarms;
             var alarm = new Alarm { Id = Guid.NewGuid().ToString(), TimeSpan = givenTimeSpan }; //opretter en alarm med et unikt Id (kaldt i Alarm.cs)
             _alarms.Add(alarm);
-            SettingsService.Alarms = _alarms.ToList(); //opdaterer SettingService med nye alarmer
-            ScheduleAlarms(); //de satte alarmer bliver kaldt
             return alarm;
         }
         private void OnAlarmsChanged(object sender, NotifyCollectionChangedEventArgs e) //funktion til at håndterer ændringer i ObservableCollection
@@ -37,6 +35,7 @@ namespace tremorur.Services
                     alarms.Add(newAlarm); //tilføjer nye alarmer
                 }
             }
+            ScheduleAlarms(); //de satte alarmer bliver kaldt
             SettingsService.Alarms = alarms; //gemmer listen ned igen via settingservice 
         }
         public Alarm? GetAlarm(string id) //Metoden tager et id som parameter (den unikke nøgle til alarmen).
@@ -79,6 +78,15 @@ namespace tremorur.Services
             SettingsService.Alarms = new List<Alarm>(); //tømmer alarmene i settingsService
 
             ScheduleAlarms();//starter forfra og sætter nye timere
+        }
+
+        public void TempAlarm(TimeSpan delay, Alarm alarm)// midlertidlig alarm som udsætter alarmtidspunktet
+        {
+            TimeSpan triggerTime = DateTime.Now.Add(delay).TimeOfDay;//tilføjer delay til givent tidspunikt
+
+            var tempAlarm = new Alarm { Id = Guid.NewGuid().ToString(), TimeSpan = triggerTime}; //opretter midlertidlig alarm med delay
+            Timer timer = new Timer(TriggerAlarm, alarm, delay, Timeout.InfiniteTimeSpan);
+            activeTimers.Add(timer);//tilføjer alarm til aktive timere
         }
     }
 }

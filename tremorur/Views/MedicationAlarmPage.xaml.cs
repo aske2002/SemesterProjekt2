@@ -53,6 +53,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
         if (alarmToShow != null)
         {
             RegisterResponse(alarmToShow, false); //registerer at brugeren annullerer
+            alarmService.TempAlarm(TimeSpan.FromMinutes(5), alarmToShow);//udsætter alarmen 5 minutter
         }
         await Task.Delay(3000); //venter 3 sekunder med at navigerer til HomePage
         await navigationService.GoToAsync("//home");

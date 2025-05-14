@@ -21,8 +21,6 @@ namespace tremorur.Views
             StartClock();
             this.vibrationsService = vibrationsService;
         }
-
-
         async void StartClock()
         {
             while (true)
@@ -52,9 +50,9 @@ namespace tremorur.Views
         {
             try
             {
-                await vibrationsService.NavigateLevelUp();
+                var index = await vibrationsService.NavigateLevelUp();
                 if (BindingContext is HomeViewModel vm && vm.Level >= 1 && vm.Level < 7)
-                    vm.Level++;
+                    vm.Level = index;
             }
             catch (Exception ex)
             {
@@ -66,9 +64,9 @@ namespace tremorur.Views
         {
             try
             {
-                await vibrationsService.NavigateLevelDown();
+                var index = await vibrationsService.NavigateLevelDown();
                 if (BindingContext is HomeViewModel vm && vm.Level > 1)
-                    vm.Level--;
+                    vm.Level = index;
             }
             catch (Exception ex)
             {
@@ -84,5 +82,5 @@ namespace tremorur.Views
                 await navigationService.GoToAsync("//setAlarm"); //går til SetAlarmPage
             }
         }
-    }
+    }   
 }

@@ -57,29 +57,35 @@ namespace tremorur.Services
             {
                 currentLevel = vibrationsLevels.IndexOf(vibrationsLevels.Find(e => e.Id == currentPattern.Id));
             }
+            else
+            {
+
+            }
             return currentLevel;
         }
-        public async Task NavigateLevelUp()
+        public async Task<int> NavigateLevelUp()
         {
             if (_patternChar == null)
             {
-                return;
+                return 0;
             }
             var currentVibrationIndex = await GetCurrentVibration(_patternChar);
-            var nextLevelIndex = (currentVibrationIndex + 1) % vibrationsLevels.Count; //finder næste index i vibrations liste
+            var nextLevelIndex = (currentVibrationIndex + 1 + vibrationsLevels.Count) % vibrationsLevels.Count; //finder næste index i vibrations liste
             var nextLevel = vibrationsLevels[nextLevelIndex];//finder næste objekt i vibrations liste
             await _patternChar.WriteValueAsync(nextLevel.ToBytes());//skriver level om til bytes og sender det til RPi
+            return nextLevelIndex;
         }
-        public async Task NavigateLevelDown()
+        public async Task<int> NavigateLevelDown()
         {
             if (_patternChar == null)
             {
-                return;
+                return 0;
             }
             var currentVibrationIndex = await GetCurrentVibration(_patternChar);
-            var preLevelIndex = (currentVibrationIndex - 1) % vibrationsLevels.Count; //finder forrige index i vibrations liste
+            var preLevelIndex = (currentVibrationIndex - 1 + vibrationsLevels.Count) % vibrationsLevels.Count; //finder forrige index i vibrations liste
             var preLevel = vibrationsLevels[preLevelIndex];//finder forrige objekt i vibrations liste
             await _patternChar.WriteValueAsync(preLevel.ToBytes());//skriver level om til bytes og sender det til RPi
+            return preLevelIndex;
         }
     }
 }
