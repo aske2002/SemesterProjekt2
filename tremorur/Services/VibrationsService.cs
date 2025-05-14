@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using shared.Models;
 using shared.Models.Vibrations;
 using tremorur.Models.Bluetooth;
@@ -11,10 +12,12 @@ namespace tremorur.Services
         private IBluetoothPeripheralService? _vibrationService => _bluetoothStateManager.Peripheral?.Services?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationServiceUUID);
         private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationPatternCharacteristicUUID);
         private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationEnabledCharacteristicUUID);
+        private ILogger<VibrationsService> logger;
 
-        public VibrationsService(IBluetoothStateManager bluetoothStateManager) //initialiserer bluetoothService
+        public VibrationsService(IBluetoothStateManager bluetoothStateManager, ILogger<VibrationsService> logger) //initialiserer bluetoothService
         {
             _bluetoothStateManager = bluetoothStateManager;
+            this.logger = logger;
         }
 
         public async Task StartStopVibration()
@@ -23,8 +26,9 @@ namespace tremorur.Services
             {
                 return;
             }
-
             var currentValue = await _onOffChar.ReadValueAsync(); //læser fra RPi om vibration er tændt
+            logger.LogInformation("Toggling vibration, current state: {state}", currentValue.FirstOrDefault());
+
             var vibrationRunning = currentValue.FirstOrDefault() == 1; //hvis vibration er tændt [1] så er vibrationRunning true, ellers false
 
             if (!vibrationRunning)

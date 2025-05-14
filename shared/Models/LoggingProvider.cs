@@ -17,8 +17,7 @@ public class CustomLoggingProvider : ILoggerProvider
                 {
                     builder
                         .SetMinimumLevel(LogLevel.Information)
-                        .AddConsole()
-                        .AddDebug();
+                        .AddConsole();
                     builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DebugLoggerProvider>());
                 }) ?? throw new InvalidOperationException("LoggerFactory cannot be null");
                 return _loggerFactory;

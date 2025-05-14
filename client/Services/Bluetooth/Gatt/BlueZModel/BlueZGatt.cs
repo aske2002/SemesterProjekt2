@@ -16,7 +16,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
     }
 
     [DBusInterface("org.bluez.Device1")]
-    internal interface IDevice1 : IDBusObject
+    public interface IDevice1 : IDBusObject
     {
         Task DisconnectAsync();
         Task<Device1Properties> GetAllAsync();

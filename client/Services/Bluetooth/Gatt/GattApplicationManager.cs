@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 using client.Models;
 using client.Services.Bluetooth.Advertisements;
@@ -24,6 +26,7 @@ namespace client.Services.Bluetooth.Gatt
         private readonly AdvertisingManager advertisingManager;
         private readonly AdvertisementConfig advertisementConfig;
         public ImmutableList<GattService> Services { get; private set; } = ImmutableList<GattService>.Empty;
+        public ObservableCollection<IDevice1> ConnectedDevices { get; private set; } = new();
         public GattApplicationBuilder Builder { get; } = new GattApplicationBuilder();
         public readonly string AppId = Guid.NewGuid().ToString().Substring(0, 8);
         public string ApplicationObjectPath => $"/{AppId}";
@@ -82,6 +85,7 @@ namespace client.Services.Bluetooth.Gatt
             await adapter.SetAliasAsync(advertisementConfig.LocalName);
 
             var serviceDescriptions = Builder.BuildServiceDescriptions();
+
             await BuildApplicationTree(serviceDescriptions);
             await RegisterApplicationInBluez(ApplicationObjectPath);
 
@@ -92,6 +96,61 @@ namespace client.Services.Bluetooth.Gatt
                 ServiceUUIDs = [advertisementConfig.ServiceUUID],
             }, AppId);
 
+            await ListenForDeviceUpdates();
+        }
+
+        private async void InterfaceAdded((ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces) args)
+        {
+            if (args.interfaces.ContainsKey("org.bluez.Device1"))
+            {
+                var device = _serverContext.Connection.CreateProxy<IDevice1>("org.bluez", args.@object);
+                var deviceProperties = await device.GetAllAsync();
+                if (!ConnectedDevices.Any(d => d.ObjectPath == args.@object))
+                {
+                    ConnectedDevices.Add(device);
+                    logger.LogInformation($"Device added to list: {deviceProperties.Name} - {deviceProperties.Address}");
+                }
+            }
+            else if (
+                args.interfaces.ContainsKey("org.bluez.GattService1"))
+            {
+                var service = _serverContext.Connection.CreateProxy<IGattService1>("org.bluez", args.@object);
+                var serviceProperties = await service.GetAllAsync();
+                logger.LogInformation($"Service added: {serviceProperties.UUID}");
+            }
+            else if (args.interfaces.ContainsKey("org.bluez.GattCharacteristic1"))
+            {
+                var characteristic = _serverContext.Connection.CreateProxy<IGattCharacteristic1>("org.bluez", args.@object);
+                var characteristicProperties = await characteristic.GetAllAsync();
+                logger.LogInformation($"Characteristic added: {characteristicProperties.UUID}");
+            }
+        }
+
+        private void InterfaceRemoved((ObjectPath @object, string[] interfaces) args)
+        {
+            if (args.interfaces.Contains("org.bluez.Device1"))
+            {
+                var device = _serverContext.Connection.CreateProxy<IDevice1>("org.bluez", args.@object);
+                var deviceInList = ConnectedDevices.FirstOrDefault(d => d.ObjectPath == args.@object);
+                if (deviceInList != null)
+                {
+                    ConnectedDevices.Remove(deviceInList);
+                    logger.LogInformation($"Device removed from list: {args.@object}");
+                }
+
+            }
+        }
+
+        private void InterfaceException(Exception? error)
+        {
+            logger.LogError(error, "Error in GattApplicationManager");
+        }
+
+        private async Task ListenForDeviceUpdates()
+        {
+            var objectManager = _serverContext.Connection.CreateProxy<IObjectManager>("org.bluez", "/");
+            await objectManager.WatchInterfacesAddedAsync(InterfaceAdded, InterfaceException);
+            await objectManager.WatchInterfacesRemovedAsync(InterfaceRemoved, InterfaceException);
         }
 
         private async Task BuildApplicationTree(IEnumerable<GattServiceDescription> gattServiceDescriptions)
@@ -175,7 +234,7 @@ namespace client.Services.Bluetooth.Gatt
                     var deviceProperties = await device.GetAllAsync();
                     try
                     {
-                        if (deviceProperties.Connected )
+                        if (deviceProperties.Connected)
                         {
                             logger.LogInformation($"Disconnecting device at {path}");
                             await device.DisconnectAsync();

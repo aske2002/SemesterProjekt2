@@ -57,7 +57,7 @@ namespace tremorur.Views
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, "Error navigating up: " + ex.Message);
-                Shell.Current.DisplayAlert("Error", "Error navigating up: " + ex.Message, "OK");
+                await Shell.Current.DisplayAlert("Error", "Error navigating up: " + ex.Message, "OK");
             }
         }
         protected override async void OnDownButtonClicked(object? sender, EventArgs e)
@@ -71,7 +71,7 @@ namespace tremorur.Views
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, "Error navigating down: " + ex.Message);
-                Shell.Current.DisplayAlert("Error", "Error navigating down: " + ex.Message, "OK");
+                await Shell.Current.DisplayAlert("Error", "Error navigating down: " + ex.Message, "OK");
             }
         }
         protected async override void OnUpButtonHeld(object? sender, int ms, Action didHandle)

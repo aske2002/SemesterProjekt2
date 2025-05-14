@@ -2,7 +2,6 @@
 using System.Text;
 using client.Services.Bluetooth.Core;
 using client.Services.Bluetooth.Models;
-using client.Services.Bluetooth.Utilities;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using shared.Models;
@@ -13,10 +12,9 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
     public class GattCharacteristic : PropertiesBase<GattCharacteristic1Properties>, IGattCharacteristic1
     {
         public string UUID => Properties.UUID;
-        private  ILogger<GattCharacteristic> _logger { get; } = CustomLoggingProvider.CreateLogger<GattCharacteristic>();
+        private ILogger<GattCharacteristic> _logger { get; } = CustomLoggingProvider.CreateLogger<GattCharacteristic>();
         private readonly IMessenger _messenger;
         public IList<GattDescriptor> Descriptors { get; } = new List<GattDescriptor>();
-
         public GattCharacteristic(ObjectPath objectPath, GattCharacteristic1Properties properties, IMessenger messenger) : base(objectPath, properties)
         {
             _messenger = messenger;
@@ -36,13 +34,16 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
                 CharacteristicId = Properties.UUID,
                 Data = value
             }));
-            if (response != null && response.Error)
+            if ((response != null && !response.Error) || response == null)
             {
+                _logger.LogInformation($"WriteValueAsync: {Properties.UUID} - {BitConverter.ToString(value)}");
                 await SetAsync("Value", value);
             }
             else
             {
+                _logger.LogError($"WriteValueAsync: {Properties.UUID} failed with error: {response?.Message}");
                 throw new DBusException("org.bluez.Error.Failed", response?.Message);
+
             }
         }
 
@@ -78,20 +79,16 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
             return Task.FromResult(allprops);
         }
 
-        public Task StartNotifyAsync()
+        public async Task StartNotifyAsync()
         {
             _logger.LogInformation($"StartNotifyAsync: {Properties.UUID}");
-            Properties.Notifying = true;
-            var options = new Dictionary<string, object> { { "flags", "notify" } };
-            return WriteValueAsync(Properties.Value, options);
+            await SetAsync("Notifying", true);
         }
 
-        public Task StopNotifyAsync()
+        public async Task StopNotifyAsync()
         {
             _logger.LogInformation($"StopNotifyAsync: {Properties.UUID}");
-            Properties.Notifying = false;
-            var options = new Dictionary<string, object> { { "flags", "stop-notify" } };
-            return WriteValueAsync(Properties.Value, options);
+            await SetAsync("Notifying", false);
         }
     }
 }

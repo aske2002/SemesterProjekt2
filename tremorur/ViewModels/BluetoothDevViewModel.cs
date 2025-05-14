@@ -25,7 +25,6 @@ namespace tremorur.ViewModels
 
                 if (value != null)
                 {
-                    SubscribeToDisconnected(value);
                     SubscribeToCharacteristic(value);
                 }
 
@@ -46,18 +45,6 @@ namespace tremorur.ViewModels
             EntryCompletedCommand = new Command<string>(SendTextPattern);
 
         }
-
-        private void SubscribeToDisconnected(IBluetoothPeripheral peripheral)
-        {
-            if (peripheral is BluetoothPeripheral bluetoothPeripheral)
-            {
-                bluetoothPeripheral.Disconnected += async (s, e) =>
-                {
-                    await _navigationService.GoBackAsync();
-                };
-            }
-        }
-
         private void SubscribeToCharacteristic(IBluetoothPeripheral peripheral)
         {
             foreach (var service in peripheral.Services)

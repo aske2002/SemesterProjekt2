@@ -33,8 +33,9 @@ namespace client.Services.Bluetooth.Core
 
         public Task SetAsync(string prop, object val)
         {
+            Properties.SetProperty(prop, val);
             OnPropertiesChanged.Invoke(PropertyChanges.ForProperty(prop, val));
-            return Properties.SetProperty(prop, val);
+            return Task.CompletedTask;
         }
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)

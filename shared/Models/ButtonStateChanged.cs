@@ -1,4 +1,5 @@
 
+using System.Diagnostics.CodeAnalysis;
 using shared.Models.Vibrations;
 
 namespace shared.Models;
@@ -10,7 +11,7 @@ public record ButtonStateChanged(WatchButton Button, ButtonState State, DateTime
         return [Button.ToFlagByte(), State.ToFlagByte()];
     }
 
-    public static bool TryParse(byte[] bytes, out ButtonStateChanged? result)
+    public static bool TryParse(byte[] bytes, [NotNullWhen(true)] out ButtonStateChanged? result)
     {
         result = null;
 

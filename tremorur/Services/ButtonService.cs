@@ -1,9 +1,11 @@
 
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using shared.Messages;
 using shared.Models;
 using tremorur.Messages;
 using tremorur.Models.Bluetooth;
+using tremorur.Models.Bluetooth.Events;
 
 public interface IButtonService
 {
@@ -27,80 +29,65 @@ public class ButtonService : IButtonService
 
     private readonly tremorur.Services.IMessenger _messenger;
     private readonly ILogger<ButtonService> _logger;
-    public ButtonService(tremorur.Services.IMessenger messenger, ILogger<ButtonService> logger)
+    private readonly IBluetoothStateManager _bluetoothStateManager;
+    public ButtonService(tremorur.Services.IMessenger messenger, ILogger<ButtonService> logger, IBluetoothStateManager bluetoothStateManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
+        _bluetoothStateManager = bluetoothStateManager ?? throw new ArgumentNullException(nameof(bluetoothStateManager));
         _messenger.On<ButtonPressedMessage>(Button_Pressed);
         _messenger.On<ButtonReleasedMessage>(Button_Released);
-        _messenger.On<DeviceConnected>(RegisterBluetoothHandlers);
+
+        _bluetoothStateManager.CharacteristicValueChanged += ButtonValueChanged;
+        _bluetoothStateManager.DiscoveredCharacteristic += Characteristic_Discovered;
+        _bluetoothStateManager.PeripheralConnected += Peripheral_Connected;
     }
 
-    private void RegisterBluetoothHandlers(DeviceConnected e)
+    private async void Peripheral_Connected(object? sender, IBluetoothPeripheral e)
     {
-        e.Peripheral.Services.CollectionChanged += (sender, args) =>
-        {
-            if (args.NewItems == null)
-                return;
+        var service = e.Services.FirstOrDefault(s => s.UUID == BluetoothIdentifiers.ButtonServiceUUID);
 
-            foreach (IBluetoothPeripheralService service in args.NewItems)
-            {
-                Service_Found(service);
-            }
-        };
-
-        foreach (var characteristic in e.Peripheral.Services)
-        {
-            Service_Found(characteristic);
-        }
-    }
-
-    private async void Service_Found(IBluetoothPeripheralService service)
-    {
-        // "A1B2C3D4-1000-4000-8000-ABCDEF123456"
-        if (service == null || service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
+        if (service == null)
             return;
-
-        service.Characteristics.CollectionChanged += (sender, args) =>
-        {
-            if (args.NewItems == null) 
-                return;
-
-            foreach (IBluetoothPeripheralCharacteristic characteristic in args.NewItems)
-            {
-                Characteristic_Found(characteristic);
-            }
-        };
 
         foreach (var characteristic in service.Characteristics)
         {
-            Characteristic_Found(characteristic);
+            if (BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.ContainsKey(characteristic.UUID))
+            {
+                _logger.LogInformation($"Discovered button characteristic: {characteristic.UUID}");
+                await characteristic.SetNotifyingAsync(true);
+            }
+
         }
     }
 
-    private async void Characteristic_Found(IBluetoothPeripheralCharacteristic characteristic)
+    private void Characteristic_Discovered(object? sender, DiscoveredCharacteristicEventArgs e)
     {
-        if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(characteristic.UUID, out var buttonType))
+        if (e.Service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
             return;
 
-        characteristic.ValueUpdated += (sender, value) => Characteristic_ValueUpdated(buttonType, value);
-        await characteristic.SetNotifyingAsync(true);
+        e.Characteristic.SetNotifyingAsync(true);
     }
 
-    private void Characteristic_ValueUpdated(WatchButton sender, byte[] data)
+    private void ButtonValueChanged(object? sender, CharacteristicValueChangedEventArgs e)
     {
-
-        if (!ButtonStateChanged.TryParse(data, out var e))
+        if (e.Service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
             return;
 
-        _logger.LogInformation($"Button {sender} state changed to {e?.State}");
-        switch (e?.State)
+        if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(e.Characteristic.UUID, out var button))
+            return;
+
+        if (!ButtonStateChanged.TryParse(e.Value, out var buttonState))
+            return;
+
+        _logger.LogInformation($"Button {buttonState.State} state changed to {buttonState.State}");
+        switch (buttonState.State)
         {
             case ButtonState.Pressed:
-                _messenger.SendMessage(new ButtonPressedMessage(sender));
+                _messenger.SendMessage(new ButtonPressedMessage(button));
                 break;
             case ButtonState.Depressed:
-                _messenger.SendMessage(new ButtonReleasedMessage(sender));
+                _messenger.SendMessage(new ButtonReleasedMessage(buttonState.Button));
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

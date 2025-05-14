@@ -13,13 +13,12 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = Host.CreateApplicationBuilder(args);
 var loggingProvider = new CustomLoggingProvider();
-builder.Logging.ClearProviders();
-builder.Logging.AddProvider(loggingProvider);
-builder.Services.AddSingleton<ILoggerProvider>(loggingProvider);
 var logger = loggingProvider.CreateLogger("Program");
 
-var messenger = new WeakReferenceMessenger();
+builder.Logging.ClearProviders();
+builder.Logging.AddProvider(loggingProvider);
 
+var messenger = new WeakReferenceMessenger();
 builder.Services.AddSingleton<IMessenger>(messenger);
 builder.Services.AddHostedService<VibrationManager>();
 builder.Services.AddHostedService<BluetoothService>();
@@ -29,8 +28,6 @@ builder.Services.AddHostedService<HardwareButtonManager>();
 logger.LogInformation("==Application starting==");
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddLogging(configure => configure.AddConsole());
-
     logger.LogInformation("Waiting for debugger to attach");
     while (!Debugger.IsAttached)
     {

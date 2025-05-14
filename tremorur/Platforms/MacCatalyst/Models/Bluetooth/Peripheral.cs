@@ -7,36 +7,26 @@ namespace tremorur.Models.Bluetooth;
 
 public partial class BluetoothPeripheral : IBluetoothPeripheral
 {
-
     public readonly CBPeripheral NativePeripheral;
+
     private TaskCompletionSource<float?>? _rssiTaskCompletionSource;
-    private readonly BluetoothService _bluetoothService;
-    public BluetoothPeripheral(CBPeripheral cBPeripheral, BluetoothService bluetoothService) : base()
+    public BluetoothPeripheral(CBPeripheral cBPeripheral) : base()
     {
         NativePeripheral = cBPeripheral;
-        NativePeripheral.DiscoveredService += DiscoveredService;
+        NativePeripheral.DiscoveredService += CBPeripheral_DiscoveredService;
         NativePeripheral.RssiRead += RssiRead;
-
         NativePeripheral.DiscoverServices();
         NativePeripheral.ReadRSSI();
-        _bluetoothService = bluetoothService;
-        _bluetoothService.DisconnectedPeripheral += DisconnectedPeripheral;
     }
 
-    public void DisconnectedPeripheral(object? sender, string identifier)
-    {
-        if (identifier == UUID)
-        {
-            Disconnected?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    void DiscoveredService(object? sender, NSErrorEventArgs e)
+    void CBPeripheral_DiscoveredService(object? sender, NSErrorEventArgs e)
     {
         var allServices = NativePeripheral?.Services?.ToList() ?? new List<CBService>();
         var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.UUID.ToString())).ToList();
+
         foreach (var service in missingServices.Select(x => new BluetoothPeripheralService(x)))
         {
+            DiscoveredService?.Invoke(this, service);
             services.Add(service);
         }
     }

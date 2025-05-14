@@ -16,18 +16,19 @@ public partial class BluetoothPeripheralService : IBluetoothPeripheralService
 
         if (nativePeripheral != null)
         {
-            nativePeripheral.DiscoveredCharacteristics += Service_DiscoveredCharacteristics;
+            nativePeripheral.DiscoveredCharacteristics += CBService_DiscoveredCharacteristics;
             nativePeripheral?.DiscoverCharacteristics(forService: cBService);
         }
     }
 
-    private void Service_DiscoveredCharacteristics(object? sender, CBServiceEventArgs e)
+    private void CBService_DiscoveredCharacteristics(object? sender, CBServiceEventArgs e)
     {
         var allCharacteristics = nativeService?.Characteristics?.ToList() ?? new List<CBCharacteristic>();
-        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString())).ToList();
+        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString().ToUpper())).ToList();
 
         foreach (var characteristic in missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)))
         {
+            DiscoveredCharacteristic?.Invoke(this, characteristic);
             characteristics.Add(characteristic);
         }
     }

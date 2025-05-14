@@ -109,32 +109,9 @@ namespace client.Services.Bluetooth
             }
         }
 
-        // public async Task<MessageResponse?> ButtonStateChanged(AsyncRequestProxy<CharChangeData, MessageResponse> args)
-        // {
-        //     try
-        //     {
-        //         logger.LogInformation("Button state changed");
-        //         logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
-
-        //         if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(args.Value.CharacteristicId, out var button))
-        //         {
-        //             logger.LogError("Failed to parse button state");
-        //             return MessageResponse.Failure("Failed to parse button state");
-        //         }
-
-        //         var state = args.Value.Data[0] == 1 ? ButtonState.Depressed : ButtonState.Pressed;
-        //         await messenger.Send(new ButtonStateChangedMessage(button, state));
-        //         return MessageResponse.Success();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         logger.LogError(ex, "Failed to parse button state");
-        //         return MessageResponse.Failure("Failed to parse button state");
-        //     }
-        // }
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            logger.LogInformation("Starting bluetooth service");
             registerGattApplication();
 
             // Register the GATT characteristic handlers

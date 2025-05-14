@@ -13,6 +13,7 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
     public partial string UUID { get; }
     public partial BluetoothCharacteristicProperties Properties { get; }
     public partial byte[] LastValue { get; }
+
     public event EventHandler<byte[]> ValueUpdated = delegate { };
     public event EventHandler<bool> NotifyingUpdated = delegate { };
 
