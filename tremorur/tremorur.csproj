@@ -82,6 +82,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="Views\.xaml.cs">
+        <DependentUpon>AlarmListPage.xaml</DependentUpon>
+      </Compile>
       <Compile Update="Views\SetAlarmPage.xaml.cs">
         <DependentUpon>SetAlarmPage.xaml</DependentUpon>
       </Compile>
@@ -106,6 +109,12 @@
 
     <ItemGroup>
       <MauiXaml Update="Views\MedicationAlarmPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+      <MauiXaml Update="Views\AlarmListPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+      <MauiXaml Update="Views\SetVibrationPage.xaml">
         <Generator>MSBuild:Compile</Generator>
       </MauiXaml>
     </ItemGroup>

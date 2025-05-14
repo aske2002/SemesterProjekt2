@@ -2,6 +2,7 @@ using System.Globalization;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
+using tremorur.Views;
 using shared.Models;
 using tremorur.Messages;
 
@@ -46,6 +47,13 @@ namespace tremorur
 
             builder.Services.AddTransient<BluetoothConnectPage>();
             builder.Services.AddTransient<BluetoothConnectViewModel>();
+            builder.Services.AddTransient<BluetoothDevPage>();
+            builder.Services.AddTransient<BluetoothDevViewModel>();
+
+
+
+            builder.Services.AddTransient<BluetoothConnectPage>();
+            builder.Services.AddTransient<BluetoothConnectViewModel>();
 
             builder.Services.AddTransient<BluetoothDevPage>();
             builder.Services.AddTransient<BluetoothDevViewModel>();
@@ -60,6 +68,11 @@ namespace tremorur
 
             var messenger = new Messenger(CustomLoggingProvider.CreateLogger<Services.IMessenger>()); // Create a new instance of the messenger with the logger
             builder.Services.AddSingleton<Services.IMessenger>(messenger);
+
+            builder.Services.AddTransient<AlarmListPage>();
+            builder.Services.AddTransient<AlarmListViewModel>();
+
+
 
             var mauiApp = builder.Build();
             messenger.SendMessage<AppBuilt>(new(mauiApp.Services));

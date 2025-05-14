@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
+using System.Collections.ObjectModel; //for at kunne bruge ObservableCollection
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using tremorur.Messages;
@@ -67,6 +67,17 @@ namespace tremorur.Services
                 messenger.SendMessage(new AlarmTriggeredEvent(alarm));
             }
         }
+        public void DeleteAlarm(string id)
+        {
+            var alarm = _alarms.FirstOrDefault(a => a.Id == id);
+            if (alarm != null)
+            {
+                _alarms.Remove(alarm);
+            }
+
+
+        }
+
         public void ClearAlarms() //metode der sletter alle gemte alarmer
         {
             foreach (var timer in activeTimers)
