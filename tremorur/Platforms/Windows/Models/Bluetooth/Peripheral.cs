@@ -3,6 +3,7 @@ using System.Diagnostics;
 using CommunityToolkit.WinUI.Connectivity;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Foundation;
 
 namespace tremorur.Models.Bluetooth;
 
@@ -17,17 +18,10 @@ public partial class BluetoothPeripheral
         AdvertisementData = advertisement;
         Services_Changed(NativePeripheral, null);
         NativePeripheral.GattServicesChanged += Services_Changed ;
-        NativePeripheral.ConnectionStatusChanged += ConnectionStatusChanged;
+        NativePeripheral.ConnectionStatusChanged += (device, sender) => ConnectionStatusChanged?.Invoke(this, sender);
     }
 
-    private void ConnectionStatusChanged(BluetoothLEDevice sender, object args)
-    {
-        // Handle connection status changes
-        if (NativePeripheral.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
-        {
-            Disconnected.Invoke(this, EventArgs.Empty);
-        }
-    }
+    public event TypedEventHandler<BluetoothPeripheral, object>? ConnectionStatusChanged;
 
     private void Services_Changed(BluetoothLEDevice sender, object args)
     {
