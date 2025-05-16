@@ -51,7 +51,7 @@ namespace tremorur.Views
             try
             {
                 var index = await vibrationsService.NavigateLevelUp();
-                if (BindingContext is HomeViewModel vm && vm.Level >= 1 && vm.Level < 7)
+                if (BindingContext is HomeViewModel vm)
                     vm.Level = index;
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace tremorur.Views
             try
             {
                 var index = await vibrationsService.NavigateLevelDown();
-                if (BindingContext is HomeViewModel vm && vm.Level > 1)
+                if (BindingContext is HomeViewModel vm)
                     vm.Level = index;
             }
             catch (Exception ex)

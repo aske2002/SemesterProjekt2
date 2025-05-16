@@ -31,7 +31,7 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
                 MedicationLabel.Text = "Tag din medicin!";
             }
             else
-            {
+            {   
                 MedicationLabel.Text = "Kunne ikke hente alarm";
             }
         }

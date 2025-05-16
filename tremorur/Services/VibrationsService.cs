@@ -44,10 +44,15 @@ namespace tremorur.Services
         {
             VibrationSettings.CreateSinePatternSettings(50), //level 1
             VibrationSettings.CreateSinePatternSettings(80), // level 2
-            VibrationSettings.CreateDynamicPatternSettings((1000,1),(100,0),(500,1),(150,0)),//level 3
-            VibrationSettings.CreateSinePatternSettings(50), //level 4
-            VibrationSettings.CreateSinePatternSettings(50), //level 5
-            VibrationSettings.CreateSinePatternSettings(50), //level 6
+            VibrationSettings.CreateDynamicPatternSettings((1000,1),(500,0),(500,1),(700,0)),//level 3
+            VibrationSettings.CreateDynamicPatternSettings((2000,1),(750,0),(1000,1)), //level 4
+            VibrationSettings.CreateExpressionSettings((t) => (Math.Floor(t / 2000) % 2 == 1 ) ? 1 : 0), // Level 5
+
+            VibrationSettings.CreateMixedPatternSettings(
+                (VibrationSettings.CreateSinePatternSettings(50), 2000), // sinus i 2 sekunder
+                (VibrationSettings.CreateConstantPatternSettings(0.7), 3000) // derefter konstant 70% intensitet i 3 sekunder - og så gentag
+            ), //level 6
+
             VibrationSettings.CreateConstantPatternSettings(1), //level 7
         };
 

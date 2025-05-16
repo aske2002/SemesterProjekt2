@@ -9,7 +9,7 @@ namespace tremorur.Services
     {
         private ObservableCollection<Alarm> _alarms;
         private readonly IMessenger messenger;
-        private List<Timer> activeTimers = new(); //gemmer alle aktive timere
+        private Dictionary<string, Timer> activeTimers = new(); //gemmer alle aktive timere
         public Alarm? CurrentAlarm { get; set; }//getter og setter nuværende alarm, hvis der er nogen ellers null. Bliver brugt i AlarmTriggered i NavigationsService
 
         public AlarmService(IMessenger messenger)
@@ -35,8 +35,8 @@ namespace tremorur.Services
                     alarms.Add(newAlarm); //tilføjer nye alarmer
                 }
             }
-            ScheduleAlarms(); //de satte alarmer bliver kaldt
             SettingsService.Alarms = alarms; //gemmer listen ned igen via settingservice 
+            ScheduleAlarms(); //de satte alarmer bliver kaldt
         }
         public Alarm? GetAlarm(string id) //Metoden tager et id som parameter (den unikke nøgle til alarmen).
 
@@ -51,11 +51,17 @@ namespace tremorur.Services
         {
             foreach (var alarm in SettingsService.Alarms)
             {
+                if (activeTimers.TryGetValue(alarm.Id, out var activeTimerForAlarm))
+                {
+                    continue;
+                }
                 TimeSpan delay = alarm.TimeSpan - DateTime.Now.TimeOfDay;
                 if (delay < TimeSpan.Zero)
                     delay += TimeSpan.FromDays(1);
                 Timer timer = new Timer(TriggerAlarm, alarm, delay, Timeout.InfiniteTimeSpan);
-                activeTimers.Add(timer);
+                activeTimers[alarm.Id] = timer;
+
+
             }
         }
         private void TriggerAlarm(object? state)
@@ -82,7 +88,7 @@ namespace tremorur.Services
         {
             foreach (var timer in activeTimers)
             {
-                timer.Dispose(); //stopper alle aktive timere
+                timer.Value.Dispose(); //stopper alle aktive timere
             }
             activeTimers.Clear(); //tømmer listen med aktive timere
             _alarms.Clear(); //collectionchanges tømmes og UI opdateres
@@ -97,7 +103,7 @@ namespace tremorur.Services
 
             var tempAlarm = new Alarm { Id = Guid.NewGuid().ToString(), TimeSpan = triggerTime}; //opretter midlertidlig alarm med delay
             Timer timer = new Timer(TriggerAlarm, alarm, delay, Timeout.InfiniteTimeSpan);
-            activeTimers.Add(timer);//tilføjer alarm til aktive timere
+            activeTimers[tempAlarm.Id] = timer;//tilføjer alarm til aktive timere
         }
     }
 }
