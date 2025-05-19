@@ -36,7 +36,7 @@ public record VibrationSettings
     }
 
     /// <summary>
-    /// Creates a VibrationSettings object with a sine pattern.
+    /// Creates a VibrationSettings object with a sine pattern. 
     /// </summary>
     /// <param name="frequency">
     /// The frequency of the sine wave in Hz.

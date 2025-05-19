@@ -27,7 +27,7 @@ namespace tremorur.Services
                 return;
             }
             var currentValue = await _onOffChar.ReadValueAsync(); //læser fra RPi om vibration er tændt
-            logger.LogInformation("Toggling vibration, current state: {state}", currentValue.FirstOrDefault());
+            logger.LogInformation("Toggling vibration, current state: {state}", currentValue.FirstOrDefault());//logbeked med informationsniveau
 
             var vibrationRunning = currentValue.FirstOrDefault() == 1; //hvis vibration er tændt [1] så er vibrationRunning true, ellers false
 
@@ -47,19 +47,17 @@ namespace tremorur.Services
             VibrationSettings.CreateDynamicPatternSettings((1000,1),(500,0),(500,1),(700,0)),//level 3
             VibrationSettings.CreateDynamicPatternSettings((2000,1),(750,0),(1000,1)), //level 4
             VibrationSettings.CreateExpressionSettings((t) => (Math.Floor(t / 2000) % 2 == 1 ) ? 1 : 0), // Level 5
-
             VibrationSettings.CreateMixedPatternSettings(
                 (VibrationSettings.CreateSinePatternSettings(50), 2000), // sinus i 2 sekunder
-                (VibrationSettings.CreateConstantPatternSettings(0.7), 3000) // derefter konstant 70% intensitet i 3 sekunder - og så gentag
+                (VibrationSettings.CreateConstantPatternSettings(0.7), 3000) // derefter konstant 70% intensitet i 3 sekunder -> gentag
             ), //level 6
-
             VibrationSettings.CreateConstantPatternSettings(1), //level 7
         };
 
         private async Task<int> GetCurrentVibration(IBluetoothPeripheralCharacteristic characteristic)//metode for at gøre navigation lettere
         {
-            var currentData = await characteristic.ReadValueAsync(); //læser fra PPi hvad mønsteret er
-            var currentPattern = await VibrationSettings.FromBytes(currentData);//læser hvilket level mønster RPi er på
+            var currentData = await characteristic.ReadValueAsync(); //læser fra RPI hvad mønsteret er
+            var currentPattern = await VibrationSettings.FromBytes(currentData);//læser hvilket level mønster RPI er på
 
             var currentLevel = 0;
             if (currentPattern != null)
