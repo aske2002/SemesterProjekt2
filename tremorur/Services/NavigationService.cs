@@ -31,16 +31,6 @@ namespace tremorur.Services
                 return Shell.Current.GoToAsync(navigateionState, parameters);
             }
         }
-        public Task GoBackAsync() //bliver denne metode brugt nogen steder???!!!
-        {
-            if (Shell.Current is null)
-            {
-                throw new NotSupportedException($"Navigation with the '{nameof(GoBackAsync)}' method is currently supported only with a Shell-enabled application.");
-            }
-            var navigateionState = new ShellNavigationState("..");
-            _messenger.SendMessage(navigateionState);
-            return Shell.Current.GoToAsync(navigateionState);
-        }
 
         public async void AlarmTriggered(AlarmTriggeredEvent evt) //metode der reagerer på event og starter navigation - modtager event-objekt, der indeholder den alarm der bliver trigget
         {

@@ -18,23 +18,7 @@ public record VibrationSettings
         var pattern = new VibrationPatternMixed(patterns.Select(p => new VibrationPatternMixed.VibrationPatternSegment(p.settings.Pattern, p.durationMS)).ToList(), 5);
         return new VibrationSettings { Pattern = pattern, Id = Guid.NewGuid() };
     }
-
-    public static VibrationSettings CreateMixedPatternSettings(params (IVibrationPattern pattern, int durationMS)[] patterns)
-    {
-        var pattern = new VibrationPatternMixed(patterns.Select(p => new VibrationPatternMixed.VibrationPatternSegment(p.pattern, p.durationMS)).ToList(), 5);
-        return new VibrationSettings { Pattern = pattern, Id = Guid.NewGuid() };
-    }
- 
-    public static VibrationSettings CreateExpressionSettings(Expression<Func<double, double>> expression)
-    {
-        var pattern = new VibrationPatternExpression(expression, 1);
-        return new VibrationSettings
-        {
-            Id = Guid.NewGuid(),
-            Pattern = pattern
-        };
-    }
-
+        
     /// <summary>
     /// Creates a VibrationSettings object with a sine pattern. 
     /// </summary>

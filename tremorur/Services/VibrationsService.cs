@@ -10,9 +10,7 @@ namespace tremorur.Services
     {
         private readonly IBluetoothStateManager _bluetoothStateManager;
         private IBluetoothPeripheralService? _vibrationService => _bluetoothStateManager.Peripheral?.Services?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationServiceUUID);
-        //
         private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationPatternCharacteristicUUID);
-        //
         private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationEnabledCharacteristicUUID);
         private ILogger<VibrationsService> logger;
 
@@ -48,7 +46,10 @@ namespace tremorur.Services
             VibrationSettings.CreateSinePatternSettings(80), // level 2
             VibrationSettings.CreateDynamicPatternSettings((1000,1),(500,0),(500,1),(700,0)),//level 3
             VibrationSettings.CreateDynamicPatternSettings((2000,1),(750,0),(1000,1)), //level 4
-            VibrationSettings.CreateExpressionSettings((t) => (Math.Floor(t / 2000) % 2 == 1 ) ? 1 : 0), // Level 5
+            VibrationSettings.CreateMixedPatternSettings(
+                (VibrationSettings.CreateSinePatternSettings(50), 2000), // sinus i 2 sekunder
+                (VibrationSettings.CreateDynamicPatternSettings((2000,1),(750,0)), 3000) // derefter konstant 70% intensitet i 3 sekunder -> gentag
+            ), // Level 5
             VibrationSettings.CreateMixedPatternSettings(
                 (VibrationSettings.CreateSinePatternSettings(50), 2000), // sinus i 2 sekunder
                 (VibrationSettings.CreateConstantPatternSettings(0.7), 3000) // derefter konstant 70% intensitet i 3 sekunder -> gentag
@@ -56,31 +57,29 @@ namespace tremorur.Services
             VibrationSettings.CreateConstantPatternSettings(1), //level 7
         };
 
-        private async Task<int> GetCurrentVibration(IBluetoothPeripheralCharacteristic characteristic)//hjælpefunktion der finder nuværnde level
+        private async Task<int> GetCurrentVibration(IBluetoothPeripheralCharacteristic characteristic)//hjælpemetode der finder nuværende level
         {
-            if (_onOffChar == null)
+            if (_onOffChar == null || _patternChar == null)
+            {
                 return 0;
+            }
 
-            var onOffValue = await _onOffChar.ReadValueAsync(); //læser om vibratione er tændt [1] eller slukket [0]
+            var onOffValue = await _onOffChar.ReadValueAsync(); //læser om vibrationerne er tændt [1] eller slukket [0]
             var isVibrationOn = onOffValue.FirstOrDefault() == 1;
 
             if (!isVibrationOn)
             {
-                return 0; // vibration er slukket
+                return 0; // Vibration er slukket
             }
-            var currentData = await characteristic.ReadValueAsync(); //læser aktuelt vibrationsmønster fra RPi hvis tændt
+            var currentData = await _patternChar.ReadValueAsync(); //læser vibrationsmønster fra RPi hvis tændt
             var currentPattern = await VibrationSettings.FromBytes(currentData);//identificerer mønsteret
 
             if (currentPattern != null)
             {
                 var currentLevel = vibrationsLevels.IndexOf(vibrationsLevels.Find(e => e.Id == currentPattern.Id));
-
-                if (currentLevel >= 0)
-                {
-                    return currentLevel + 1;//returnerer som 1-7
-                }
+                return currentLevel >= 0 ? currentLevel + 1: 0; //returnerer level som 1-7
             }
-            return 1;
+            return 0;//ukendt mønster
         }
         public async Task<int> NavigateLevelUp()
         {
