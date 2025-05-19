@@ -10,7 +10,6 @@ public class Messenger : IMessenger
 {
     private readonly ILogger _logger;
     private readonly ICommunityToolkitMessenger _messenger = StrongReferenceMessenger.Default;
-    private readonly List<IMiddlewareRegistration> _middleware = new();
     private IServiceProvider? serviceProvider;
 
     public Messenger(ILogger logger)

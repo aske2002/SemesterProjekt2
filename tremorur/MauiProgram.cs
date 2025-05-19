@@ -43,20 +43,6 @@ namespace tremorur
 
             builder.Services.AddTransient<SetAlarmViewModel>();
             builder.Services.AddTransient<SetAlarmPage>();
-            
-
-            builder.Services.AddTransient<BluetoothConnectPage>();
-            builder.Services.AddTransient<BluetoothConnectViewModel>();
-            builder.Services.AddTransient<BluetoothDevPage>();
-            builder.Services.AddTransient<BluetoothDevViewModel>();
-
-
-
-            builder.Services.AddTransient<BluetoothConnectPage>();
-            builder.Services.AddTransient<BluetoothConnectViewModel>();
-
-            builder.Services.AddTransient<BluetoothDevPage>();
-            builder.Services.AddTransient<BluetoothDevViewModel>();
 
             var loggerProvider = new CustomLoggingProvider();
 

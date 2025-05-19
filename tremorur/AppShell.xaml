@@ -30,17 +30,7 @@
             Route="medicationPage"/>
     </FlyoutItem>
 
-	<FlyoutItem Title="Alarmer" Route="AlarmListPage">
-		<ShellContent ContentTemplate="{DataTemplate vw:AlarmListPage}" />
-	</FlyoutItem>
-    <FlyoutItem Title="Bluetooth List">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:BluetoothConnectPage}"
-            Route="bluetoothConnect"/>
-    </FlyoutItem>
-    <FlyoutItem Title="Bluetooth Device">
-        <ShellContent
-            ContentTemplate="{DataTemplate vw:BluetoothDevPage}"
-            Route="bluetoothDev"/>
+    <FlyoutItem Title="Alarmer" Route="AlarmListPage">
+        <ShellContent ContentTemplate="{DataTemplate vw:AlarmListPage}" />
     </FlyoutItem>
 </Shell>
