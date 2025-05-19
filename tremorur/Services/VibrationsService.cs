@@ -10,11 +10,13 @@ namespace tremorur.Services
     {
         private readonly IBluetoothStateManager _bluetoothStateManager;
         private IBluetoothPeripheralService? _vibrationService => _bluetoothStateManager.Peripheral?.Services?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationServiceUUID);
+        //
         private IBluetoothPeripheralCharacteristic? _patternChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationPatternCharacteristicUUID);
+        //
         private IBluetoothPeripheralCharacteristic? _onOffChar => _vibrationService?.Characteristics?.FirstOrDefault(e => e.UUID == BluetoothIdentifiers.VibrationEnabledCharacteristicUUID);
         private ILogger<VibrationsService> logger;
 
-        public VibrationsService(IBluetoothStateManager bluetoothStateManager, ILogger<VibrationsService> logger) //initialiserer bluetoothService
+        public VibrationsService(IBluetoothStateManager bluetoothStateManager, ILogger<VibrationsService> logger) //initialiserer bluetoothStateManager
         {
             _bluetoothStateManager = bluetoothStateManager;
             this.logger = logger;
@@ -54,21 +56,31 @@ namespace tremorur.Services
             VibrationSettings.CreateConstantPatternSettings(1), //level 7
         };
 
-        private async Task<int> GetCurrentVibration(IBluetoothPeripheralCharacteristic characteristic)//metode for at gøre navigation lettere
+        private async Task<int> GetCurrentVibration(IBluetoothPeripheralCharacteristic characteristic)//hjælpefunktion der finder nuværnde level
         {
-            var currentData = await characteristic.ReadValueAsync(); //læser fra RPI hvad mønsteret er
-            var currentPattern = await VibrationSettings.FromBytes(currentData);//læser hvilket level mønster RPI er på
+            if (_onOffChar == null)
+                return 0;
 
-            var currentLevel = 0;
+            var onOffValue = await _onOffChar.ReadValueAsync(); //læser om vibratione er tændt [1] eller slukket [0]
+            var isVibrationOn = onOffValue.FirstOrDefault() == 1;
+
+            if (!isVibrationOn)
+            {
+                return 0; // vibration er slukket
+            }
+            var currentData = await characteristic.ReadValueAsync(); //læser aktuelt vibrationsmønster fra RPi hvis tændt
+            var currentPattern = await VibrationSettings.FromBytes(currentData);//identificerer mønsteret
+
             if (currentPattern != null)
             {
-                currentLevel = vibrationsLevels.IndexOf(vibrationsLevels.Find(e => e.Id == currentPattern.Id));
-            }
-            else
-            {
+                var currentLevel = vibrationsLevels.IndexOf(vibrationsLevels.Find(e => e.Id == currentPattern.Id));
 
+                if (currentLevel >= 0)
+                {
+                    return currentLevel + 1;//returnerer som 1-7
+                }
             }
-            return currentLevel;
+            return 1;
         }
         public async Task<int> NavigateLevelUp()
         {
