@@ -46,7 +46,3 @@ public class CustomLoggingProvider : ILoggerProvider
         LoggerFactory.Dispose();
     }
 }
-
-public static class LoggingBuilderConfigurationExtensions
-{
-}

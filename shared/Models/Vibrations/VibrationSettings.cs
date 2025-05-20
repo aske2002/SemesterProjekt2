@@ -14,7 +14,7 @@ public record VibrationSettings
     };
 
     public static VibrationSettings CreateMixedPatternSettings(params (VibrationSettings settings, int durationMS)[] patterns)
-    {
+    {   
         var pattern = new VibrationPatternMixed(patterns.Select(p => new VibrationPatternMixed.VibrationPatternSegment(p.settings.Pattern, p.durationMS)).ToList(), 5);
         return new VibrationSettings { Pattern = pattern, Id = Guid.NewGuid() };
     }

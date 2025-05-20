@@ -63,7 +63,6 @@ namespace tremorur
             }
         }
 
-        [Development.HotReload.OnHotReload]
         private void SizeChanged(object? sender, EventArgs? e)
         {
             if (_absoluteLayout == null || this._grid == null)
