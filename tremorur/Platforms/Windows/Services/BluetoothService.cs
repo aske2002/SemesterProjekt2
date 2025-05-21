@@ -11,6 +11,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 
 namespace tremorur.Services;
+
 public partial class BluetoothService
 {
     BluetoothLEAdvertisementWatcher advertisementWatcher;
@@ -32,11 +33,30 @@ public partial class BluetoothService
     {
         if (ScanForUUIDs != null && ScanForUUIDs.Count() > 0)
         {
-            if (ScanForUUIDs.All(uuid => args.Advertisement.ServiceUuids.Any(s => s.ToString().ToUpper() == uuid.ToUpper())))
+            if (ScanForUUIDs.All(uuid => args.Advertisement.ServiceUuids.Any(s => s.ToString().ToLower() == uuid.ToLower())))
             {
                 AddDiscoveredPeripheral(new DiscoveredPeripheral(args, this));
             }
         }
+        else
+        {
+            AddDiscoveredPeripheral(new DiscoveredPeripheral(args, this));
+        }
+    }
+
+
+    private Dictionary<ulong, string> knownDevices
+    {
+        get
+        {
+            return SettingsService.GetClassFromStorage<Dictionary<ulong, string>>(nameof(knownDevices), new());
+        }
+    }
+    private void AddKnownDevice(ulong address, string id)
+    {
+        var devices = knownDevices;
+        devices[address] = id;
+        SettingsService.SetClassInStorage(nameof(knownDevices), devices);
     }
 
     internal partial async Task<IBluetoothPeripheral> ConnectPeripheralAsyncInternal(IDiscoveredPeripheral discoveredPeripheral)
@@ -45,32 +65,31 @@ public partial class BluetoothService
         {
             throw new ArgumentException("Invalid device type", nameof(discoveredPeripheral));
         }
+        BluetoothLEDevice nativeDevice;
 
-        string aqsFilter = BluetoothLEDevice.GetDeviceSelectorFromBluetoothAddress(bluetoothDiscoveredPeripheral.AdvertisementData.BluetoothAddress);
-        var devices = await DeviceInformation.FindAllAsync(aqsFilter);
-        var deviceInfo = devices.FirstOrDefault();
-
-        if (deviceInfo == null)
+        if (knownDevices.TryGetValue(bluetoothDiscoveredPeripheral.AdvertisementData.BluetoothAddress, out var id))
         {
-            throw new Exception("Failed to get device information");
+            nativeDevice = await BluetoothLEDevice.FromIdAsync(id);
+        }
+        else
+        {
+            string aqsFilter = BluetoothLEDevice.GetDeviceSelectorFromBluetoothAddress(bluetoothDiscoveredPeripheral.AdvertisementData.BluetoothAddress);
+            var devices = await DeviceInformation.FindAllAsync(aqsFilter);
+            var deviceInfo = devices.FirstOrDefault();
+
+            if (deviceInfo == null)
+            {
+                throw new Exception("Failed to get device information");
+
+            }
+
+            nativeDevice = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id);
+            AddKnownDevice(bluetoothDiscoveredPeripheral.AdvertisementData.BluetoothAddress, deviceInfo.Id);
         }
 
-        var nativeDevice = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id);
         await ConnectBletoothLEDevice(nativeDevice);
-     
-        var peripheral = new BluetoothPeripheral(nativeDevice, bluetoothDiscoveredPeripheral.AdvertisementData);
-        peripheral.ConnectionStatusChanged += BluetoothLEDevice_ConnectionChanged;
-
+        var peripheral = new BluetoothPeripheral(nativeDevice, bluetoothDiscoveredPeripheral.AdvertisementData, this);
         return peripheral;
-
-    }
-
-    private void BluetoothLEDevice_ConnectionChanged(BluetoothPeripheral device, object sender)
-    {
-        if (device.State == BluetoothPeripheralState.Disconnected || device.State == BluetoothPeripheralState.Disconnecting)
-        {
-            PeripheralDidDisconnect(device.UUID, string.IsNullOrEmpty(sender.ToString()) ? new Exception(sender.ToString()) : null);
-        }
     }
 
     internal partial async Task ConnectPeripheralAsyncInternal(IBluetoothPeripheral bluetoothPeripheral)
@@ -86,36 +105,51 @@ public partial class BluetoothService
 
     private async Task ConnectBletoothLEDevice(BluetoothLEDevice nativeDevice)
     {
-        if (nativeDevice.ConnectionStatus == BluetoothConnectionStatus.Connected) {
-            return;
-        }
+       var accessResult = await nativeDevice.RequestAccessAsync();
 
         if (!nativeDevice.DeviceInformation.Pairing.IsPaired)
         {
-            var customPairing = nativeDevice.DeviceInformation.Pairing.Custom;
-            customPairing.PairingRequested += (sender, args) =>
+            if (!nativeDevice.DeviceInformation.Pairing.IsPaired)
             {
-                args.Accept(); // or use args.Accept(pin) if required
-            };
-            var pairingResult = await customPairing.PairAsync(DevicePairingKinds.ConfirmOnly, DevicePairingProtectionLevel.Default);
+                var customPairing = nativeDevice.DeviceInformation.Pairing.Custom;
+                customPairing.PairingRequested += (sender, args) =>
+                {
+                    args.Accept(); // or use args.Accept(pin) if required
+                };
+                var pairingResult = await customPairing.PairAsync(DevicePairingKinds.ConfirmOnly, DevicePairingProtectionLevel.Default);
 
-            if (pairingResult.Status != DevicePairingResultStatus.Paired)
-            {
-                throw new Exception("Failed to pair with device");
+                if (pairingResult.Status != DevicePairingResultStatus.Paired)
+                {
+                    throw new Exception($"Failed to pair with device: {pairingResult.Status}");
+                }
             }
         }
-        // Get all the services for this device
-        var getGattServicesAsyncTokenSource = new CancellationTokenSource(15000);
-        var getGattServicesAsyncTask = await
-            Task.Run(
-                () => nativeDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached),
-                getGattServicesAsyncTokenSource.Token);
 
-        var result = await getGattServicesAsyncTask;
-
-        if (result.Status != GattCommunicationStatus.Success)
+        if (nativeDevice.ConnectionStatus == BluetoothConnectionStatus.Connected)
         {
-            throw new Exception("Failed to get GATT services");
+            return;
+        }
+
+        var retryCount = 0;
+        var maxRetries = 20;
+        while (nativeDevice.ConnectionStatus != BluetoothConnectionStatus.Connected)
+        {
+            if (retryCount > maxRetries)
+            {
+                throw new Exception("Failed to connect to GATT server");
+            }
+
+            try
+            {
+                var result = await nativeDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached);
+                if (result.Status == GattCommunicationStatus.Success)
+                {
+                    break;
+                }
+            }
+            catch (Exception) { }
+            retryCount++;
+            _logger.Log(LogLevel.Warning, $"Failed to connect to GATT server. Retrying {retryCount}/{maxRetries}..."); ;
         }
     }
 
@@ -141,5 +175,4 @@ public partial class BluetoothService
         advertisementWatcher.Stop();
         _logger.Log(LogLevel.Information, "Bluetooth scan stopped.");
     }
-
 }

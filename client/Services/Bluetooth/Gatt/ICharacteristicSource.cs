@@ -1,25 +1,17 @@
 ﻿using System.Threading.Tasks;
+using client.Services.Bluetooth.Core;
+using client.Services.Bluetooth.Gatt.BlueZModel;
 
-namespace client.Services.Bluetooth.Gatt
+namespace DotnetBleServer.Gatt
 {
-    public interface ICharacteristicSource
-    {
-        Task WriteValueAsync(byte[] value);
-        Task<byte[]> ReadValueAsync();
-    }
-    
-    public class DefaultCharacteristicSource : ICharacteristicSource
-    {
-        public Task WriteValueAsync(byte[] value)
-        {
-            var str = System.Text.Encoding.UTF8.GetString(value);
-            Console.WriteLine($"WriteValueAsync: {str}");
-            return Task.CompletedTask;
-        }
 
-        public Task<byte[]> ReadValueAsync()
-        {
-            return Task.FromResult(Array.Empty<byte>());
-        }
+    public abstract class ICharacteristicSource
+    {
+        public PropertiesBase<GattCharacteristic1Properties> Properties;
+        public abstract Task WriteValueAsync(byte[] value, bool response);
+        public abstract Task<byte[]> ReadValueAsync();
+        public abstract Task StartNotifyAsync();
+        public abstract Task StopNotifyAsync();
+        public abstract Task ConfirmAsync();
     }
 }

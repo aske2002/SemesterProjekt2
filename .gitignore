@@ -14,3 +14,7 @@ tremorur/tremorur.csproj.user
 
 .vs/tremorur/v17/
 .vs/
+
+client/publish/
+
+client/publish.zip

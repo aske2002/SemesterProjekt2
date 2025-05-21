@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-
+﻿
 namespace client.Services.Bluetooth.Utilities
 {
     public static class PropertyAccessExtensions

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using client.Services.Bluetooth.Gatt.BlueZModel;
-using Tmds.DBus;
+﻿using Tmds.DBus;
 
 namespace client.Services.Bluetooth.Core
 {

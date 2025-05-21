@@ -30,23 +30,19 @@ namespace tremorur
 
             builder.Services.AddTransient<AlarmService>();
             builder.Services.AddSingleton<IDialogService, DialogService>();
-            builder.Services.AddSingleton<INavigationService, NavigationService>();
-
-            builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<INavigationService, NavigationService>(); //bruges til at navigere rundt med. Har en goto, hvordan vi navigerer rundt mellem mapperne. 
 
-            builder.Services.AddSingleton<HomeViewModel>();
-            builder.Services.AddSingleton<HomePage>();
+            builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<HomePage>();
 
-            builder.Services.AddTransient<MedicationAlarmViewModel>();
             builder.Services.AddTransient<MedicationAlarmPage>();
 
-            builder.Services.AddTransient<SetAlarmViewModel>();
             builder.Services.AddTransient<SetAlarmPage>();
 
             var loggerProvider = new CustomLoggingProvider();
 
             // Register the logger factory in services, so it's available later
+            builder.Logging.ClearProviders(); // Clear default providers
             builder.Services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.AddProvider(loggerProvider);

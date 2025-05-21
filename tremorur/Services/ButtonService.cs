@@ -37,41 +37,13 @@ public class ButtonService : IButtonService
         _bluetoothStateManager = bluetoothStateManager ?? throw new ArgumentNullException(nameof(bluetoothStateManager));
         _messenger.On<ButtonPressedMessage>(Button_Pressed);
         _messenger.On<ButtonReleasedMessage>(Button_Released);
-
         _bluetoothStateManager.CharacteristicValueChanged += ButtonValueChanged;
-        _bluetoothStateManager.DiscoveredCharacteristic += Characteristic_Discovered;
-        _bluetoothStateManager.PeripheralConnected += Peripheral_Connected;
     }
 
-    private async void Peripheral_Connected(object? sender, IBluetoothPeripheral e)
-    {
-        var service = e.Services.FirstOrDefault(s => s.UUID == BluetoothIdentifiers.ButtonServiceUUID);
-
-        if (service == null)
-            return;
-
-        foreach (var characteristic in service.Characteristics)
-        {
-            if (BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.ContainsKey(characteristic.UUID))
-            {
-                _logger.LogInformation($"Discovered button characteristic: {characteristic.UUID}");
-                await characteristic.SetNotifyingAsync(true);
-            }
-
-        }
-    }
-
-    private void Characteristic_Discovered(object? sender, DiscoveredCharacteristicEventArgs e)
-    {
-        if (e.Service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
-            return;
-
-        e.Characteristic.SetNotifyingAsync(true);
-    }
 
     private void ButtonValueChanged(object? sender, CharacteristicValueChangedEventArgs e)
     {
-        if (e.Service.UUID != BluetoothIdentifiers.ButtonServiceUUID)
+        if (e.Service.UUID != BluetoothIdentifiers.TemorurServiceUUID)
             return;
 
         if (!BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.TryGetValue(e.Characteristic.UUID, out var button))

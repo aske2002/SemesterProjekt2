@@ -31,11 +31,11 @@ namespace client.Services.Bluetooth.Core
             return Task.FromResult(Properties);
         }
 
+
         public Task SetAsync(string prop, object val)
         {
-            Properties.SetProperty(prop, val);
             OnPropertiesChanged.Invoke(PropertyChanges.ForProperty(prop, val));
-            return Task.CompletedTask;
+            return Properties.SetProperty(prop, val);
         }
 
         public Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler)

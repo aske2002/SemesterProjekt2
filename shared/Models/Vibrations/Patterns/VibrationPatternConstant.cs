@@ -11,7 +11,7 @@ public record VibrationPatternConstant : VibrationPatternBase
         return intensity;
     }
 
-    public VibrationPatternConstant(double intensity, double resolution = double.MaxValue) : base(resolution)
+    public VibrationPatternConstant(double intensity, double resolution = 1000) : base(resolution)
     {
         this.intensity = intensity;
     }
@@ -23,7 +23,7 @@ public record VibrationPatternConstant : VibrationPatternBase
     /// <param name="resolution">The resolution of the vibration pattern, default is double.MaxValue.</param>
     /// <returns>A Task that represents the asynchronous operation. The task result contains the VibrationPatternConstant object.</returns>
     /// <exception cref="ArgumentException">Thrown when the byte array is not valid.</exception>
-    public static Task<VibrationPatternConstant> ParseAsync(BinaryAdapter reader, double resolution = double.MaxValue)
+    public static Task<VibrationPatternConstant> ParseAsync(PatternReader reader, double resolution)
     {
         if (reader.RemainingBytes != 8)
         {

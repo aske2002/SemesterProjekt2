@@ -11,7 +11,7 @@
     x:Name="shell"
     BackgroundColor="Transparent"
     FlyoutBackgroundColor="Transparent"
-    Shell.NavBarIsVisible="False"
+    Shell.NavBarIsVisible="True"
     Shell.FlyoutBackdrop="Transparent"
     mc:Ignorable="d">
     <FlyoutItem Title="HomePage">

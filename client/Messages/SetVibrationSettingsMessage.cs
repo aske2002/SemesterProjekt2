@@ -1,9 +1,9 @@
 using client.Models;
 using shared.Models.Vibrations;
 
-public class SetVibrationSettingsMessage : AsyncRequestResponseMesage<VibrationSettings>
+public class SetVibrationSettingsMessage : AsyncRequestResponseMesage<byte[]>
 {
-    public SetVibrationSettingsMessage(VibrationSettings value) : base(value)
+    public SetVibrationSettingsMessage(byte[] value) : base(value)
     {
     }
 }

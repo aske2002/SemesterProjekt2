@@ -24,7 +24,7 @@ public partial class BluetoothPeripheralService : IBluetoothPeripheralService
     private void CBService_DiscoveredCharacteristics(object? sender, CBServiceEventArgs e)
     {
         var allCharacteristics = nativeService?.Characteristics?.ToList() ?? new List<CBCharacteristic>();
-        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString().ToUpper())).ToList();
+        var missingCharacteristics = allCharacteristics.Where(x => !Characteristics.Any(y => y.UUID == x.UUID.ToString().ToLower())).ToList();
 
         foreach (var characteristic in missingCharacteristics.Select(x => new BluetoothPeripheralCharacteristic(x)))
         {
@@ -35,6 +35,6 @@ public partial class BluetoothPeripheralService : IBluetoothPeripheralService
 
     private ObservableCollection<IBluetoothPeripheralCharacteristic> characteristics = new ObservableCollection<IBluetoothPeripheralCharacteristic>();
     public partial ObservableCollection<IBluetoothPeripheralCharacteristic> Characteristics => characteristics;
-    public partial string UUID => nativeService?.UUID.ToString().ToUpper() ?? string.Empty;
+    public partial string UUID => nativeService?.UUID.ToString().ToLower() ?? string.Empty;
     public partial bool IsPrimary => this.nativeService.Primary;
 }

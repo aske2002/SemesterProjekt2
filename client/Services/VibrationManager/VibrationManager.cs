@@ -6,9 +6,12 @@ using client.Models;
 using shared.Models.Vibrations;
 using shared.Models.Vibrations.Patterns;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsMessage>, IRecipient<ToggleVibrationsMessage>
 {
+    private ConcurrentDictionary<Guid, VibrationSettings> cachedVibrationSettings = new ConcurrentDictionary<Guid, VibrationSettings>();
+
     private readonly IMessenger _messenger;
     private readonly ILogger<VibrationManager> _logger;
     private bool _isVibrationEnabled = false;
@@ -60,7 +63,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
             var intensity = Pattern.GetCurrentIntensity(stopwatch.Elapsed.TotalMilliseconds);
             var dutyCycle = intensity.AsDutyCycle(HardwareConstants.VIBRATION_PWM_MIN_DUTY_CYCLE, HardwareConstants.VIBRATION_PWM_MAX_DUTY_CYCLE);
             _logger.LogInformation("Vibration intensity: {Intensity} (Duty Cycle: {DutyCycle})", intensity, dutyCycle);
-            
+
             lock (pwmChannel)
             {
                 pwmChannel.DutyCycle = dutyCycle;
@@ -125,11 +128,12 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
         return Task.CompletedTask;
     }
 
-    public void Receive(SetVibrationSettingsMessage message)
+    public async void Receive(SetVibrationSettingsMessage message)
     {
-        VibrationSettings = message.Value;
-        _logger.LogInformation("Vibration settings changed to pattern with id {Id} of type {Type} with resolution {Resolution}", message.Value.Id, message.Value.Pattern.GetType(), message.Value.Pattern.Resolution);
         message.Reply(Task.CompletedTask);
+        VibrationSettings = await VibrationSettings.FromBytes(message.Value)
+            ?? throw new ArgumentException("Invalid vibration settings");
+        _logger.LogInformation("Vibration settings changed to pattern with id {Id} of type {Type} with resolution {Resolution}", VibrationSettings.Id, VibrationSettings.Pattern.GetType(), VibrationSettings.Pattern.Resolution);
     }
 
     public void Receive(ToggleVibrationsMessage message)

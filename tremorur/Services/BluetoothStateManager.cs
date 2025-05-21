@@ -35,7 +35,7 @@ public class BluetoothStateManager : IBluetoothStateManager
         _bluetoothService.PeripheralDisconnected += OnPeripheralDisconnected;
         _bluetoothService.DiscoveredCharacteristic += OnDiscoveredCharacteristic;
         _bluetoothService.CharacteristicValueChanged += OnCharacteristicValueChanged;
-        _bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
+        StartDiscovery();
     }
 
     public event EventHandler<bool>? ConnectionStateChanged;
@@ -44,13 +44,24 @@ public class BluetoothStateManager : IBluetoothStateManager
     public event EventHandler<DiscoveredCharacteristicEventArgs>? DiscoveredCharacteristic;
     public event EventHandler? PeripheralDisconnected;
 
-    private bool IsValidPeripheral(IBluetoothPeripheral peripheral) => peripheral.Services.Any(s => s.UUID == BluetoothIdentifiers.VibrationServiceUUID);
+    private bool IsValidDiscoveredPeripheral(IDiscoveredPeripheral peripheral) => peripheral.Services.Any(s => s == BluetoothIdentifiers.TemorurServiceUUID);
+    private bool IsValidPeripheral(IBluetoothPeripheral peripheral) => peripheral.Services.Any(s => s.UUID == BluetoothIdentifiers.TemorurServiceUUID);
 
-    public void OnDiscoveredCharacteristic(object? sender, DiscoveredCharacteristicEventArgs e)
+    private void StartDiscovery()
     {
+        _bluetoothService.StartDiscovery([BluetoothIdentifiers.TemorurServiceUUID]);
+    }
+
+    public async void OnDiscoveredCharacteristic(object? sender, DiscoveredCharacteristicEventArgs e)
+    {
+        _logger.LogWarning("Discovered characteristic: {Characteristic}", e.Characteristic.UUID);
         if (IsValidPeripheral(e.Peripheral))
         {
-            _logger.LogInformation("Discovered characteristic: {UUID}", e.Characteristic.UUID);
+            if (e.Service.UUID == BluetoothIdentifiers.TemorurServiceUUID)
+            {
+                await e.Characteristic.SetNotifyingAsync(true);
+            }
+
             DiscoveredCharacteristic?.Invoke(this, e);
         }
     }
@@ -58,16 +69,15 @@ public class BluetoothStateManager : IBluetoothStateManager
     {
         if (IsValidPeripheral(e.Peripheral))
         {
-            _logger.LogInformation("Characteristic value changed: {UUID}", e.Characteristic.UUID);
             CharacteristicValueChanged?.Invoke(this, e);
         }
     }
     private void OnPeripheralDisconnected(object? sender, PeripheralDisconnectedEventArgs e)
     {
-        if (_peripheral != null && e.Peripheral == _peripheral)
+        if (e.Peripheral.UUID == _peripheral?.UUID || _peripheral == null)
         {
             _peripheral = null;
-            _bluetoothService.StartDiscovery(BluetoothIdentifiers.VibrationServiceUUID);
+            StartDiscovery();
             ConnectionStateChanged?.Invoke(this, false);
             PeripheralDisconnected?.Invoke(this, EventArgs.Empty);
             _messenger.SendMessage(new DeviceDisconnected());
@@ -76,13 +86,13 @@ public class BluetoothStateManager : IBluetoothStateManager
 
     private async void OnDiscoveredPeripheral(object? sender, IDiscoveredPeripheral peripheral)
     {
-        if (!peripheral.Services.Any(s => s == BluetoothIdentifiers.VibrationServiceUUID))
+        if (!IsValidDiscoveredPeripheral(peripheral))
         {
+            _logger.LogInformation("Peripheral {Peripheral} does not have the required services", peripheral.LocalName);
             return;
         }
 
         _bluetoothService.StopDiscovery();
-        _logger.LogInformation("Watch found: {Peripheral}", peripheral.LocalName);
         _peripheral = await peripheral.ConnectAsync();
         if (_peripheral == null)
         {

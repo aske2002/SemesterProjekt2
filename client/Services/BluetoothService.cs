@@ -14,8 +14,8 @@ namespace client.Services.Bluetooth
 {
     public static class BluetoothFlags
     {
-        public const CharacteristicFlags VibrationPatternFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
-        public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.Write | CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
+        public const CharacteristicFlags VibrationPatternFlags = CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
+        public const CharacteristicFlags VibrationEnabledFlags = CharacteristicFlags.WriteWithoutResponse | CharacteristicFlags.Notify | CharacteristicFlags.Read;
         public const CharacteristicFlags ButtonStateFlags = CharacteristicFlags.Notify | CharacteristicFlags.Read;
     }
 
@@ -23,13 +23,14 @@ namespace client.Services.Bluetooth
     {
         private readonly Dictionary<string, Dictionary<string, CharacteristicFlags>> _services = new()
         {
-            {BluetoothIdentifiers.ButtonServiceUUID, BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.ToDictionary(x => x.Key, x => BluetoothFlags.ButtonStateFlags)},
-            {BluetoothIdentifiers.VibrationServiceUUID, new Dictionary<string, CharacteristicFlags>
-                {
-                    {BluetoothIdentifiers.VibrationPatternCharacteristicUUID, BluetoothFlags.VibrationPatternFlags},
-                    {BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, BluetoothFlags.VibrationEnabledFlags}
-                }
-            }
+            {BluetoothIdentifiers.TemorurServiceUUID,
+
+BluetoothIdentifiers.ButtonStateCharacteristicUUIDs.ToDictionary(x => x.Key, x => BluetoothFlags.ButtonStateFlags)
+                    .Concat(new Dictionary<string, CharacteristicFlags>
+                    {
+                        {BluetoothIdentifiers.VibrationPatternCharacteristicUUID, BluetoothFlags.VibrationPatternFlags},
+                            {BluetoothIdentifiers.VibrationEnabledCharacteristicUUID, BluetoothFlags.VibrationEnabledFlags}
+                    }).ToDictionary(x => x.Key, x => x.Value) }
         };
         private readonly ServerContext serverContext;
         private readonly GattApplicationManager app;
@@ -41,7 +42,7 @@ namespace client.Services.Bluetooth
             this.messenger = messenger;
             messenger.RegisterAll(this);
             serverContext = new ServerContext();
-            app = new GattApplicationManager(serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.VibrationServiceUUID, BluetoothIdentifiers.AdvertisementType);
+            app = new GattApplicationManager(serverContext, BluetoothIdentifiers.AdvertisementName, BluetoothIdentifiers.TemorurServiceUUID, BluetoothIdentifiers.AdvertisementType);
         }
 
         private void registerGattApplication()
@@ -75,10 +76,7 @@ namespace client.Services.Bluetooth
             try
             {
                 logger.LogInformation("Vibration settings set");
-                logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
-
-                var settings = await VibrationSettings.FromBytes(args.Value.Data);
-                await messenger.Send(new SetVibrationSettingsMessage(settings));
+                await messenger.Send(new SetVibrationSettingsMessage(args.Value.Data));
                 return MessageResponse.Success();
             }
             catch (Exception ex)
@@ -95,16 +93,17 @@ namespace client.Services.Bluetooth
         {
             try
             {
-                logger.LogInformation("Vibration toggled");
-                logger.LogInformation($"Data: {BitConverter.ToString(args.Value.Data)}");
-
                 var state = args.Value.Data[0] == 1;
+                logger.LogInformation($"Vibrations: {(state ? "Enabled" : "Disabled")}");
                 await messenger.Send(new ToggleVibrationsMessage(state));
                 return MessageResponse.Success();
             }
-            catch
+            catch (Exception ex)
             {
-                logger.LogError("Failed to parse vibration state");
+                logger.LogError(ex, "Failed to parse vibration state");
+                logger.LogError($"Data: {BitConverter.ToString(args.Value.Data)}");
+                logger.LogError($"Exception: {ex.Message}");
+                logger.LogError($"StackTrace: {ex.StackTrace}");
                 return MessageResponse.Failure("Failed to toggle vibration state");
             }
         }

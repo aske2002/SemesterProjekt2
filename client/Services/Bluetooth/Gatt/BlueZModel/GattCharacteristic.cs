@@ -22,28 +22,38 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
 
         public Task<byte[]> ReadValueAsync(IDictionary<string, object> options)
         {
-
+            _logger.LogInformation($"Reading value for characteristic {Properties.UUID}");
             return Task.FromResult(Properties.Value);
         }
 
+        // public Task ConfirmAsync()
+        // {
+        //     _logger.LogInformation($"Confirming notification for characteristic {Properties.UUID}");
+        //     return Task.CompletedTask;
+        // }
+
         public async Task WriteValueAsync(byte[] value, IDictionary<string, object> options)
         {
+
+            _logger.LogInformation($"Writing value for characteristic {Properties.UUID}");
+            foreach (var option in options)
+            {
+                _logger.LogInformation($"Option: {option.Key} = {option.Value}");
+            }
+
             var response = await _messenger.Send(new CharChangeEvent(new CharChangeData
             {
                 DeviceId = options.TryGetValue("device", out var deviceId) ? deviceId.ToString() : null,
                 CharacteristicId = Properties.UUID,
                 Data = value
             }));
-            if ((response != null && !response.Error) || response == null)
+            if (response != null && response.Error)
             {
-                _logger.LogInformation($"WriteValueAsync: {Properties.UUID} - {BitConverter.ToString(value)}");
                 await SetAsync("Value", value);
             }
             else
             {
-                _logger.LogError($"WriteValueAsync: {Properties.UUID} failed with error: {response?.Message}");
                 throw new DBusException("org.bluez.Error.Failed", response?.Message);
-
             }
         }
 
@@ -60,9 +70,9 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
             return ObjectPath + "/descriptor" + Descriptors.Count;
         }
 
-        public Task<IDictionary<string, IDictionary<string, object>>> GetAllPropsAsync()
+        public IDictionary<string, IDictionary<string, object>> GetProperties()
         {
-            IDictionary<string, IDictionary<string, object>> allprops = new Dictionary<string, IDictionary<string, object>>
+            return new Dictionary<string, IDictionary<string, object>>
             {
                 {
                     "org.bluez.GattCharacteristic1", new Dictionary<string, object>
@@ -70,24 +80,22 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
                         {"Service", Properties.Service},
                         {"UUID", Properties.UUID},
                         {"Flags", Properties.Flags},
-                        {"Descriptors", Descriptors.Select(d => d.ObjectPath).ToArray()},
-                        {"Value", Properties.Value},
-                        {"Notifying", Properties.Notifying},
+                        {"Descriptors", Descriptors.Select(d => d.ObjectPath).ToArray()}
                     }
                 }
             };
-            return Task.FromResult(allprops);
         }
+
 
         public async Task StartNotifyAsync()
         {
-            _logger.LogInformation($"StartNotifyAsync: {Properties.UUID}");
+            _logger.LogInformation($"Starting notification for characteristic {Properties.UUID}");
             await SetAsync("Notifying", true);
         }
 
         public async Task StopNotifyAsync()
         {
-            _logger.LogInformation($"StopNotifyAsync: {Properties.UUID}");
+            _logger.LogInformation($"Stopping notification for characteristic {Properties.UUID}");
             await SetAsync("Notifying", false);
         }
     }

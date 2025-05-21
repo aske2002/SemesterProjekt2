@@ -14,7 +14,6 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
     private TaskCompletionSource? notifyTaskCompletionSource;
     private CBPeripheral? nativePeripheral => nativeCharacteristic?.Service?.Peripheral;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
-    private ILogger<BluetoothPeripheralCharacteristic> _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheralCharacteristic>();
     public BluetoothPeripheralCharacteristic(CBCharacteristic cBCharacteristic)
     {
         nativeCharacteristic = cBCharacteristic;
@@ -87,7 +86,7 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
         }
     }
 
-    public partial string UUID => nativeCharacteristic.UUID.ToString().ToUpper();
+    public partial string UUID => nativeCharacteristic.UUID.ToString().ToLower();
 
     public partial async Task SetNotifyingAsync(bool value)
     {
@@ -125,10 +124,9 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
             throw new InvalidOperationException("Write operation already in progress.");
         }
 
-        writeTaskCompletionSource = new TaskCompletionSource();
-
         if (nativeCharacteristic.Properties.HasFlag(CBCharacteristicProperties.Write))
         {
+            writeTaskCompletionSource = new TaskCompletionSource();
             nativePeripheral.WriteValue(NSData.FromArray(data), nativeCharacteristic, CBCharacteristicWriteType.WithResponse);
             await writeTaskCompletionSource.Task;
         }

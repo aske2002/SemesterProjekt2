@@ -8,9 +8,7 @@
              xmlns:controls="clr-namespace:tremorur.Controls"
              xmlns:vm="clr-namespace:tremorur.ViewModels"
              xmlns:models="clr-namespace:tremorur.Models"
-             Shell.NavBarIsVisible="False"
              ControlTemplate="{StaticResource LayoutTemplate}"
-             x:DataType="vm:MedicationAlarmViewModel"
              mc:Ignorable="d">
 
     <Grid 

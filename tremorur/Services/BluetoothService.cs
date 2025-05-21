@@ -71,13 +71,16 @@ public partial class BluetoothService : IBluetoothService
         else
         {
             var newPeripheral = await ConnectPeripheralAsyncInternal(discoveredPeripheral);
+            foreach (var service in newPeripheral.Services)
+            {
+                IBluetoothPeripheral_DiscoveredService(newPeripheral, service);
+            }
             newPeripheral.DiscoveredService += IBluetoothPeripheral_DiscoveredService;
 
             if (newPeripheral != null)
             {
                 previouslyConnectedDevices.TryAdd(newPeripheral.UUID, newPeripheral);
                 _logger.LogInformation("Connected to new peripheral: {Peripheral}", newPeripheral.Name);
-
                 return newPeripheral;
             }
             else
@@ -92,6 +95,10 @@ public partial class BluetoothService : IBluetoothService
         if (sender is IBluetoothPeripheral peripheral)
         {
             DiscoveredService?.Invoke(peripheral, new DiscoveredServiceEventArgs(peripheral, service));
+            foreach (var characteristic in service.Characteristics)
+            {
+                IBluetoothPeripheralService_DiscoveredCharacteristic(service, peripheral, characteristic);
+            }
             service.DiscoveredCharacteristic += (s, e) => IBluetoothPeripheralService_DiscoveredCharacteristic(s, peripheral, e);
         }
     }
@@ -121,9 +128,9 @@ public partial class BluetoothService : IBluetoothService
         startInternalDiscovery();
     }
 
-    public void StartDiscovery(string serviceUuid)
+    public void StartDiscovery(string[] serviceUuids)
     {
-        ScanForUUIDs = [serviceUuid];
+        ScanForUUIDs = serviceUuids;
         startInternalDiscovery();
     }
 

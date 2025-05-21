@@ -29,7 +29,7 @@ public record VibrationPatternExpression : VibrationPatternBase
     /// <param name="resolution">The resolution of the vibration pattern, default is double.MaxValue.</param>
     /// <returns>A Task that represents the asynchronous operation. The task result contains the VibrationPatternExpression object.</returns>
     /// <exception cref="ArgumentException">Thrown when the expression is invalid.</exception>
-    public static async Task<VibrationPatternExpression> ParseAsync(BinaryAdapter reader, double resolution)
+    public static async Task<VibrationPatternExpression> ParseAsync(PatternReader reader, double resolution)
     {
         var expression = reader.ReadAllAsString();
         return await ParseAsync(expression, resolution);
@@ -54,8 +54,6 @@ public record VibrationPatternExpression : VibrationPatternBase
     }
     private double estimateRefreshInterval()
     {
-        double maxRefreshInterval = 1000;
-
         double maxAllowedDelta = 0.05; // 5% of the range
         double testDurationMs = 1000;
         double stepMs = 1;
@@ -78,10 +76,10 @@ public record VibrationPatternExpression : VibrationPatternBase
         }
 
         if (maxSlope == 0)
-            return maxRefreshInterval; // Very slow change, can update rarely
+            return MAX_RESOLUTION / 2; // Very slow change, can update rarely
 
         // Compute a refresh interval that keeps delta below the threshold
         double interval = maxAllowedDelta / maxSlope;
-        return Math.Max(interval, 1); // Clamp to at least 1ms
+        return Math.Min(Math.Max(interval, MIN_RESOLUTION), MAX_RESOLUTION);
     }
 }

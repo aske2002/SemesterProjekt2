@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using client.Models;
 using client.Services.Bluetooth.Advertisements;
@@ -29,7 +30,7 @@ namespace client.Services.Bluetooth.Gatt
         public ObservableCollection<IDevice1> ConnectedDevices { get; private set; } = new();
         public GattApplicationBuilder Builder { get; } = new GattApplicationBuilder();
         public readonly string AppId = Guid.NewGuid().ToString().Substring(0, 8);
-        public string ApplicationObjectPath => $"/{AppId}";
+        public string ApplicationObjectPath => $"/org/bluez/{AppId}";
         private GattApplication gattApplication;
         private IMessenger messenger = new WeakReferenceMessenger();
         private readonly ILogger logger = CustomLoggingProvider.CreateLogger<GattApplicationManager>();
@@ -83,11 +84,12 @@ namespace client.Services.Bluetooth.Gatt
             await _serverContext.Connect();
             var adapter = _serverContext.Connection.CreateProxy<IAdapter1>("org.bluez", "/org/bluez/hci0");
             await adapter.SetAliasAsync(advertisementConfig.LocalName);
+            await adapter.SetPoweredAsync(true);
+            await adapter.SetDiscoverableAsync(true);
+            await adapter.SetPairableAsync(false);
+            await adapter.SetDiscoverableTimeoutAsync(0);
 
             var serviceDescriptions = Builder.BuildServiceDescriptions();
-
-            await BuildApplicationTree(serviceDescriptions);
-            await RegisterApplicationInBluez(ApplicationObjectPath);
 
             await advertisingManager.CreateAdvertisement(new AdvertisementProperties()
             {
@@ -96,66 +98,16 @@ namespace client.Services.Bluetooth.Gatt
                 ServiceUUIDs = [advertisementConfig.ServiceUUID],
             }, AppId);
 
-            await ListenForDeviceUpdates();
+            await BuildApplicationTree(serviceDescriptions);
+            await RegisterApplicationInBluez(ApplicationObjectPath);
         }
 
-        private async void InterfaceAdded((ObjectPath @object, IDictionary<string, IDictionary<string, object>> interfaces) args)
-        {
-            if (args.interfaces.ContainsKey("org.bluez.Device1"))
-            {
-                var device = _serverContext.Connection.CreateProxy<IDevice1>("org.bluez", args.@object);
-                var deviceProperties = await device.GetAllAsync();
-                if (!ConnectedDevices.Any(d => d.ObjectPath == args.@object))
-                {
-                    ConnectedDevices.Add(device);
-                    logger.LogInformation($"Device added to list: {deviceProperties.Name} - {deviceProperties.Address}");
-                }
-            }
-            else if (
-                args.interfaces.ContainsKey("org.bluez.GattService1"))
-            {
-                var service = _serverContext.Connection.CreateProxy<IGattService1>("org.bluez", args.@object);
-                var serviceProperties = await service.GetAllAsync();
-                logger.LogInformation($"Service added: {serviceProperties.UUID}");
-            }
-            else if (args.interfaces.ContainsKey("org.bluez.GattCharacteristic1"))
-            {
-                var characteristic = _serverContext.Connection.CreateProxy<IGattCharacteristic1>("org.bluez", args.@object);
-                var characteristicProperties = await characteristic.GetAllAsync();
-                logger.LogInformation($"Characteristic added: {characteristicProperties.UUID}");
-            }
-        }
 
-        private void InterfaceRemoved((ObjectPath @object, string[] interfaces) args)
-        {
-            if (args.interfaces.Contains("org.bluez.Device1"))
-            {
-                var device = _serverContext.Connection.CreateProxy<IDevice1>("org.bluez", args.@object);
-                var deviceInList = ConnectedDevices.FirstOrDefault(d => d.ObjectPath == args.@object);
-                if (deviceInList != null)
-                {
-                    ConnectedDevices.Remove(deviceInList);
-                    logger.LogInformation($"Device removed from list: {args.@object}");
-                }
-
-            }
-        }
-
-        private void InterfaceException(Exception? error)
-        {
-            logger.LogError(error, "Error in GattApplicationManager");
-        }
-
-        private async Task ListenForDeviceUpdates()
-        {
-            var objectManager = _serverContext.Connection.CreateProxy<IObjectManager>("org.bluez", "/");
-            await objectManager.WatchInterfacesAddedAsync(InterfaceAdded, InterfaceException);
-            await objectManager.WatchInterfacesRemovedAsync(InterfaceRemoved, InterfaceException);
-        }
 
         private async Task BuildApplicationTree(IEnumerable<GattServiceDescription> gattServiceDescriptions)
         {
             await _serverContext.Connection.RegisterObjectAsync(gattApplication);
+
 
             foreach (var serviceDescription in gattServiceDescriptions)
             {
@@ -177,12 +129,6 @@ namespace client.Services.Bluetooth.Gatt
         {
             var gattManager = _serverContext.Connection.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
             await gattManager.RegisterApplicationAsync(new ObjectPath(applicationObjectPath), new Dictionary<string, object>());
-        }
-
-        private async Task UnregisterApplicationInBluez(string applicationObjectPath)
-        {
-            var gattManager = _serverContext.Connection.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
-            await gattManager.UnregisterApplicationAsync(new ObjectPath(applicationObjectPath));
         }
 
         private async Task<GattService> AddNewService(
@@ -211,14 +157,21 @@ namespace client.Services.Bluetooth.Gatt
             await _serverContext.Connection.RegisterObjectAsync(gattDescriptor);
         }
 
+        private async Task UnregisterApplicationInBluez(string applicationObjectPath)
+        {
+            var gattManager = _serverContext.Connection.CreateProxy<IGattManager1>("org.bluez", "/org/bluez/hci0");
+            await gattManager.UnregisterApplicationAsync(new ObjectPath(applicationObjectPath));
+        }
+
+
         public async ValueTask DisposeAsync()
         {
             await advertisingManager.DisposeAsync();
-            await UnregisterApplicationInBluez(ApplicationObjectPath);
             foreach (var service in Services)
             {
                 await _serverContext.Connection.UnregisterServiceAsync(service.ObjectPath.ToString());
             }
+            await UnregisterApplicationInBluez(ApplicationObjectPath);
 
             var deviceManager = _serverContext.Connection.CreateProxy<IObjectManager>("org.bluez", "/");
             var managedObjects = await deviceManager.GetManagedObjectsAsync();
@@ -247,5 +200,6 @@ namespace client.Services.Bluetooth.Gatt
                 }
             }
         }
+
     }
 }

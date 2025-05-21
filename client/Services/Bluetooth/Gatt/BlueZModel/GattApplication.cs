@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using client.Services.Bluetooth.Core;
+﻿using client.Services.Bluetooth.Core;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using shared.Models;
@@ -15,16 +12,16 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
         private readonly IList<GattService> _services = new List<GattService>();
         private readonly IMessenger _messenger;
         private readonly ILogger<GattApplication> _logger = CustomLoggingProvider.CreateLogger<GattApplication>();
-
         public GattApplication(ObjectPath objectPath, IMessenger messenger)
         {
             _messenger = messenger;
             ObjectPath = objectPath;
+            _logger.LogInformation($"GattApplication created: {objectPath}");
         }
 
         public ObjectPath ObjectPath { get; }
 
-        public async Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
+        public Task<IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>> GetManagedObjectsAsync()
         {
             IDictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>> result =
                 new Dictionary<ObjectPath, IDictionary<string, IDictionary<string, object>>>();
@@ -33,7 +30,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
                 result[service.ObjectPath] = service.GetProperties();
                 foreach (var characteristic in service.Characteristics)
                 {
-                    result[characteristic.ObjectPath] = await characteristic.GetAllPropsAsync();
+                    result[characteristic.ObjectPath] = characteristic.GetProperties();
                     foreach (var descriptor in characteristic.Descriptors)
                     {
                         result[descriptor.ObjectPath] = descriptor.GetProperties();
@@ -41,13 +38,13 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
                 }
             }
 
-            return result;
+            return Task.FromResult(result);
         }
+
 
         public GattService AddService(GattService1Properties gattService)
         {
             var servicePath = ObjectPath + "/service" + _services.Count;
-            _logger.LogInformation($"GattService created: {servicePath}");
             var service = new GattService(servicePath, gattService, _messenger);
             _services.Add(service);
             return service;

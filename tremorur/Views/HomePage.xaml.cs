@@ -20,6 +20,13 @@ namespace tremorur.Views
             this.navigationService = navigationService;
             StartClock();
             this.vibrationsService = vibrationsService;
+            this.vibrationsService.VibrationLevelChanged += (sender, level) =>
+            {
+                if (BindingContext is HomeViewModel vm)
+                {
+                    vm.Level = level + 1;
+                }
+            };
         }
         async void StartClock()
         {
@@ -40,19 +47,13 @@ namespace tremorur.Views
             {
                 didHandle();
                 await vibrationsService.StartStopVibration(); //starter vibrationer
-                if (BindingContext is HomeViewModel vm)
-                {
-                    vm.Level = vm.Level == 0 ? 1 : 0;
-                }
             }
         }
         protected override async void OnUpButtonClicked(object? sender, EventArgs e)
         {
             try
             {
-                var index = await vibrationsService.NavigateLevelUp();
-                if (BindingContext is HomeViewModel vm)
-                    vm.Level = index;
+                await vibrationsService.NavigateLevelUp();
             }
             catch (Exception ex)
             {
@@ -64,9 +65,7 @@ namespace tremorur.Views
         {
             try
             {
-                var index = await vibrationsService.NavigateLevelDown();
-                if (BindingContext is HomeViewModel vm)
-                    vm.Level = index;
+                await vibrationsService.NavigateLevelDown();
             }
             catch (Exception ex)
             {

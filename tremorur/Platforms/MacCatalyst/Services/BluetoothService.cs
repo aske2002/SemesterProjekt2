@@ -55,7 +55,7 @@ public partial class BluetoothService : IBluetoothService
     }
     private void CM_ConnectedPeripheral(object? sender, CBPeripheralEventArgs e)
     {
-        string identifier = e.Peripheral.Identifier.ToString();
+        string identifier = e.Peripheral.Identifier.ToString().ToLower();
         var taskSource = connectTasks.GetValueOrDefault(identifier);
         if (taskSource != null)
         {

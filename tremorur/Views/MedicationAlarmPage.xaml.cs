@@ -12,9 +12,8 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
     private readonly AlarmService alarmService;
 
     private Alarm? alarmToShow;
-    public MedicationAlarmPage(MedicationAlarmViewModel viewModel, IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
+    public MedicationAlarmPage(IButtonService buttonService, INavigationService navigationService, AlarmService alarmService) : base(buttonService)
     {
-        BindingContext = viewModel;
         InitializeComponent();
         StartClock();
         this.navigationService = navigationService;
@@ -49,7 +48,8 @@ public partial class MedicationAlarmPage : ContentPageWithButtons
 
     protected override async void OnCancelButtonClicked(object? sender, EventArgs e)
     {
-        MedicationLabel.Text = "Påmindelse annulleret";
+        MedicationLabel.Text = "Påmindelse annulleret\nudsættes 5 minutter";
+
         if (alarmToShow != null)
         {
             RegisterResponse(alarmToShow, false); //registerer at brugeren annullerer

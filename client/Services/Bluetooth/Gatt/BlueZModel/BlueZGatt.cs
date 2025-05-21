@@ -136,6 +136,7 @@ namespace client.Services.Bluetooth.Gatt.BlueZModel
         Task WriteValueAsync(byte[] Value, IDictionary<string, object> Options);
         Task StartNotifyAsync();
         Task StopNotifyAsync();
+        // Task ConfirmAsync();
         Task<object> GetAsync(string prop);
         Task<GattCharacteristic1Properties> GetAllAsync();
         Task SetAsync(string prop, object val);

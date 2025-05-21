@@ -45,11 +45,12 @@
                 <Label
                         x:Name="LevelLabel"
                         Text="{Binding LevelText}"
-                        FontSize="Caption"
-                        FontAttributes="Bold"
+                        FontSize="Large"
+                        FontAttributes="None"
                         TextColor="White"
                         Grid.Row="2"
                         Grid.ColumnSpan="2"
+                        Margin="0,0,0,10"
                         VerticalOptions="Start"
                         HorizontalOptions="Center"/>
 

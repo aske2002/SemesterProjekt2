@@ -12,10 +12,7 @@
       ],
       "problemMatcher": {
         "owner": "dotnet",
-        "fileLocation": [
-          "relative",
-          "${workspaceFolder}"
-        ],
+        "fileLocation": ["relative", "${workspaceFolder}"],
         "pattern": [
           {
             "regexp": "^\\s*\\[\\d+\\]\\s*(.*)\\s*:\\s*(.*)\\s*:\\s*(.*)$",
@@ -27,26 +24,20 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".*",
-          "endsPattern": "==Application started=="
+          "endsPattern": "\\s+==Application started==\\s+"
         }
       },
-      "dependsOn": [
-        "publish",
-        "copy",
-        "stop"
-      ],
+      "dependsOn": ["stop", "delete", "publish:dev", "copy"],
       "dependsOrder": "sequence"
     },
     {
-      "label": "deploy",
+      "label": "deploy:dev",
       "type": "shell",
-      "dependsOn": [
-        "publish",
-        "copy"
-      ],
+      "dependsOn": ["delete", "publish:dev", "copy", "run:dev"],
       "dependsOrder": "sequence",
       "problemMatcher": []
     },
+
     {
       "label": "stop",
       "type": "shell",
@@ -59,25 +50,15 @@
       "detail": "Stop the running application on the PI"
     },
     {
-      "type": "shell",
-      "command": "scp",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "args": [
-        "-r",
-        "publish/*",
-        "aske1131@raspberrypi.local:/home/aske1131/tremorur/"
-      ],
-      "problemMatcher": [],
-      "dependsOn": [
-        "delete"
-      ],
       "label": "copy",
-      "detail": "Copy the published files to the PI"
+      "detail": "Copy the published files to the PI",
+      "type": "shell",
+      "dependsOn": ["zip", "transfer", "extract"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
     },
     {
-      "label": "delete",
+      "label": "delete:remote",
       "type": "shell",
       "command": "ssh",
       "args": [
@@ -88,17 +69,101 @@
       "detail": "Delete the publish directory on the PI"
     },
     {
+      "label": "delete",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "rm -rf publish/*"],
+      "dependsOn": ["delete:remote"],
+      "problemMatcher": [],
+      "detail": "Delete the publish directory locally"
+    },
+    {
       "command": "dotnet",
       "args": [
         "publish",
         "-c",
         "Release",
+        "-r",
+        "linux-arm64",
         "-o",
         "publish"
       ],
       "problemMatcher": "$msCompile",
-      "label": "publish",
+      "label": "publish:dev",
       "detail": "Publish the project to the publish directory"
+    },
+    {
+      "label": "run:prod",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ssh",
+      "args": [
+        "aske1131@raspberrypi.local",
+        "sudo /usr/bin/systemctl stop tremorur-dev.service && sudo /usr/bin/systemctl restart tremorur.service"
+      ]
+    },
+    {
+      "label": "run:dev",
+      "type": "shell",
+      "isBackground": true,
+      "command": "ssh",
+      "args": [
+        "aske1131@raspberrypi.local",
+        "sudo /usr/bin/systemctl stop tremorur.service && sudo /usr/bin/systemctl restart tremorur-dev.service"
+      ]
+    },
+    {
+      "label": "deploy:prod",
+      "type": "shell",
+      "dependsOn": ["delete", "publish:prod", "copy", "run:prod"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "command": "dotnet",
+      "args": [
+        "publish",
+        "-c",
+        "Release",
+        "-r",
+        "linux-arm64",
+        "-o",
+        "publish",
+        "--self-contained"
+      ],
+      "problemMatcher": "$msCompile",
+      "label": "publish:prod",
+      "detail": "Publish the project to the publish directory"
+    },
+
+    {
+      "label": "transfer",
+      "type": "shell",
+      "command": "scp",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": ["publish.zip", "aske1131@raspberrypi.local:/home/aske1131/"],
+      "problemMatcher": [],
+      "detail": "Copy the published files to the PI"
+    },
+    {
+      "label": "extract",
+      "type": "shell",
+      "command": "ssh",
+      "args": [
+        "aske1131@raspberrypi.local",
+        "bash -c \"unzip -o /home/aske1131/publish.zip -d /home/aske1131/tremorur/\""
+      ],
+      "problemMatcher": [],
+      "detail": "Extract the zip file on the PI"
+    },
+    {
+      "label": "zip",
+      "type": "shell",
+      "command": "bash",
+      "args": ["-c", "zip -r publish.zip publish"],
+      "problemMatcher": []
     }
   ]
 }

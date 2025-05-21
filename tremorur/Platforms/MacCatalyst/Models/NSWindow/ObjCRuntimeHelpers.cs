@@ -188,7 +188,7 @@ public static class CHelpers
             IntPtr methodPtr = Marshal.ReadIntPtr(methodListPtr, (int)(i * IntPtr.Size));
             IntPtr selector = method_getName(methodPtr);
             string? selName = Marshal.PtrToStringAnsi(sel_getName(selector));
-            Debug.WriteLine($"  - {selName}");
+            
         }
     }
 }
@@ -518,7 +518,7 @@ public static class CatalystWindowHelper
 
         if (canCall)
         {
-            Debug.WriteLine("✅ Delegate responds to _hostWindowForUIWindow:");
+            
             IntPtr nsWindowProxy = CHelpers.Messaging.objc_msgSend_IntPtr(appDelegate, selector, uiWindow.Handle);
 
             var attachedWindowSelector = CHelpers.sel_registerName("attachedWindow");
@@ -530,13 +530,13 @@ public static class CatalystWindowHelper
             }
             else
             {
-                Debug.WriteLine("⚠️ Method exists, but returned nil.");
+                
                 return null;
             }
         }
         else
         {
-            Debug.WriteLine("❌ Delegate does not respond to _hostWindowForUIWindow:");
+            
         }
         return null;
     }

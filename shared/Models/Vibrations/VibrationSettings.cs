@@ -1,9 +1,12 @@
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using shared.Models.Vibrations.Patterns;
 
 namespace shared.Models.Vibrations;
+
 public record VibrationSettings
 {
+    private static ConcurrentDictionary<Guid, VibrationSettings> _cachedVibrationSettings = new ConcurrentDictionary<Guid, VibrationSettings>();
     public required IVibrationPattern Pattern;
     public Guid Id;
 
@@ -14,11 +17,11 @@ public record VibrationSettings
     };
 
     public static VibrationSettings CreateMixedPatternSettings(params (VibrationSettings settings, int durationMS)[] patterns)
-    {   
+    {
         var pattern = new VibrationPatternMixed(patterns.Select(p => new VibrationPatternMixed.VibrationPatternSegment(p.settings.Pattern, p.durationMS)).ToList(), 5);
         return new VibrationSettings { Pattern = pattern, Id = Guid.NewGuid() };
     }
-        
+
     /// <summary>
     /// Creates a VibrationSettings object with a sine pattern. 
     /// </summary>
@@ -56,7 +59,7 @@ public record VibrationSettings
     /// <returns>VibrationSettings object</returns>
     public static VibrationSettings CreateConstantPatternSettings(double intensity)
     {
-        var pattern = new VibrationPatternConstant(intensity, double.MaxValue);
+        var pattern = new VibrationPatternConstant(intensity);
         return new VibrationSettings
         {
             Id = Guid.NewGuid(),
@@ -76,10 +79,10 @@ public record VibrationSettings
     ///     100% intensity for 10000ms.
     /// </example>
     /// <returns>VibrationSettings object</returns>
-    public static VibrationSettings CreateDynamicPatternSettings(params (double durationMS, double intensity)[] points)
+    public static VibrationSettings CreateDynamicPatternSettings(params (int durationMS, double intensity)[] points)
     {
         var segments = points
-            .Select(point => new VibrationPatternDynamic.VibrationPatternSegment((int)point.durationMS, point.intensity))
+            .Select(point => new VibrationPatternDynamic.VibrationPatternSegment(point.durationMS, point.intensity))
             .ToList();
         var pattern = new VibrationPatternDynamic(segments, 20);
         return new VibrationSettings
@@ -125,15 +128,24 @@ public record VibrationSettings
             return null;
         }
 
-        var reader = BinaryAdapter.Create(bytes);
+        var reader = PatternReader.Create(bytes);
         var id = reader.ReadGuid();
+
+        if (_cachedVibrationSettings.TryGetValue(id, out var cachedSettings))
+        {
+            reader.Dispose();
+            return cachedSettings;
+        }
+
         var pattern = await VibrationHelpers.ParseAsVibrationData(reader);
         reader.Dispose();
 
-        return new VibrationSettings
+        var settings = new VibrationSettings
         {
             Id = id,
             Pattern = pattern
         };
+        _cachedVibrationSettings.TryAdd(id, settings);
+        return settings;
     }
 }

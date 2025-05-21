@@ -1,9 +1,9 @@
-public class BinaryAdapter : IDisposable
+public class PatternReader : IDisposable
 {
     private MemoryStream _stream;
     private BinaryReader _reader;
     private BinaryWriter _writer;
-    public BinaryAdapter(MemoryStream stream)
+    public PatternReader(MemoryStream stream)
     {
         _stream = stream;
         _reader = new BinaryReader(_stream);
@@ -93,22 +93,22 @@ public class BinaryAdapter : IDisposable
         _writer.Flush();
     }
 
-    public static BinaryAdapter Empty()
+    public static PatternReader Empty()
     {
         var stream = new MemoryStream();
-        return new BinaryAdapter(stream);
+        return new PatternReader(stream);
     }
 
-    public BinaryAdapter CreateSubReader(int length)
+    public PatternReader CreateSubReader(int length)
     {
         var data = _reader.ReadBytes(length);
         var stream = new MemoryStream(data);
-        return new BinaryAdapter(stream);
+        return new PatternReader(stream);
     }
-    public static BinaryAdapter Create(byte[] data)
+    public static PatternReader Create(byte[] data)
     {
         var stream = new MemoryStream(data);
-        return new BinaryAdapter(stream);
+        return new PatternReader(stream);
     }
 
     public void Dispose()

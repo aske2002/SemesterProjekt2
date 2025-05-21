@@ -52,7 +52,7 @@ public record VibrationPatternMixed : VibrationPatternBase
     /// <param name="resolution">The resolution of the vibration pattern, default is double.MaxValue.</param>
     /// <returns>A Task that represents the asynchronous operation. The task result contains the VibrationPatternExpression object.</returns>
     /// <exception cref="ArgumentException">Thrown when the expression is invalid.</exception>
-    public static async Task<VibrationPatternMixed> ParseAsync(BinaryAdapter reader, double resolution)
+    public static async Task<VibrationPatternMixed> ParseAsync(PatternReader reader, double resolution)
     {
         List<IVibrationPattern> segments = new List<IVibrationPattern>();
         List<int> durations = new List<int>();

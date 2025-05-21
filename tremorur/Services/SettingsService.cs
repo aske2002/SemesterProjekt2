@@ -9,13 +9,14 @@ public static class SettingsService
 {
     public static List<Alarm> Alarms
     {
-        get => GetClassFromStorage<List<Alarm>>("Alarms").ToList();//læser liser af alarmer fra storage og håndterer JSON-fil
+        get => GetClassFromStorage<List<Alarm>>("Alarms").ToList();//lï¿½ser liser af alarmer fra storage og hï¿½ndterer JSON-fil
         set => SetClassInStorage("Alarms", value);//skriver ny liste af alarmer til storage JSON-fil 
     }
-    private static ImmutableDictionary<string, object?> _cache = ImmutableDictionary<string, object?>.Empty;//undgår unødvendig læsning af data
-    private static IPreferences DefaultPreferences => Microsoft.Maui.Storage.Preferences.Default;//bruger MAUI Preferences til at læse og lagre data
+    private static ImmutableDictionary<string, object?> _cache = ImmutableDictionary<string, object?>.Empty;//undgï¿½r unï¿½dvendig lï¿½sning af data
+    private static IPreferences DefaultPreferences => Microsoft.Maui.Storage.Preferences.Default;//bruger MAUI Preferences til at lï¿½se og lagre data
     private static IPreferences Preferences { get; set; } = DefaultPreferences;//har som standard DefaultPreferences men kan overskrives
-    public static T GetClassFromStorage<T>(string storageKey, T defaultValue)//Henter værdi fra storage, med default hvis værdien ikke deserialiseres
+    
+    public static T GetClassFromStorage<T>(string storageKey, T defaultValue)//Henter vï¿½rdi fra storage, med default hvis vï¿½rdien ikke deserialiseres
     {
         if (_cache.TryGetValue(storageKey, out var weaklyTypedCachedValue)//tjekker om _cache er typen T
             && weaklyTypedCachedValue is T value)

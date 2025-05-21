@@ -1,8 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.WinUI.Connectivity;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 
 namespace tremorur.Models.Bluetooth;
@@ -12,24 +15,40 @@ public partial class BluetoothPeripheral
 
     public BluetoothLEDevice NativePeripheral { get; private set; }
     public BluetoothLEAdvertisementReceivedEventArgs AdvertisementData { get; private set; }
-    public BluetoothPeripheral(BluetoothLEDevice leDevice, BluetoothLEAdvertisementReceivedEventArgs advertisement) : base()
+    private readonly BluetoothService _bluetoothService;
+    private readonly ILogger<BluetoothPeripheral> _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheral>();
+    public BluetoothPeripheral(BluetoothLEDevice leDevice, BluetoothLEAdvertisementReceivedEventArgs advertisement, BluetoothService bluetoothService) : base()
     {
         NativePeripheral = leDevice;
         AdvertisementData = advertisement;
+        _bluetoothService = bluetoothService;
         Services_Changed(NativePeripheral, null);
-        NativePeripheral.GattServicesChanged += Services_Changed ;
-        NativePeripheral.ConnectionStatusChanged += (device, sender) => ConnectionStatusChanged?.Invoke(this, sender);
+        NativePeripheral.GattServicesChanged += Services_Changed;
+        NativePeripheral.ConnectionStatusChanged += ConnectionStatusChanged;
     }
 
-    public event TypedEventHandler<BluetoothPeripheral, object>? ConnectionStatusChanged;
+    private void ConnectionStatusChanged(BluetoothLEDevice sender, object args)
+    {
+        // Handle connection status changes
+        if (NativePeripheral.ConnectionStatus == BluetoothConnectionStatus.Disconnected)
+        {
+            _logger.Log(LogLevel.Information, $"Peripheral {UUID} disconnected");
+            _logger.LogWarning($"Peripheral {UUID} disconnected with error {args}");
+            _bluetoothService.PeripheralDidDisconnect(UUID, null);
+        }
+    }
 
     private void Services_Changed(BluetoothLEDevice sender, object args)
     {
-        var allServices = NativePeripheral.GattServices.ToList();
-        var missingServices = allServices.Where(x => !Services.Any(y => y.UUID == x.Uuid.ToString())).ToList();
-        foreach (var service in missingServices.Select(x => new BluetoothPeripheralService(x)))
+        var allServices = NativePeripheral.GattServices.ToList().OrderBy(x => x.Session.SessionStatus);
+        foreach (var service in allServices)
         {
-            services.Add(service);
+            if (!services.Any(x => x.UUID.ToLower() == service.Uuid.ToString().ToLower()))
+            {
+                var bluetoothPeripheralService = new BluetoothPeripheralService(service);
+                DiscoveredService.Invoke(this, bluetoothPeripheralService);
+                services.Add(bluetoothPeripheralService);
+            }
         }
     }
 
@@ -40,7 +59,7 @@ public partial class BluetoothPeripheral
     private ObservableCollection<IBluetoothPeripheralService> services = new ObservableCollection<IBluetoothPeripheralService>();
     public partial ObservableCollection<IBluetoothPeripheralService> Services => services;
 
-    public partial string UUID => NativePeripheral.BluetoothDeviceId.ToString().ToUpper();
+    public partial string UUID => NativePeripheral.BluetoothDeviceId.ToString().ToLower();
     public partial Task<float?> GetSsriAsync()
     {
         return Task.FromResult((float?)AdvertisementData.RawSignalStrengthInDBm);

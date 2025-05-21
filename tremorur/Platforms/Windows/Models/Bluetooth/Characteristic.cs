@@ -11,44 +11,24 @@ namespace tremorur.Models.Bluetooth;
 public partial class BluetoothPeripheralCharacteristic
 {
     private readonly GattCharacteristic nativeCharacteristic;
+    private readonly GattDeviceService nativeService;
     private TaskCompletionSource? notifyTaskCompletionSource;
     private List<Action<byte[]>> notifyActions = new List<Action<byte[]>>();
     private bool isNotifying = false;
     private bool isBroadcasted = false;
     private byte[] lastValue = Array.Empty<byte>();
+    private readonly ILogger _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheralCharacteristic>();
 
-    public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic)
+    public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic, GattDeviceService gattDeviceService)
     {
         nativeCharacteristic = gattCharacteristic;
+        nativeService = gattDeviceService;
         nativeCharacteristic.ValueChanged += Characteristic_UpdatedValue;
     }
-
-    private async Task readDescriptors()
-    {
-        var result = await nativeCharacteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
-        if (result.ClientCharacteristicConfigurationDescriptor.HasFlag(GattClientCharacteristicConfigurationDescriptorValue.Notify))
-        {
-            isNotifying = true;
-        }
-        else
-        {
-            isNotifying = false;
-        }
-
-        if (result.ClientCharacteristicConfigurationDescriptor.HasFlag(GattClientCharacteristicConfigurationDescriptorValue.Indicate))
-        {
-            isBroadcasted = true;
-        }
-        else
-        {
-            isBroadcasted = false;
-        }
-    }
-
     private void Characteristic_UpdatedValue(object? sender, GattValueChangedEventArgs e)
     {
         var data = e.CharacteristicValue.ToArray();
-        
+
         if (data.Length == 0)
         {
             return;
@@ -61,15 +41,18 @@ public partial class BluetoothPeripheralCharacteristic
         ValueUpdated.Invoke(this, data);
     }
 
-    public partial string UUID => nativeCharacteristic.Uuid.ToString().ToUpper();
+    public partial string UUID => nativeCharacteristic.Uuid.ToString().ToLower();
 
     public partial async Task SetNotifyingAsync(bool value)
     {
+
         var flags = nativeCharacteristic.CharacteristicProperties;
         if (!flags.HasFlag(GattCharacteristicProperties.Notify) && !flags.HasFlag(GattCharacteristicProperties.Indicate))
         {
             throw new InvalidOperationException("Characteristic does not support notifications.");
         }
+
+        _logger.LogInformation($"Setting notifying for {UUID} to {value}");
         var result = await nativeCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(value ? GattClientCharacteristicConfigurationDescriptorValue.Notify : GattClientCharacteristicConfigurationDescriptorValue.None);
 
 
@@ -77,8 +60,6 @@ public partial class BluetoothPeripheralCharacteristic
         {
             throw new Exception($"Failed to set notification: {result}");
         }
-
-        await readDescriptors();
     }
 
     public partial async Task WriteValueAsync(byte[] data)
@@ -95,7 +76,7 @@ public partial class BluetoothPeripheralCharacteristic
         writer.WriteBytes(data);
         var buffer = writer.DetachBuffer();
 
-        if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
+        if (nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
         {
             await nativeCharacteristic.WriteValueWithResultAsync(buffer, GattWriteOption.WriteWithoutResponse);
         }
@@ -108,7 +89,7 @@ public partial class BluetoothPeripheralCharacteristic
     public partial async Task<byte[]> ReadValueAsync()
     {
 
-        if (!nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Write))
+        if (!nativeCharacteristic.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Read))
         {
             throw new InvalidOperationException("Characteristic does not support reading.");
 

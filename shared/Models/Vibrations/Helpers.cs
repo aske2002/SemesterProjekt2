@@ -10,7 +10,7 @@ public static class VibrationHelpers
     public const int HeaderModeSize = 1;
     public const int HeaderResolutionSize = 8;
     public const int HeaderSize = HeaderLengthSize + HeaderModeSize + HeaderResolutionSize;
-    public static async Task<IVibrationPattern> ParseAsVibrationData(BinaryAdapter reader)
+    public static async Task<IVibrationPattern> ParseAsVibrationData(PatternReader reader)
     {
         var size = reader.ReadInt32();
         var mode = FromFlagByte<VibrationMode>(reader.ReadByte());
