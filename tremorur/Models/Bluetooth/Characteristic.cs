@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using shared.Models;
 
 namespace tremorur.Models.Bluetooth;
 
@@ -21,4 +23,6 @@ public partial class BluetoothPeripheralCharacteristic : IBluetoothPeripheralCha
     public bool IsReadable => Properties.HasFlag(BluetoothCharacteristicProperties.Read);
     public bool IsWritable => Properties.HasFlag(BluetoothCharacteristicProperties.Write) || Properties.HasFlag(BluetoothCharacteristicProperties.WriteWithoutResponse);
     public bool IsNotifiable => Properties.HasFlag(BluetoothCharacteristicProperties.Notify) || Properties.HasFlag(BluetoothCharacteristicProperties.Indicate);
+    internal readonly ILogger _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheralCharacteristic>();
+
 }

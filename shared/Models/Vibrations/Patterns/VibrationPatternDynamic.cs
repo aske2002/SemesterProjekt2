@@ -13,19 +13,15 @@ public record VibrationPatternDynamic : VibrationPatternBase
     public override VibrationMode Mode => VibrationMode.Dynamic;
     public double Duration => Segments.Sum(x => x.DurationMS);
     private Dictionary<double, VibrationPatternSegment> durationMap { get; set; } = new Dictionary<double, VibrationPatternSegment>();
-    public Dictionary<double, VibrationPatternSegment> DurationMap => durationMap;
     public List<VibrationPatternSegment> Segments
     {
         get => durationMap.Values.ToList();
         set
         {
-            var logger = CustomLoggingProvider.CreateLogger<VibrationPatternDynamic>();
             var map = new Dictionary<double, VibrationPatternSegment>();
-            logger.LogInformation($"VibrationPatternDynamic: {value.Count} segments");
             double currentDuration = 0;
             foreach (var segment in value)
             {
-                logger.LogInformation($"VibrationPatternDynamic: Segment at {currentDuration}ms, Intensity {segment.Intensity}");
                 map[currentDuration] = segment;
                 currentDuration += segment.DurationMS;
             }

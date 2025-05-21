@@ -8,6 +8,5 @@ public interface IBluetoothPeripheralService
     string UUID { get; }
     ObservableCollection<IBluetoothPeripheralCharacteristic> Characteristics { get; }
     event EventHandler<IBluetoothPeripheralCharacteristic> DiscoveredCharacteristic;
-    // event EventHandler<IBluetoothPeripheralService> AvailabilityChanged;
     bool IsPrimary { get; }
 }

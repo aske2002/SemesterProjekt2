@@ -49,7 +49,7 @@ public class VibrationManager : IHostedService, IRecipient<SetVibrationSettingsM
         _messenger.RegisterAll(this);
         pwmChannel = PwmChannel.Create(
             HardwareConstants.GPIO_CHIP,
-            HardwareConstants.VIBRATION_PWM_GPIO,
+            HardwareConstants.VIBRATION_CHIP_PIN_NR,
             HardwareConstants.VIBRATION_PWM_FREQUENCY,
             0
         );

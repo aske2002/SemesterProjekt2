@@ -17,8 +17,6 @@ public partial class BluetoothPeripheralCharacteristic
     private bool isNotifying = false;
     private bool isBroadcasted = false;
     private byte[] lastValue = Array.Empty<byte>();
-    private readonly ILogger _logger = CustomLoggingProvider.CreateLogger<BluetoothPeripheralCharacteristic>();
-
     public BluetoothPeripheralCharacteristic(GattCharacteristic gattCharacteristic, GattDeviceService gattDeviceService)
     {
         nativeCharacteristic = gattCharacteristic;
