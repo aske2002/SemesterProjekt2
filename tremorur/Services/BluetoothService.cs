@@ -128,9 +128,9 @@ public partial class BluetoothService : IBluetoothService
         startInternalDiscovery();
     }
 
-    public void StartDiscovery(string[] serviceUuids)
+    public void StartDiscovery(string[] serviceUUIDs)
     {
-        ScanForUUIDs = serviceUuids;
+        ScanForUUIDs = serviceUUIDs;
         startInternalDiscovery();
     }
 

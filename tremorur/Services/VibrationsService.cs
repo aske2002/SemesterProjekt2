@@ -124,7 +124,7 @@ namespace tremorur.Services
             VibrationSettings.CreateConstantPatternSettings(1), //level 7
         };
 
-        public async Task<int> GetCurrentVibration(byte[]? data = null)//hjælpemetode der finder nuværende level
+        private async Task<int> GetCurrentVibration(byte[]? data = null)//hjælpemetode der finder nuværende level
         {
             if (data == null)
             {

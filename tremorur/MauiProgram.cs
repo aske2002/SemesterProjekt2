@@ -32,12 +32,12 @@ namespace tremorur
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>(); //bruges til at navigere rundt med. Har en goto, hvordan vi navigerer rundt mellem mapperne. 
 
-            builder.Services.AddTransient<HomeViewModel>();
-            builder.Services.AddTransient<HomePage>();
+            builder.Services.AddSingleton<HomeViewModel>();
+            builder.Services.AddSingleton<HomePage>();
 
-            builder.Services.AddTransient<MedicationAlarmPage>();
+            builder.Services.AddSingleton<MedicationAlarmPage>();
 
-            builder.Services.AddTransient<SetAlarmPage>();
+            builder.Services.AddSingleton<SetAlarmPage>();
 
             var loggerProvider = new CustomLoggingProvider();
 

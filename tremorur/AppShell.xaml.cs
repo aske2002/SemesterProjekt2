@@ -14,33 +14,6 @@ namespace tremorur
         {
             InitializeComponent();
             RegisterRoutes();
-
-
-#if MACCATALYST
-            HandlerChanged += (s, e) =>
-            {
-                if (Handler is ShellRenderer shellRenderer)
-                {
-                    var tabbarView = shellRenderer.ChildViewControllers.OfType<ShellItemRenderer>().FirstOrDefault()?.View;
-                    if (tabbarView != null)
-                    {
-                        tabbarView.BackgroundColor = UIColor.Clear;
-                    }
-                }
-            };
-
-            Navigated += (s, e) =>
-            {
-                if (Handler is ShellRenderer shellRenderer)
-                {
-                    var tabbarView = shellRenderer.ChildViewControllers.OfType<ShellItemRenderer>().FirstOrDefault()?.View;
-                    if (tabbarView != null)
-                    {
-                        tabbarView.BackgroundColor = UIColor.Clear;
-                    }
-                }
-            };
-#endif
         }
         private void RegisterRoutes()
         {

@@ -41,7 +41,7 @@
 
                                 <Label
                     Text="{Binding TimeSpan}"
-                    TextColor="Black"
+                    TextColor="White"
                     FontSize="Medium"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"

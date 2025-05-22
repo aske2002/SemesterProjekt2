@@ -16,6 +16,6 @@ public interface IBluetoothService
     public event EventHandler<DiscoveredCharacteristicEventArgs> DiscoveredCharacteristic;
     public event EventHandler<PeripheralDisconnectedEventArgs> PeripheralDisconnected;
     void StartDiscovery();
-    void StartDiscovery(string[] serviceUUID);
+    void StartDiscovery(string[] serviceUUIDs);
     void StopDiscovery();
 }

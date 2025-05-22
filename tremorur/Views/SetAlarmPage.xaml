@@ -9,6 +9,10 @@
     xmlns:controls="clr-namespace:tremorur.Controls"
     xmlns:vm="clr-namespace:tremorur.ViewModels"
     xmlns:models="clr-namespace:tremorur.Models"
+    Background="Transparent"
+    Shell.PresentationMode="NotAnimated"
+    BackgroundColor="Transparent"
+    Shell.BackgroundColor="Transparent"
     ControlTemplate="{StaticResource LayoutTemplate}"
     mc:Ignorable="d">
     <Grid 
